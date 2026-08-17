@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b" />
+      <stop offset="50%" stop-color="#065f46" />
+      <stop offset="100%" stop-color="#022c22" />
+    </linearGradient>
+
+    <!-- Gold Gradient Primary -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="35%" stop-color="#f59e0b" />
+      <stop offset="70%" stop-color="#d97706" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+
+    <!-- Gold Light Gradient -->
+    <linearGradient id="goldLightGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fffbeb" />
+      <stop offset="100%" stop-color="#fde68a" />
+    </linearGradient>
+
+    <!-- Emerald Glow -->
+    <radialGradient id="innerGlow" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.35" />
+      <stop offset="70%" stop-color="#047857" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#022c22" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="dropShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.35" />
+    </filter>
+
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Outer Shadow Circle -->
+  <circle cx="256" cy="256" r="236" fill="url(#bgGrad)" filter="url(#dropShadow)" />
+
+  <!-- Inner Soft Radial Light -->
+  <circle cx="256" cy="256" r="236" fill="url(#innerGlow)" />
+
+  <!-- Islamic Geometric Ring / Gold Border -->
+  <circle cx="256" cy="256" r="226" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-opacity="0.85" />
+  <circle cx="256" cy="256" r="218" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-dasharray="6 4" stroke-opacity="0.6" />
+
+  <!-- Subtle Mosque Dome Silhouette in Background -->
+  <path d="M 206 310 C 206 240, 256 195, 256 160 C 256 195, 306 240, 306 310 Z" fill="#047857" fill-opacity="0.35" />
+  <path d="M 160 330 C 160 270, 195 245, 195 215 C 195 245, 230 270, 230 330 Z" fill="#047857" fill-opacity="0.2" />
+  <path d="M 282 330 C 282 270, 317 245, 317 215 C 317 245, 352 270, 352 330 Z" fill="#047857" fill-opacity="0.2" />
+
+  <!-- Golden Crescent Moon (Hilal) -->
+  <g filter="url(#softGlow)">
+    <path d="M 285 110 
+             C 185 118, 118 200, 126 302 
+             C 133 388, 206 430, 280 415 
+             C 210 395, 172 335, 175 260 
+             C 178 185, 226 132, 285 110 Z" 
+          fill="url(#goldGrad)" />
+  </g>
+
+  <!-- Golden 8-Point Star (Rub el Hizb Inspired / Amalan Bintang) -->
+  <g transform="translate(340, 155) scale(0.95)" filter="url(#softGlow)">
+    <!-- Star 1 -->
+    <polygon points="0,-32 10,-10 32,0 10,10 0,32 -10,10 -32,0 -10,-10" fill="url(#goldGrad)" />
+    <!-- Rotated 45 deg -->
+    <polygon points="0,-32 10,-10 32,0 10,10 0,32 -10,10 -32,0 -10,-10" fill="url(#goldLightGrad)" transform="rotate(45)" opacity="0.9" />
+    <circle cx="0" cy="0" r="5" fill="#ffffff" />
+  </g>
+
+  <!-- Small Shimmer Stars -->
+  <circle cx="390" cy="225" r="3.5" fill="#fef08a" opacity="0.8" />
+  <circle cx="315" cy="95" r="2.5" fill="#fef08a" opacity="0.9" />
+  <circle cx="150" cy="180" r="2.5" fill="#fef08a" opacity="0.6" />
+
+  <!-- Open Book (Sekolah Rakyat Education & Quranic Foundation) -->
+  <g transform="translate(0, 20)">
+    <!-- Left Page Base -->
+    <path d="M 256 345 C 220 330, 175 330, 140 345 L 145 285 C 180 270, 220 270, 256 285 Z" fill="#f8fafc" />
+    <!-- Right Page Base -->
+    <path d="M 256 345 C 292 330, 337 330, 372 345 L 367 285 C 332 270, 292 270, 256 285 Z" fill="#f1f5f9" />
+    
+    <!-- Top Layer Left Page -->
+    <path d="M 256 338 C 222 324, 180 324, 148 338 L 153 280 C 185 266, 222 266, 256 280 Z" fill="#ffffff" />
+    <!-- Top Layer Right Page -->
+    <path d="M 256 338 C 290 324, 332 324, 364 338 L 359 280 C 327 266, 290 266, 256 280 Z" fill="#f8fafc" />
+
+    <!-- Book Spine & Gold Rim -->
+    <path d="M 256 278 L 256 352" stroke="url(#goldGrad)" stroke-width="4" stroke-linecap="round" />
+    <path d="M 148 338 C 180 324, 222 324, 256 338 C 290 324, 332 324, 364 338" fill="none" stroke="url(#goldGrad)" stroke-width="3" />
+
+    <!-- Checklist / Amalan Badge Centered inside Book -->
+    <g transform="translate(256, 308) scale(0.85)">
+      <circle cx="0" cy="0" r="22" fill="#065f46" stroke="url(#goldGrad)" stroke-width="2" />
+      <path d="M -9 -1 L -3 6 L 10 -6" fill="none" stroke="#fbbf24" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </g>
+
+  <!-- Text Base Ribbon / Banner "PUASAKU" -->
+  <g transform="translate(256, 420)">
+    <!-- Decorative underline gold bar -->
+    <path d="M -90 0 L 90 0" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round" />
+    <circle cx="0" cy="0" r="3.5" fill="#fde68a" />
+    <circle cx="-90" cy="0" r="2.5" fill="#f59e0b" />
+    <circle cx="90" cy="0" r="2.5" fill="#f59e0b" />
+  </g>
+</svg>

@@ -1,0 +1,407 @@
+import React, { useState, useMemo } from 'react';
+import { UserSession } from '../types';
+import {
+  Lock,
+  User,
+  AlertCircle,
+  ArrowRight,
+  ShieldCheck,
+  Download,
+  Sparkles,
+  Moon,
+} from 'lucide-react';
+
+interface LoginFormProps {
+  onLogin: (session: UserSession) => void;
+  error?: string;
+  isSupabaseConnected?: boolean;
+  onOpenSupabaseConfig?: () => void;
+  onInstallPwa?: () => void;
+  isPwaInstalled?: boolean;
+  onOpenWisdomModal?: () => void;
+}
+
+interface StarParticle {
+  id: number;
+  top: number;
+  left: number;
+  size: number;
+  opacity: number;
+  duration: number;
+  delay: number;
+  color: string;
+  isSparkle?: boolean;
+}
+
+export const LoginForm: React.FC<LoginFormProps> = ({
+  onLogin,
+  error: propError,
+  onInstallPwa,
+  isPwaInstalled = false,
+  onOpenWisdomModal,
+}) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(propError || null);
+
+  // Generate organic starry field for Ramadan login ambiance
+  const stars = useMemo<StarParticle[]>(() => {
+    const list: StarParticle[] = [];
+    const colors = ['#fef08a', '#fde047', '#ffffff', '#6ee7b7', '#fbbf24'];
+
+    for (let i = 0; i < 42; i++) {
+      const isSparkle = i % 6 === 0;
+      list.push({
+        id: i,
+        top: Math.random() * 95,
+        left: Math.random() * 96 + 2,
+        size: isSparkle ? Math.random() * 7 + 7 : Math.random() * 3 + 1.5,
+        opacity: Math.random() * 0.6 + 0.3,
+        duration: Math.random() * 2.5 + 1.8,
+        delay: Math.random() * 3,
+        color: colors[i % colors.length],
+        isSparkle,
+      });
+    }
+    return list;
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    const cleanUser = username.trim().toLowerCase();
+    const cleanPass = password.trim();
+
+    if (cleanUser === 'admin' && cleanPass === 'admin') {
+      onLogin({
+        username: 'admin',
+        role: 'admin',
+        name: 'Administrator Asrama / Koordinator',
+      });
+    } else if (cleanUser === 'puasa' && cleanPass === 'puasa') {
+      onLogin({
+        username: 'puasa',
+        role: 'penginput',
+        name: 'Petugas Input Data',
+      });
+    } else if (cleanUser === 'cekpuasa' && cleanPass === 'cekpuasa') {
+      onLogin({
+        username: 'cekpuasa',
+        role: 'pengecek',
+        name: 'Petugas Pengecek / Verifikator',
+      });
+    } else {
+      setError('Username atau Password salah! Pastikan kredensial yang Anda masukkan sesuai.');
+    }
+  };
+
+  return (
+    <div className="relative min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#021c15] via-[#033123] to-[#01140e] text-white overflow-hidden select-none">
+      {/* Dynamic Keyframes for Login Ramadan Sky & Animated Walking Camel */}
+      <style>{`
+        @keyframes loginTwinkle {
+          0%, 100% {
+            opacity: 0.15;
+            transform: scale(0.75);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.3);
+            filter: drop-shadow(0 0 5px currentColor);
+          }
+        }
+        @keyframes loginShootingStar {
+          0% {
+            transform: translateX(0) translateY(0) rotate(-30deg);
+            opacity: 0;
+          }
+          20% {
+            opacity: 1;
+          }
+          60% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(-400px) translateY(240px) rotate(-30deg);
+            opacity: 0;
+          }
+        }
+        @keyframes loginLanternSway {
+          0%, 100% {
+            transform: rotate(-3.5deg);
+          }
+          50% {
+            transform: rotate(3.5deg);
+          }
+        }
+        @keyframes loginMoonGlow {
+          0%, 100% {
+            filter: drop-shadow(0 0 16px rgba(253, 224, 71, 0.45));
+          }
+          50% {
+            filter: drop-shadow(0 0 32px rgba(253, 224, 71, 0.8));
+          }
+        }
+        @keyframes camelWalkTrack {
+          0% {
+            left: 2%;
+            transform: scaleX(1) translateY(0px);
+          }
+          23% {
+            transform: scaleX(1) translateY(-0.8px);
+          }
+          46% {
+            left: 88%;
+            transform: scaleX(1) translateY(0px);
+          }
+          49% {
+            left: 88%;
+            transform: scaleX(-1) translateY(-1.2px);
+          }
+          51% {
+            left: 88%;
+            transform: scaleX(-1) translateY(0px);
+          }
+          74% {
+            transform: scaleX(-1) translateY(-0.8px);
+          }
+          96% {
+            left: 2%;
+            transform: scaleX(-1) translateY(0px);
+          }
+          99% {
+            left: 2%;
+            transform: scaleX(1) translateY(-1.2px);
+          }
+          100% {
+            left: 2%;
+            transform: scaleX(1) translateY(0px);
+          }
+        }
+        @keyframes camelGait {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          25% {
+            transform: translateY(-1.5px) rotate(1.5deg);
+          }
+          50% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          75% {
+            transform: translateY(-1.5px) rotate(-1.5deg);
+          }
+        }
+      `}</style>
+
+      {/* Ramadan Starry Night Background Layer */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        {/* Subtle Geometric Texture */}
+        <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:28px_28px] opacity-10" />
+
+        {/* Ambient Top Glow Rings */}
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/4 -left-20 w-80 h-80 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Crescent Moon in Top Right */}
+        <div className="absolute top-8 right-8 sm:top-12 sm:right-16 text-amber-200 pointer-events-none [animation:loginMoonGlow_4s_ease-in-out_infinite]">
+          <Moon className="w-10 h-10 sm:w-14 sm:h-14 text-amber-200 fill-amber-300/25" />
+        </div>
+
+        {/* Hanging Ramadan Lanterns */}
+        <div className="absolute -top-2 left-6 sm:left-16 flex flex-col items-center origin-top pointer-events-none [animation:loginLanternSway_6s_ease-in-out_infinite]">
+          <div className="w-0.5 h-20 sm:h-32 bg-gradient-to-b from-amber-600/40 via-amber-400/60 to-amber-300" />
+          <div className="w-6 h-8 sm:w-7 sm:h-10 rounded-b-2xl rounded-t-xs bg-gradient-to-b from-amber-400 to-amber-600 border border-amber-300 shadow-[0_0_20px_rgba(251,191,36,0.65)] flex items-center justify-center">
+            <div className="w-2.5 h-4 bg-yellow-100 rounded-full animate-pulse shadow-[0_0_10px_#fef08a]" />
+          </div>
+        </div>
+
+        <div className="absolute -top-2 right-24 sm:right-36 hidden md:flex flex-col items-center origin-top pointer-events-none [animation:loginLanternSway_5s_ease-in-out_infinite_1.5s]">
+          <div className="w-0.5 h-16 bg-gradient-to-b from-amber-600/40 via-amber-400/60 to-amber-300" />
+          <div className="w-5 h-7 rounded-b-xl rounded-t-xs bg-gradient-to-b from-amber-400 to-amber-600 border border-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.5)] flex items-center justify-center">
+            <div className="w-2 h-3 bg-yellow-100 rounded-full animate-pulse shadow-[0_0_8px_#fef08a]" />
+          </div>
+        </div>
+
+        {/* Shooting Star */}
+        <div className="absolute top-12 right-20 w-32 h-0.5 bg-gradient-to-l from-amber-200 via-yellow-100 to-transparent pointer-events-none [animation:loginShootingStar_4s_ease-out_infinite_1.8s]" />
+
+        {/* Twinkling Stars */}
+        {stars.map((star) => (
+          <div
+            key={star.id}
+            style={{
+              position: 'absolute',
+              top: `${star.top}%`,
+              left: `${star.left}%`,
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              color: star.color,
+              animation: `loginTwinkle ${star.duration}s ease-in-out infinite ${star.delay}s`,
+            }}
+            className="pointer-events-none flex items-center justify-center"
+          >
+            {star.isSparkle ? (
+              <svg
+                viewBox="0 0 24 24"
+                className="w-full h-full fill-current drop-shadow-[0_0_5px_currentColor]"
+              >
+                <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5L12 0Z" />
+              </svg>
+            ) : (
+              <div
+                className="w-full h-full rounded-full shadow-[0_0_3px_currentColor]"
+                style={{ backgroundColor: star.color }}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Main Login Glassmorphic Card Container */}
+      <div className="relative z-10 max-w-md w-full space-y-6 bg-gradient-to-b from-emerald-950/85 via-emerald-900/80 to-[#022118]/90 p-8 sm:p-10 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.65)] border border-amber-400/35 backdrop-blur-md">
+        {/* Header Branding */}
+        <div className="text-center space-y-3">
+          <div className="relative inline-block">
+            {/* Ambient Logo Glow */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-amber-400/30 via-emerald-400/40 to-yellow-300/30 rounded-2xl blur-md animate-pulse" />
+            <div className="relative p-2.5 rounded-2xl bg-gradient-to-b from-emerald-800 to-emerald-950 border-2 border-amber-400/60 shadow-[0_0_20px_rgba(251,191,36,0.3)]">
+              <img src="/assets/logo.svg" alt="Logo Puasaku" className="w-14 h-14 object-contain drop-shadow-md" />
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300 tracking-wider font-sans drop-shadow-[0_2px_8px_rgba(251,191,36,0.35)]">
+              PUASAKU
+            </h2>
+            <div className="flex items-center justify-center gap-2 mt-1">
+              <div className="h-[1.5px] w-5 bg-gradient-to-r from-transparent to-amber-400/80 rounded-full" />
+              <span className="px-3 py-0.5 rounded-full text-[11px] font-black bg-emerald-950/90 text-amber-300 border border-amber-400/50 shadow-xs tracking-widest">
+                SRT 1 KEDIRI
+              </span>
+              <div className="h-[1.5px] w-5 bg-gradient-to-l from-transparent to-amber-400/80 rounded-full" />
+            </div>
+            <p className="text-xs text-emerald-300/90 font-medium mt-2 max-w-xs mx-auto">
+              Sistem Informasi Pencatatan & Verifikasi Amalan Puasa Siswa
+            </p>
+          </div>
+        </div>
+
+        {/* Form Login */}
+        <form onSubmit={handleSubmit} className="space-y-4 pt-1">
+          {error && (
+            <div className="p-3.5 rounded-xl bg-red-950/80 border border-red-500/70 text-red-200 text-xs font-semibold flex items-start gap-2.5 shadow-md animate-in fade-in duration-150">
+              <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Mini Ramadan Desert Line with Walking Camel */}
+          <div className="relative pt-1 pb-1 px-1 overflow-hidden" title="Unta Berjalan di Bawah Langit Ramadhan">
+            {/* The desert dune / walking track line */}
+            <div className="relative w-full h-[1.5px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent rounded-full shadow-[0_0_6px_rgba(251,191,36,0.4)]" />
+
+            {/* Walking Animated Camel Silhouette */}
+            <div
+              className="absolute bottom-[2px] pointer-events-none origin-bottom [animation:camelWalkTrack_14s_easeInOutSine_infinite]"
+            >
+              <div className="[animation:camelGait_0.65s_ease-in-out_infinite]">
+                <svg
+                  viewBox="0 0 44 36"
+                  className="w-5 h-4 sm:w-5.5 sm:h-4.5 text-amber-300 fill-current drop-shadow-[0_0_6px_rgba(251,191,36,0.8)]"
+                >
+                  <path d="M38 6.5c0-1.8-2-3-3.6-2-1.2.8-1 2.5-1 3.8l-2.4 4.5c-1.3-.4-2.8-1.2-4.5-1.2-2 0-3.8 1-4.8 2.2-1.4-1-3-1.6-4.6-1.3-2.2.3-3.8 1.8-4.3 3.8h-.8c-.8 0-1.5.8-1.5 1.8 0 1.2.4 2.4 1 3.2l-.5 7c0 .8.6 1.5 1.5 1.5.8 0 1.4-.6 1.5-1.4l.5-6.2h3.2l.5 6.2c.1.8.7 1.4 1.5 1.4.8 0 1.5-.7 1.5-1.5l-.5-7c1.8-.4 3.5-1.5 4.4-3l.5 8.5c0 .8.6 1.5 1.5 1.5.8 0 1.4-.6 1.5-1.4l.5-7h2.8l.5 7c.1.8.7 1.4 1.5 1.4.8 0 1.5-.7 1.5-1.5l-.7-8.2c1.5-1.8 1.8-4.4.7-6.6l-.3-3.8c.8-1 2.2-2.2 2.2-3.8z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-extrabold text-amber-300/90 uppercase tracking-wider mb-1.5">
+              Username
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400/70">
+                <User className="w-4 h-4" />
+              </div>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Masukkan username (admin / puasa / cekpuasa)"
+                className="w-full pl-10 pr-4 py-2.5 text-sm bg-emerald-950/70 border border-emerald-700/80 rounded-xl text-white placeholder-emerald-400/50 focus:bg-emerald-950 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all shadow-inner"
+                required
+                autoComplete="username"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-extrabold text-amber-300/90 uppercase tracking-wider mb-1.5">
+              Password
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400/70">
+                <Lock className="w-4 h-4" />
+              </div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Masukkan password"
+                className="w-full pl-10 pr-4 py-2.5 text-sm bg-emerald-950/70 border border-emerald-700/80 rounded-xl text-white placeholder-emerald-400/50 focus:bg-emerald-950 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all shadow-inner"
+                required
+                autoComplete="current-password"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm shadow-[0_0_20px_rgba(16,185,129,0.35)] border border-emerald-400/40 hover:border-amber-300/70 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer mt-5"
+          >
+            <span>Masuk ke Sistem</span>
+            <ArrowRight className="w-4 h-4 text-amber-200" />
+          </button>
+        </form>
+
+        {/* Action Shortcuts: PWA Install & Mutiara Hikmah Puasa */}
+        <div className="space-y-2 pt-1">
+          {onOpenWisdomModal && (
+            <button
+              type="button"
+              onClick={onOpenWisdomModal}
+              className="w-full py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-emerald-950/80 hover:bg-emerald-900/90 text-amber-300 border border-amber-400/40 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
+            >
+              <Moon className="w-3.5 h-3.5 text-amber-300 fill-amber-300/30" />
+              <span>Buka Mutiara Hikmah Puasa</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+            </button>
+          )}
+
+          {!isPwaInstalled && onInstallPwa && (
+            <button
+              type="button"
+              onClick={onInstallPwa}
+              className="w-full py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-emerald-950 shadow-[0_0_15px_rgba(251,191,36,0.3)] border border-amber-300 transition-all cursor-pointer"
+            >
+              <Download className="w-4 h-4" />
+              <span>Pasang Aplikasi PUASAKU (PWA di HP)</span>
+              <Sparkles className="w-3.5 h-3.5 text-emerald-950 animate-pulse" />
+            </button>
+          )}
+        </div>
+
+        {/* Clean Footer Info */}
+        <div className="pt-4 border-t border-emerald-800/60 text-center">
+          <p className="text-[11px] text-emerald-400/90 flex items-center justify-center gap-1.5 font-medium">
+            <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+            Portal Terproteksi • SMP / SMA SRT 1 Kediri
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+

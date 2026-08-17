@@ -1,0 +1,177 @@
+name: Build Android APK (Capacitor)
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Tipe Build APK'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - 'release'
+          - 'debug'
+          - 'both'
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: 📱 Build & Sign Capacitor Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 22 (LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: ☕ Setup Java Development Kit (JDK 21)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: 🤖 Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 📦 Install Node Dependencies
+        run: |
+          npm install
+
+      - name: 🎨 Generate Web & App Icons from assets/logo.svg
+        run: |
+          node scripts/generate-icons.js
+
+      - name: 🏗️ Build Web Assets (Vite Dist)
+        run: |
+          npm run build
+
+      - name: ⚡ Initialize & Sync Capacitor Android
+        run: |
+          if [ ! -d "android" ]; then
+            echo "Menambahkan platform Android ke Capacitor..."
+            npx cap add android
+          fi
+          
+          # Generate icons directly into newly created android res folders
+          echo "Menyinkronkan icon aplikasi Android dari logo.svg..."
+          node scripts/generate-icons.js
+          
+          echo "Menyinkronkan web dist ke Android..."
+          npx cap sync android
+
+      - name: 🔐 Generate Automatic Keystore
+        id: generate_keystore
+        run: |
+          KEYSTORE_PATH="$RUNNER_TEMP/release.keystore"
+          KEY_ALIAS="puasaku_key"
+          KEY_PASS="puasaku123456"
+          STORE_PASS="puasaku123456"
+
+          echo "Membuat Signature Keystore otomatis..."
+          keytool -genkeypair -v \
+            -keystore "$KEYSTORE_PATH" \
+            -alias "$KEY_ALIAS" \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass "$STORE_PASS" \
+            -keypass "$KEY_PASS" \
+            -dname "CN=PUASAKU SRT 1 KEDIRI, OU=IT Department, O=Sekolah Rakyat 1 Kediri, L=Kediri, ST=Jawa Timur, C=ID"
+
+          echo "KEYSTORE_PATH=$KEYSTORE_PATH" >> $GITHUB_ENV
+          echo "KEY_ALIAS=$KEY_ALIAS" >> $GITHUB_ENV
+          echo "KEY_PASS=$KEY_PASS" >> $GITHUB_ENV
+          echo "STORE_PASS=$STORE_PASS" >> $GITHUB_ENV
+          echo "✓ Keystore berhasil dibuat!"
+
+      - name: 🔨 Build Android APK with Gradle
+        env:
+          JAVA_OPTS: "-Xmx3072m -Dorg.gradle.daemon=false"
+        run: |
+          cd android
+          chmod +x gradlew
+          
+          BUILD_TYPE="${{ github.event.inputs.build_type || 'release' }}"
+          echo "Building with Gradle: $BUILD_TYPE"
+          
+          if [ "$BUILD_TYPE" = "debug" ]; then
+            ./gradlew assembleDebug --no-daemon --stacktrace
+          else
+            ./gradlew assembleRelease --no-daemon --stacktrace || ./gradlew assembleDebug --no-daemon --stacktrace
+          fi
+
+      - name: 🔏 Sign & Align Release APK with Android SDK apksigner
+        run: |
+          BUILD_TOOLS=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)
+          echo "Menggunakan Android Build Tools di: $BUILD_TOOLS"
+          
+          mkdir -p build-output
+          
+          # Check for unsigned or generated release APK
+          RELEASE_APK=$(find android/app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          
+          if [ -n "$RELEASE_APK" ] && [ -f "$RELEASE_APK" ]; then
+            echo "Release APK ditemukan: $RELEASE_APK"
+            
+            # Sign the release APK with apksigner
+            $BUILD_TOOLS/apksigner sign \
+              --ks "$KEYSTORE_PATH" \
+              --ks-key-alias "$KEY_ALIAS" \
+              --ks-pass "pass:$STORE_PASS" \
+              --key-pass "pass:$KEY_PASS" \
+              --out build-output/PUASAKU-SRT1Kediri-v1.0.0-Release-Signed.apk \
+              "$RELEASE_APK"
+              
+            echo "Memverifikasi signature APK..."
+            $BUILD_TOOLS/apksigner verify --verbose build-output/PUASAKU-SRT1Kediri-v1.0.0-Release-Signed.apk
+            echo "✓ Release APK berhasil ditandatangani dan diverifikasi!"
+          fi
+          
+          # Check for debug APK
+          DEBUG_APK=$(find android/app/build/outputs/apk/debug -name "*.apk" | head -n 1)
+          if [ -n "$DEBUG_APK" ] && [ -f "$DEBUG_APK" ]; then
+            cp "$DEBUG_APK" build-output/PUASAKU-SRT1Kediri-v1.0.0-Debug.apk
+            echo "✓ Debug APK siap: build-output/PUASAKU-SRT1Kediri-v1.0.0-Debug.apk"
+          fi
+
+      - name: 🚀 Upload APK Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Puasaku-Android-APK
+          path: build-output/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: 🏷️ Create GitHub Release (Optional on Tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build-output/*.apk
+          name: Release ${{ github.ref_name }}
+          body: |
+            ## 📱 PUASAKU SRT 1 KEDIRI - Android APK Release
+            
+            Aplikasi resmi pencatatan dan verifikasi amalan puasa siswa SRT 1 Kediri.
+            
+            ### ✨ Fitur APK:
+            - 🌟 Ikon aplikasi resmi sesuai `logo.svg`
+            - 🔐 Otentikasi & Verifikasi Multi-Peran (Admin, Penginput, Pengecek)
+            - 🔒 Penguncian Sesi & Deadline Input Puasa
+            - 📴 Siap dipasang di semua perangkat Android (Android 5.0+)
+            
+            ### 📥 Unduh File:
+            - **`PUASAKU-SRT1Kediri-v1.0.0-Release-Signed.apk`** (Versi Produksi Resmi)
+          draft: false
+          prerelease: false

@@ -1,0 +1,6 @@
+{
+  "name": "Pencatatan Puasa Sekolah Rakyat",
+  "description": "PUASAKU - Aplikasi Pencatatan dan Verifikasi Puasa Siswa SRT 1 KEDIRI",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
