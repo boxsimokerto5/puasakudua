@@ -9,6 +9,7 @@ import {
   Download,
   Sparkles,
   Moon,
+  Clock,
 } from 'lucide-react';
 
 interface LoginFormProps {
@@ -19,6 +20,7 @@ interface LoginFormProps {
   onInstallPwa?: () => void;
   isPwaInstalled?: boolean;
   onOpenWisdomModal?: () => void;
+  onOpenPrayerModal?: () => void;
 }
 
 interface StarParticle {
@@ -39,6 +41,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onInstallPwa,
   isPwaInstalled = false,
   onOpenWisdomModal,
+  onOpenPrayerModal,
 }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -366,13 +369,25 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           </button>
         </form>
 
-        {/* Action Shortcuts: PWA Install & Mutiara Hikmah Puasa */}
+        {/* Action Shortcuts: Prayer Times, Wisdom & PWA Install */}
         <div className="space-y-2 pt-1">
+          {onOpenPrayerModal && (
+            <button
+              type="button"
+              onClick={onOpenPrayerModal}
+              className="w-full py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-900/90 via-[#033c2a] to-emerald-900/90 hover:from-emerald-800 hover:to-emerald-800 text-amber-300 border border-amber-400/50 shadow-[0_0_12px_rgba(251,191,36,0.15)] transition-all cursor-pointer backdrop-blur-xs"
+            >
+              <Clock className="w-3.5 h-3.5 text-amber-400" />
+              <span>Jadwal Sholat & Imsakiyah Kediri</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+            </button>
+          )}
+
           {onOpenWisdomModal && (
             <button
               type="button"
               onClick={onOpenWisdomModal}
-              className="w-full py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-emerald-950/80 hover:bg-emerald-900/90 text-amber-300 border border-amber-400/40 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
+              className="w-full py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-emerald-950/80 hover:bg-emerald-900/90 text-emerald-200 border border-emerald-700/60 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
             >
               <Moon className="w-3.5 h-3.5 text-amber-300 fill-amber-300/30" />
               <span>Buka Mutiara Hikmah Puasa</span>

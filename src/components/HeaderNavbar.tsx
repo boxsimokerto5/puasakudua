@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
 import { UserSession } from '../types';
+import { CityLocation } from '../utils/prayerTimes';
+import { PrayerTimeHeaderPill } from './PrayerTimeHeaderPill';
 import {
   LogOut,
   ShieldCheck,
@@ -30,6 +32,8 @@ interface HeaderNavbarProps {
   onInstallPwa?: () => void;
   isPwaInstalled?: boolean;
   onOpenWisdomModal?: () => void;
+  onOpenPrayerModal?: () => void;
+  selectedCity?: CityLocation;
 }
 
 interface HeaderStar {
@@ -55,6 +59,8 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
   onInstallPwa,
   isPwaInstalled = false,
   onOpenWisdomModal,
+  onOpenPrayerModal,
+  selectedCity,
 }) => {
   const isAdmin = user.role === 'admin';
   const isPenginput = user.role === 'penginput';
@@ -254,6 +260,11 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
 
           {/* Active Session Badge, Cloud DB Status & Role Info */}
           <div className="flex items-center justify-between sm:justify-end gap-2.5 flex-wrap">
+            {/* Live Prayer Times Pill */}
+            {onOpenPrayerModal && (
+              <PrayerTimeHeaderPill onOpenModal={onOpenPrayerModal} city={selectedCity} />
+            )}
+
             {/* Hikmah Puasa Button */}
             {onOpenWisdomModal && (
               <button

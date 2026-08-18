@@ -34,11 +34,15 @@ import { StudentPhotoUploadModal } from './components/StudentPhotoUploadModal';
 import { SupabaseConfigModal } from './components/SupabaseConfigModal';
 import { SplashScreen } from './components/SplashScreen';
 import { FastingWisdomModal } from './components/FastingWisdomModal';
+import { PrayerTimesModal } from './components/PrayerTimesModal';
+import { PrayerTimeBannerCard } from './components/PrayerTimeBannerCard';
 import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { usePwaInstall } from './hooks/usePwaInstall';
+import { INDONESIA_CITIES, CityLocation } from './utils/prayerTimes';
 import { Sparkles, Cloud, CloudCheck, RefreshCw, Download } from 'lucide-react';
 
 const USER_SESSION_KEY = 'sr_kediri_user_session_v1';
+const PRAYER_CITY_KEY = 'sr_kediri_prayer_city_v1';
 
 export default function App() {
   // PWA Install State & Detection
@@ -49,6 +53,33 @@ export default function App() {
 
   // Ramadan Fasting Wisdom Modal State
   const [showWisdomModal, setShowWisdomModal] = useState(false);
+
+  // Prayer Times Modal State
+  const [showPrayerModal, setShowPrayerModal] = useState(false);
+
+  // Selected Prayer City
+  const [selectedCity, setSelectedCity] = useState<CityLocation>(() => {
+    try {
+      const saved = localStorage.getItem(PRAYER_CITY_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const match = INDONESIA_CITIES.find((c) => c.name === parsed.name);
+        return match || INDONESIA_CITIES[0];
+      }
+    } catch {
+      // fallback
+    }
+    return INDONESIA_CITIES[0];
+  });
+
+  const handleCityChange = (city: CityLocation) => {
+    setSelectedCity(city);
+    try {
+      localStorage.setItem(PRAYER_CITY_KEY, JSON.stringify(city));
+    } catch {
+      // ignore
+    }
+  };
 
   // Active Logged-in User Session State
   const [user, setUser] = useState<UserSession | null>(() => {
@@ -523,6 +554,7 @@ export default function App() {
             onInstallPwa={pwaState.triggerInstall}
             isPwaInstalled={pwaState.isInstalled}
             onOpenWisdomModal={() => setShowWisdomModal(true)}
+            onOpenPrayerModal={() => setShowPrayerModal(true)}
           />
           <SupabaseConfigModal
             isOpen={isSupabaseModalOpen}
@@ -562,10 +594,18 @@ export default function App() {
             onInstallPwa={pwaState.triggerInstall}
             isPwaInstalled={pwaState.isInstalled}
             onOpenWisdomModal={() => setShowWisdomModal(true)}
+            onOpenPrayerModal={() => setShowPrayerModal(true)}
+            selectedCity={selectedCity}
           />
 
           {/* Main Container */}
           <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 space-y-6">
+            {/* Live Ramadan Prayer Times & Imsakiyah Banner Card */}
+            <PrayerTimeBannerCard
+              onOpenModal={() => setShowPrayerModal(true)}
+              city={selectedCity}
+            />
+
             {/* Session Selector / Creator Block (Shown on regular session workflows) */}
             {activeAdminTab !== 'raport' && (
               <SessionSelector
@@ -747,6 +787,14 @@ export default function App() {
             ? 'Petugas Pengecek'
             : undefined
         }
+      />
+
+      {/* Ramadan Prayer Times & Imsakiyah Modal */}
+      <PrayerTimesModal
+        isOpen={showPrayerModal}
+        onClose={() => setShowPrayerModal(false)}
+        selectedCity={selectedCity}
+        onCityChange={handleCityChange}
       />
     </>
   );
