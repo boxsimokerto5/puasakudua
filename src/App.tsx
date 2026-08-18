@@ -36,6 +36,8 @@ import { SplashScreen } from './components/SplashScreen';
 import { FastingWisdomModal } from './components/FastingWisdomModal';
 import { PrayerTimesModal } from './components/PrayerTimesModal';
 import { PrayerTimeBannerCard } from './components/PrayerTimeBannerCard';
+import { ShortSurahsDashboardCard } from './components/ShortSurahsDashboardCard';
+import { ShortSurahsModal } from './components/ShortSurahsModal';
 import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { usePwaInstall } from './hooks/usePwaInstall';
 import { INDONESIA_CITIES, CityLocation } from './utils/prayerTimes';
@@ -56,6 +58,9 @@ export default function App() {
 
   // Prayer Times Modal State
   const [showPrayerModal, setShowPrayerModal] = useState(false);
+
+  // Short Surahs Modal State
+  const [showSurahsModal, setShowSurahsModal] = useState(false);
 
   // Selected Prayer City
   const [selectedCity, setSelectedCity] = useState<CityLocation>(() => {
@@ -555,6 +560,7 @@ export default function App() {
             isPwaInstalled={pwaState.isInstalled}
             onOpenWisdomModal={() => setShowWisdomModal(true)}
             onOpenPrayerModal={() => setShowPrayerModal(true)}
+            onOpenSurahsModal={() => setShowSurahsModal(true)}
           />
           <SupabaseConfigModal
             isOpen={isSupabaseModalOpen}
@@ -595,6 +601,7 @@ export default function App() {
             isPwaInstalled={pwaState.isInstalled}
             onOpenWisdomModal={() => setShowWisdomModal(true)}
             onOpenPrayerModal={() => setShowPrayerModal(true)}
+            onOpenSurahsModal={() => setShowSurahsModal(true)}
             selectedCity={selectedCity}
           />
 
@@ -604,6 +611,11 @@ export default function App() {
             <PrayerTimeBannerCard
               onOpenModal={() => setShowPrayerModal(true)}
               city={selectedCity}
+            />
+
+            {/* In-Dashboard Short Surahs (Juz Amma) Reader Card */}
+            <ShortSurahsDashboardCard
+              onOpenModal={() => setShowSurahsModal(true)}
             />
 
             {/* Session Selector / Creator Block (Shown on regular session workflows) */}
@@ -795,6 +807,12 @@ export default function App() {
         onClose={() => setShowPrayerModal(false)}
         selectedCity={selectedCity}
         onCityChange={handleCityChange}
+      />
+
+      {/* Short Surahs (Juz 'Amma) Modal */}
+      <ShortSurahsModal
+        isOpen={showSurahsModal}
+        onClose={() => setShowSurahsModal(false)}
       />
     </>
   );

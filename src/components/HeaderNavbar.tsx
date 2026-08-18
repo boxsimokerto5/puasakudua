@@ -18,6 +18,7 @@ import {
   Trophy,
   Moon,
   Sparkles,
+  BookOpen,
 } from 'lucide-react';
 
 interface HeaderNavbarProps {
@@ -33,6 +34,7 @@ interface HeaderNavbarProps {
   isPwaInstalled?: boolean;
   onOpenWisdomModal?: () => void;
   onOpenPrayerModal?: () => void;
+  onOpenSurahsModal?: () => void;
   selectedCity?: CityLocation;
 }
 
@@ -60,6 +62,7 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
   isPwaInstalled = false,
   onOpenWisdomModal,
   onOpenPrayerModal,
+  onOpenSurahsModal,
   selectedCity,
 }) => {
   const isAdmin = user.role === 'admin';
@@ -276,6 +279,22 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                 <Moon className="w-3.5 h-3.5 text-amber-300 fill-amber-300/40" />
                 <span className="hidden sm:inline">Hikmah Puasa</span>
                 <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
+              </button>
+            )}
+
+            {/* Surat-Surat Pendek (Juz Amma) Button */}
+            {onOpenSurahsModal && (
+              <button
+                type="button"
+                onClick={onOpenSurahsModal}
+                title="Buka Kumpulan Surat-Surat Pendek (Juz 'Amma & Pilihan) Lengkap dengan Audio"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-black bg-gradient-to-r from-teal-500/20 via-emerald-400/25 to-teal-500/20 hover:from-teal-500/40 hover:to-emerald-400/40 text-emerald-100 hover:text-white border border-emerald-400/50 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-amber-300" />
+                <span className="hidden sm:inline">Surat Pendek</span>
+                <span className="text-[10px] px-1 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                  Juz 'Amma
+                </span>
               </button>
             )}
 

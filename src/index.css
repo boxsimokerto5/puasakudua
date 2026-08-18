@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+@layer utilities {
+  .font-arabic {
+    font-family: 'Amiri', 'Scheherazade New', 'Traditional Arabic', 'KFGQPC Uthman Taha Naskh', 'Arial', serif;
+  }
+}
+
+/* Custom Scrollbar for Smooth Reading */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(2, 44, 32, 0.4);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(251, 191, 36, 0.4);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(251, 191, 36, 0.7);
+}

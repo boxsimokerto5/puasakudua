@@ -10,6 +10,7 @@ import {
   Sparkles,
   Moon,
   Clock,
+  BookOpen,
 } from 'lucide-react';
 
 interface LoginFormProps {
@@ -21,6 +22,7 @@ interface LoginFormProps {
   isPwaInstalled?: boolean;
   onOpenWisdomModal?: () => void;
   onOpenPrayerModal?: () => void;
+  onOpenSurahsModal?: () => void;
 }
 
 interface StarParticle {
@@ -42,6 +44,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   isPwaInstalled = false,
   onOpenWisdomModal,
   onOpenPrayerModal,
+  onOpenSurahsModal,
 }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -392,6 +395,20 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               <Moon className="w-3.5 h-3.5 text-amber-300 fill-amber-300/30" />
               <span>Buka Mutiara Hikmah Puasa</span>
               <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+            </button>
+          )}
+
+          {onOpenSurahsModal && (
+            <button
+              type="button"
+              onClick={onOpenSurahsModal}
+              className="w-full py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 bg-emerald-950/80 hover:bg-emerald-900/90 text-amber-200 border border-emerald-500/50 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-amber-300" />
+              <span>Baca Surat-Surat Pendek (Juz 'Amma)</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                Audio
+              </span>
             </button>
           )}
 
