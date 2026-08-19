@@ -40,6 +40,7 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
     () => new Set(students.map((s) => s.id))
   );
   const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [exportProgress, setExportProgress] = useState<{ current: number; total: number } | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'print_preview'>('grid');
   const [cardScale, setCardScale] = useState<'normal' | 'compact'>('normal');
 
@@ -126,13 +127,17 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
     }
 
     setIsExportingPdf(true);
+    setExportProgress({ current: 0, total: studentsToPrint.length });
     try {
-      await exportStudentCardsToPdf(studentsToPrint);
+      await exportStudentCardsToPdf(studentsToPrint, (current, total) => {
+        setExportProgress({ current, total });
+      });
     } catch (err) {
       console.error('Failed to generate PDF:', err);
       alert('Terjadi kesalahan saat membuat file PDF kartu santri.');
     } finally {
       setIsExportingPdf(false);
+      setExportProgress(null);
     }
   };
 
@@ -413,7 +418,9 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
               <Download className="w-4 h-4" />
               <span>
                 {isExportingPdf
-                  ? 'Sedang Memproses Dokumen PDF...'
+                  ? exportProgress
+                    ? `Merender Kartu ${exportProgress.current} / ${exportProgress.total}...`
+                    : 'Sedang Memproses Dokumen PDF...'
                   : `Export PDF Kartu Siap Cetak (${studentsToPrint.length})`}
               </span>
             </button>

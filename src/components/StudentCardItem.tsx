@@ -76,7 +76,10 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
   }[level];
 
   return (
-    <div className="w-[330px] sm:w-[350px] h-[218px] bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden flex flex-col justify-between select-none relative font-sans text-gray-800">
+    <div
+      id={`student-card-${student.id}`}
+      className="w-[330px] sm:w-[350px] h-[218px] bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden flex flex-col justify-between select-none relative font-sans text-gray-800"
+    >
       {/* Top Header Card */}
       <div
         className={`bg-gradient-to-r ${themeConfig.headerBg} text-white px-3.5 py-2 flex items-center justify-between relative overflow-hidden`}
