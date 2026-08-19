@@ -51,3 +51,16 @@ export interface AdminSettings {
   defaultDeadlineTime: string;
 }
 
+export type AdminTabType = 'admin' | 'input' | 'checker' | 'raport' | 'calendar';
+
+export interface SchoolCalendarEvent {
+  id: string;
+  date: string; // YYYY-MM-DD
+  title: string;
+  category: 'ramadhan' | 'tarbiyah' | 'kajian' | 'sosial' | 'ujian' | 'umum';
+  description?: string;
+  time?: string;
+  location?: string;
+  isImportant?: boolean;
+}
+

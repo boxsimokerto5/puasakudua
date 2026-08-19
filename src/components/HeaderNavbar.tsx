@@ -19,6 +19,7 @@ import {
   Moon,
   Sparkles,
   BookOpen,
+  CalendarCheck,
 } from 'lucide-react';
 
 interface HeaderNavbarProps {
@@ -26,8 +27,8 @@ interface HeaderNavbarProps {
   onLogout: () => void;
   activeSessionTitle?: string;
   activeSessionDate?: string;
-  activeAdminTab?: 'admin' | 'input' | 'checker' | 'raport';
-  onSelectAdminTab?: (tab: 'admin' | 'input' | 'checker' | 'raport') => void;
+  activeAdminTab?: 'admin' | 'input' | 'checker' | 'raport' | 'calendar';
+  onSelectAdminTab?: (tab: 'admin' | 'input' | 'checker' | 'raport' | 'calendar') => void;
   isSupabaseConnected?: boolean;
   onOpenSupabaseConfig?: () => void;
   onInstallPwa?: () => void;
@@ -257,6 +258,20 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
               >
                 <Trophy className="w-3.5 h-3.5 text-amber-400 fill-amber-400/30" />
                 <span>Raport & Piagam</span>
+              </button>
+
+              {/* Kalender Puasa & Hijriah Tab (Accessible to Everyone) */}
+              <button
+                type="button"
+                onClick={() => onSelectAdminTab('calendar')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  activeAdminTab === 'calendar'
+                    ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-md ring-2 ring-teal-300/60 font-black'
+                    : 'text-teal-300 hover:text-white hover:bg-emerald-800/80'
+                }`}
+              >
+                <CalendarCheck className="w-3.5 h-3.5 text-amber-300" />
+                <span>Kalender Puasa</span>
               </button>
             </div>
           )}

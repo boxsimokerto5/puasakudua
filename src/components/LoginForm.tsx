@@ -426,10 +426,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </div>
 
         {/* Clean Footer Info */}
-        <div className="pt-4 border-t border-emerald-800/60 text-center">
+        <div className="pt-4 border-t border-emerald-800/60 text-center space-y-1.5">
           <p className="text-[11px] text-emerald-400/90 flex items-center justify-center gap-1.5 font-medium">
             <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
             Portal Terproteksi • SMP / SMA SRT 1 Kediri
+          </p>
+          <p className="text-[11px] text-emerald-300/80 flex items-center justify-center gap-1 font-medium">
+            <span>Dibuat oleh</span>
+            <span className="font-bold text-amber-300 tracking-wide hover:text-amber-200 transition-colors">
+              eccko developer
+            </span>
           </p>
         </div>
       </div>

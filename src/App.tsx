@@ -37,6 +37,7 @@ import { FastingWisdomModal } from './components/FastingWisdomModal';
 import { PrayerTimesModal } from './components/PrayerTimesModal';
 import { PrayerTimeBannerCard } from './components/PrayerTimeBannerCard';
 import { ShortSurahsModal } from './components/ShortSurahsModal';
+import { CalendarView } from './components/CalendarView';
 import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { usePwaInstall } from './hooks/usePwaInstall';
 import { INDONESIA_CITIES, CityLocation } from './utils/prayerTimes';
@@ -120,7 +121,7 @@ export default function App() {
   const [isCloudSyncing, setIsCloudSyncing] = useState<boolean>(false);
 
   // Active sub-view tab for navigation
-  const [activeAdminTab, setActiveAdminTab] = useState<'admin' | 'input' | 'checker' | 'raport'>(() => {
+  const [activeAdminTab, setActiveAdminTab] = useState<'admin' | 'input' | 'checker' | 'raport' | 'calendar'>(() => {
     try {
       const saved = localStorage.getItem(USER_SESSION_KEY);
       if (saved) {
@@ -612,15 +613,18 @@ export default function App() {
 
           {/* Main Container */}
           <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 space-y-6">
-            {/* Live Ramadan Prayer Times & Imsakiyah Banner Card */}
-            <PrayerTimeBannerCard
-              onOpenModal={() => setShowPrayerModal(true)}
-              onOpenSurahsModal={() => handleOpenSurahsModal('juz_amma')}
-              city={selectedCity}
-            />
+            {/* Live Ramadan Prayer Times & Imsakiyah Banner Card (Hidden on Clean Calendar View) */}
+            {activeAdminTab !== 'calendar' && (
+              <PrayerTimeBannerCard
+                onOpenModal={() => setShowPrayerModal(true)}
+                onOpenSurahsModal={() => handleOpenSurahsModal('juz_amma')}
+                onOpenCalendar={() => setActiveAdminTab('calendar')}
+                city={selectedCity}
+              />
+            )}
 
             {/* Session Selector / Creator Block (Shown on regular session workflows) */}
-            {activeAdminTab !== 'raport' && (
+            {activeAdminTab !== 'raport' && activeAdminTab !== 'calendar' && (
               <SessionSelector
                 sessions={sessions}
                 activeSessionId={activeSessionId}
@@ -633,7 +637,22 @@ export default function App() {
             )}
 
             {/* View Switcher based on User Role & Selected Navigation Tab */}
-            {activeAdminTab === 'raport' ? (
+            {activeAdminTab === 'calendar' ? (
+              <CalendarView
+                sessions={Object.values(sessions)}
+                students={students}
+                user={user}
+                activeSessionId={activeSessionId}
+                onSelectSession={(id) => {
+                  setActiveSessionId(id);
+                }}
+                onCreateSessionForDate={(dateStr, title) => {
+                  handleCreateSession(title, dateStr);
+                  setActiveAdminTab(isAdmin || isPenginput ? 'input' : 'checker');
+                }}
+                onNavigateToTab={(tab) => setActiveAdminTab(tab)}
+              />
+            ) : activeAdminTab === 'raport' ? (
               <RaportImtaqView
                 students={students}
                 sessions={sessions}
@@ -779,6 +798,11 @@ export default function App() {
                 <span className="text-emerald-700">•</span>
                 <p className="text-[11px] text-emerald-400/70">
                   Aplikasi Pencatatan & Verifikasi Amalan Puasa Siswa © {new Date().getFullYear()}
+                </p>
+                <span className="text-emerald-700">•</span>
+                <p className="text-[11px] text-emerald-300 font-medium flex items-center gap-1">
+                  <span>Dibuat oleh</span>
+                  <span className="font-bold text-amber-300">eccko developer</span>
                 </p>
               </div>
             </div>

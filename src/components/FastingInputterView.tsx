@@ -828,6 +828,17 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
         </div>
       )}
 
+      {/* View Footer Note */}
+      <div className="pt-2 flex items-center justify-between text-xs text-slate-400 border-t border-slate-200/60">
+        <span className="text-[11px] text-slate-500">
+          Form Input Status Puasa Siswa • SRT 1 Kediri
+        </span>
+        <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
+          <span>Dibuat oleh</span>
+          <span className="font-bold text-emerald-800">eccko developer</span>
+        </div>
+      </div>
+
       {/* PDF Export Modal */}
       {isPdfModalOpen && (
         <PdfExportModal

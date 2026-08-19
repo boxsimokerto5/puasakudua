@@ -16,17 +16,20 @@ import {
   ChevronUp,
   Maximize2,
   BookOpen,
+  CalendarCheck,
 } from 'lucide-react';
 
 interface PrayerTimeBannerCardProps {
   onOpenModal: () => void;
   onOpenSurahsModal?: () => void;
+  onOpenCalendar?: () => void;
   city?: CityLocation;
 }
 
 export const PrayerTimeBannerCard: React.FC<PrayerTimeBannerCardProps> = ({
   onOpenModal,
   onOpenSurahsModal,
+  onOpenCalendar,
   city = INDONESIA_CITIES[0],
 }) => {
   const [now, setNow] = useState<Date>(new Date());
@@ -76,6 +79,19 @@ export const PrayerTimeBannerCard: React.FC<PrayerTimeBannerCardProps> = ({
 
         {/* Right: Quick Action Buttons */}
         <div className="flex items-center gap-2 ml-auto sm:ml-0 flex-wrap">
+          {/* Quick Kalender Puasa & Hijriah Trigger */}
+          {onOpenCalendar && (
+            <button
+              type="button"
+              onClick={onOpenCalendar}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black bg-emerald-950/80 hover:bg-emerald-900 text-teal-200 hover:text-white border border-teal-500/40 shadow-xs transition-all cursor-pointer"
+              title="Buka Kalender Puasa & Agenda Hijriah"
+            >
+              <CalendarCheck className="w-3.5 h-3.5 text-amber-300" />
+              <span className="hidden sm:inline">Kalender Puasa</span>
+            </button>
+          )}
+
           {/* Quick Surat Pendek, Yasin & Tahlil Popup Trigger */}
           {onOpenSurahsModal && (
             <button
