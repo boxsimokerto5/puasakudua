@@ -686,6 +686,7 @@ export default function App() {
                   onUpdateRecord={handleUpdateRecord}
                   onBulkUpdateRecords={handleBulkUpdateRecords}
                   onOpenStudentModal={() => setIsStudentModalOpen(true)}
+                  onOpenPhotoModal={() => handleOpenPhotoModal()}
                   isAdmin={true}
                   onToggleLockSession={handleToggleLockSession}
                 />
@@ -704,6 +705,7 @@ export default function App() {
                   activeSession={activeSession}
                   onUpdateRecord={handleUpdateRecord}
                   onBulkUpdateRecords={handleBulkUpdateRecords}
+                  onOpenPhotoModal={() => handleOpenPhotoModal()}
                   isAdmin={false}
                 />
               ) : (

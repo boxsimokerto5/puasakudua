@@ -35,6 +35,7 @@ interface FastingInputterViewProps {
   onUpdateRecord: (studentId: number, status: FastingStatus, notes?: string) => void;
   onBulkUpdateRecords: (updates: { studentId: number; status: FastingStatus }[]) => void;
   onOpenStudentModal?: () => void;
+  onOpenPhotoModal?: () => void;
   isAdmin?: boolean;
   onToggleLockSession?: (sessionId: string, locked: boolean) => void;
 }
@@ -45,6 +46,7 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
   onUpdateRecord,
   onBulkUpdateRecords,
   onOpenStudentModal,
+  onOpenPhotoModal,
   isAdmin = false,
   onToggleLockSession,
 }) => {
@@ -420,6 +422,19 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
+            {/* Foto Santri (ImgBB Cloud) Button */}
+            {onOpenPhotoModal && (
+              <button
+                type="button"
+                onClick={onOpenPhotoModal}
+                className="px-3.5 py-1.5 bg-gradient-to-r from-teal-700 to-emerald-800 hover:from-teal-800 hover:to-emerald-900 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs border border-emerald-600/60 cursor-pointer active:scale-95"
+                title="Kelola & Upload Foto Santri ke Cloud ImgBB / Galeri"
+              >
+                <Camera className="w-4 h-4 text-amber-300" />
+                <span>Foto Santri</span>
+              </button>
+            )}
+
             {/* Generate & Print Dorm Cards Button */}
             <button
               onClick={() => setIsDormCardModalOpen(true)}
