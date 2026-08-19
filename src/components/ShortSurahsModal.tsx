@@ -6,7 +6,8 @@ import {
 } from '../data/shortSurahs';
 import { SURAH_YASIN_DATA } from '../data/yasinData';
 import { TAHLIL_DATA, TahlilItem } from '../data/tahlilData';
-import { useQuranAudioPlayer, MaleVoiceStyle } from '../hooks/useQuranAudioPlayer';
+import { MAHALUL_QIYAM_DATA, MahalulQiyamVerse } from '../data/mahalulQiyamData';
+import { useQuranAudioPlayer } from '../hooks/useQuranAudioPlayer';
 import {
   BookOpen,
   Search,
@@ -19,22 +20,22 @@ import {
   Sparkles,
   ChevronRight,
   ChevronLeft,
-  List,
   ArrowLeft,
   Headphones,
   Mic,
   Sliders,
-  HelpCircle,
   BookMarked,
   Scroll,
   RotateCcw,
   Plus,
+  Heart,
+  Music,
 } from 'lucide-react';
 
 interface ShortSurahsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialTab?: 'juz_amma' | 'yasin' | 'tahlil';
+  initialTab?: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam';
 }
 
 export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
@@ -42,8 +43,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
   onClose,
   initialTab = 'juz_amma',
 }) => {
-  // Main Module Tab: Juz 'Amma, Surat Yasin, or Tahlil
-  const [mainTab, setMainTab] = useState<'juz_amma' | 'yasin' | 'tahlil'>(initialTab);
+  // Main Module Tab: Juz 'Amma, Surat Yasin, Tahlil, or Mahalul Qiyam
+  const [mainTab, setMainTab] = useState<'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam'>(initialTab);
 
   // Juz Amma Selected Surah
   const [selectedSurahNumber, setSelectedSurahNumber] = useState<number>(1);
@@ -54,6 +55,12 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
   const [tahlilSectionFilter, setTahlilSectionFilter] = useState<'all' | 'tawasul' | 'surat' | 'dzikir' | 'doa'>('all');
   const [tasbihCounts, setTasbihCounts] = useState<Record<number, number>>({});
   const [copiedTahlilId, setCopiedTahlilId] = useState<number | null>(null);
+
+  // Mahalul Qiyam section filter & clicker
+  const [mqSectionFilter, setMqSectionFilter] = useState<'all' | 'salam' | 'pujian' | 'syauq' | 'marhaban' | 'doa'>('all');
+  const [mqCounts, setMqCounts] = useState<Record<number, number>>({});
+  const [copiedMqId, setCopiedMqId] = useState<number | null>(null);
+  const [isMqWholeCopied, setIsMqWholeCopied] = useState<boolean>(false);
 
   // Mobile tab state for Juz Amma: 'list' (Daftar Surat) or 'reader' (Baca Surat)
   const [mobileViewTab, setMobileViewTab] = useState<'list' | 'reader'>('reader');
@@ -91,20 +98,12 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
     isSpeakingTranslation,
     currentTime,
     duration,
-    installedVoices,
-    selectedVoiceURI,
-    setSelectedVoiceURI,
     maleVoiceStyle,
     setMaleVoiceStyle,
-    customPitch,
-    setCustomPitch,
-    customRate,
-    setCustomRate,
     previewVoice,
     togglePlay,
     playSpecificVerse,
     stopAll,
-    seekFullAudio,
   } = useQuranAudioPlayer({
     surah: currentSurah,
     onVerseChange: () => {
@@ -139,6 +138,19 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
     });
   }, [tahlilSectionFilter, searchQuery]);
 
+  // Filtered Mahalul Qiyam Data
+  const filteredMahalulQiyam = useMemo(() => {
+    return MAHALUL_QIYAM_DATA.filter((item) => {
+      const matchSection = mqSectionFilter === 'all' || item.section === mqSectionFilter;
+      const matchQuery =
+        !searchQuery ||
+        item.latin.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.translation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.arabic.includes(searchQuery);
+      return matchSection && matchQuery;
+    });
+  }, [mqSectionFilter, searchQuery]);
+
   // Next and Previous Surahs for Juz Amma
   const prevSurah = currentSurahIndex > 0 ? SHORT_SURAHS_DATA[currentSurahIndex - 1] : null;
   const nextSurah =
@@ -160,7 +172,7 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
     }
   }, [initialTab]);
 
-  const handleTabChange = (newTab: 'juz_amma' | 'yasin' | 'tahlil') => {
+  const handleTabChange = (newTab: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam') => {
     stopAll();
     setMainTab(newTab);
     if (versesContainerRef.current) {
@@ -214,6 +226,24 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
     setTimeout(() => setCopiedTahlilId(null), 2000);
   };
 
+  const handleCopyMqItem = (item: MahalulQiyamVerse) => {
+    const text = `🌸 *Mahalul Qiyam - Bait ${item.id}*\n\n${item.arabic}\n\n"${item.latin}"\n\nArtinya: ${item.translation}\n\n— *PUASAKU SRT 1 KEDIRI*`;
+    navigator.clipboard.writeText(text);
+    setCopiedMqId(item.id);
+    setTimeout(() => setCopiedMqId(null), 2000);
+  };
+
+  const handleCopyWholeMq = () => {
+    let text = `🌸 *MAHALUL QIYAM LENGKAP (مَحَلُّ الْقِيَامِ)*\nSimtudduror & Ad-Diba'i • Puasaku SRT 1 Kediri\n\n`;
+    MAHALUL_QIYAM_DATA.forEach((item) => {
+      text += `[Bait ${item.id}]\n${item.arabic}\n${item.latin}\n"${item.translation}"\n\n`;
+    });
+    text += `— *PUASAKU SRT 1 KEDIRI*`;
+    navigator.clipboard.writeText(text);
+    setIsMqWholeCopied(true);
+    setTimeout(() => setIsMqWholeCopied(false), 2000);
+  };
+
   const handleIncrementTasbih = (id: number) => {
     setTasbihCounts((prev) => ({
       ...prev,
@@ -228,9 +258,19 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
     }));
   };
 
-  const idVoices = installedVoices.filter(
-    (v) => v.lang.startsWith('id') || v.lang.startsWith('ms') || v.name.toLowerCase().includes('indonesia')
-  );
+  const handleIncrementMq = (id: number) => {
+    setMqCounts((prev) => ({
+      ...prev,
+      [id]: (prev[id] || 0) + 1,
+    }));
+  };
+
+  const handleResetMq = (id: number) => {
+    setMqCounts((prev) => ({
+      ...prev,
+      [id]: 0,
+    }));
+  };
 
   const getArabicSizeClass = () => {
     switch (arabicFontSize) {
@@ -244,10 +284,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-xs overflow-hidden animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/75 backdrop-blur-xs overflow-hidden animate-in fade-in duration-200">
       <div className="bg-slate-900 border border-emerald-500/30 rounded-2xl w-full max-w-5xl h-[92vh] sm:h-[88vh] flex flex-col shadow-2xl overflow-hidden text-slate-100">
         
         {/* ========================================================= */}
@@ -261,45 +299,58 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
               <BookOpen className="w-3.5 h-3.5" />
             </div>
 
-            {/* Navigation Tabs Pill (Small Icons) */}
-            <div className="flex items-center bg-slate-950/60 p-0.5 rounded-xl border border-emerald-600/40">
+            {/* Navigation Tabs Pill (Small Icons, Compact Spacing) */}
+            <div className="flex items-center bg-slate-950/70 p-0.5 rounded-xl border border-emerald-600/40 overflow-x-auto max-w-[calc(100vw-80px)] sm:max-w-none">
               <button
                 type="button"
                 onClick={() => handleTabChange('juz_amma')}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                   mainTab === 'juz_amma'
                     ? 'bg-emerald-600 text-white shadow-xs'
                     : 'text-slate-300 hover:text-emerald-300 hover:bg-white/5'
                 }`}
               >
-                <BookOpen className="w-3 h-3" />
+                <BookOpen className="w-3 h-3 shrink-0" />
                 <span>Juz 'Amma</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleTabChange('yasin')}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                   mainTab === 'yasin'
                     ? 'bg-amber-600 text-white shadow-xs'
                     : 'text-slate-300 hover:text-amber-300 hover:bg-white/5'
                 }`}
               >
-                <Scroll className="w-3 h-3" />
-                <span>Surat Yasin</span>
+                <Scroll className="w-3 h-3 shrink-0" />
+                <span>Yasin</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleTabChange('tahlil')}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                   mainTab === 'tahlil'
                     ? 'bg-cyan-700 text-white shadow-xs'
                     : 'text-slate-300 hover:text-cyan-300 hover:bg-white/5'
                 }`}
               >
-                <BookMarked className="w-3 h-3" />
-                <span>Tahlil & Doa</span>
+                <BookMarked className="w-3 h-3 shrink-0" />
+                <span>Tahlil</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleTabChange('mahalul_qiyam')}
+                className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                  mainTab === 'mahalul_qiyam'
+                    ? 'bg-gradient-to-r from-rose-700 to-amber-600 text-white shadow-xs ring-1 ring-amber-300/50'
+                    : 'text-slate-300 hover:text-rose-300 hover:bg-white/5'
+                }`}
+              >
+                <Heart className="w-3 h-3 text-rose-300 fill-rose-300/40 shrink-0" />
+                <span>Mahalul Qiyam</span>
               </button>
             </div>
           </div>
@@ -378,9 +429,9 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
         </div>
 
         {/* ========================================================= */}
-        {/* AUDIO PLAYER BAR (Only for Juz 'Amma and Yasin) */}
+        {/* AUDIO PLAYER BAR (For Juz 'Amma & Yasin)                  */}
         {/* ========================================================= */}
-        {mainTab !== 'tahlil' && (
+        {(mainTab === 'juz_amma' || mainTab === 'yasin') && (
           <div className="px-3 sm:px-4 py-2 bg-slate-950/90 border-b border-emerald-800/40 flex flex-wrap items-center justify-between gap-2 shrink-0">
             {/* Play/Pause & Mode */}
             <div className="flex items-center gap-2">
@@ -444,7 +495,7 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                     ? 'bg-amber-500 text-slate-950 border-amber-400'
                     : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-700'
                 }`}
-                title="Pengaturan Suara Penerjemah (Nada Berat / Pria)"
+                title="Pengaturan Suara Penerjemah"
               >
                 <Sliders className="w-3 h-3" />
                 <span className="hidden md:inline">Suara Terjemah</span>
@@ -454,7 +505,7 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
         )}
 
         {/* Voice Setting Pop-down Tray */}
-        {showVoiceSettings && mainTab !== 'tahlil' && (
+        {showVoiceSettings && (mainTab === 'juz_amma' || mainTab === 'yasin') && (
           <div className="px-4 py-2.5 bg-slate-950 border-b border-amber-500/30 flex flex-wrap items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-2">
               <span className="text-amber-300 font-bold flex items-center gap-1">
@@ -960,7 +1011,7 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleIncrementTasbih(item.id)}
-                                className="flex items-center gap-1 text-xs font-bold text-cyan-300 hover:text-white"
+                                className="flex items-center gap-1 text-xs font-bold text-cyan-300 hover:text-white cursor-pointer"
                               >
                                 <Plus className="w-3 h-3" />
                                 <span>Hitung: {currentCount}</span>
@@ -969,7 +1020,7 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => handleResetTasbih(item.id)}
-                                  className="text-slate-500 hover:text-rose-400 ml-1"
+                                  className="text-slate-500 hover:text-rose-400 ml-1 cursor-pointer"
                                   title="Reset Hitungan"
                                 >
                                   <RotateCcw className="w-3 h-3" />
@@ -981,7 +1032,7 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                           <button
                             type="button"
                             onClick={() => handleCopyTahlilItem(item)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-300 hover:bg-slate-900 border border-slate-800"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-300 hover:bg-slate-900 border border-slate-800 cursor-pointer"
                             title="Salin Bacaan Ini"
                           >
                             {copiedTahlilId === item.id ? (
@@ -1009,6 +1060,220 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                       {showTranslation && (
                         <p className="text-xs sm:text-sm font-sans text-slate-300 mt-2 leading-relaxed">
                           {item.translation}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ========================================= */}
+          {/* TAB 4: MAHALUL QIYAM LENGKAP & ELEGAN     */}
+          {/* ========================================= */}
+          {mainTab === 'mahalul_qiyam' && (
+            <div
+              ref={versesContainerRef}
+              className="flex-1 overflow-y-auto p-3 sm:p-6 bg-slate-900/60 custom-scrollbar flex flex-col"
+            >
+              {/* Mahalul Qiyam Header Banner */}
+              <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-[#300a12] via-[#521321] to-[#2b0810] border border-amber-400/40 shadow-xl mb-4 text-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 opacity-10 font-arabic text-8xl select-none pointer-events-none p-2 text-amber-200">
+                  مَحَلُّ الْقِيَامِ
+                </div>
+                
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-300 text-xs font-bold mb-1 shadow-xs">
+                  <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400" />
+                  <span>Maulid Simtudduror & Ad-Diba'i</span>
+                </div>
+
+                <h2 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300 tracking-wider font-sans">
+                  Mahalul Qiyam
+                </h2>
+                
+                <p className="text-3xl sm:text-4xl font-arabic font-bold text-amber-300 mt-1 drop-shadow-md">
+                  مَحَلُّ الْقِيَامِ الشَّرِيْفِ
+                </p>
+
+                <p className="text-xs text-rose-200/90 mt-1 max-w-lg mx-auto leading-relaxed">
+                  Bait Qasidah & Shalawat Berdiri Menyambut Kelahiran Baginda Nabi Muhammad SAW Penuh Cinta & Ketakziman
+                </p>
+
+                {/* Section Filter Pills for Mahalul Qiyam */}
+                <div className="flex items-center justify-center gap-1.5 mt-4 flex-wrap text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setMqSectionFilter('all')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                      mqSectionFilter === 'all'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    Semua Bait ({MAHALUL_QIYAM_DATA.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMqSectionFilter('salam')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                      mqSectionFilter === 'salam'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    1. Yaa Nabi Salam
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMqSectionFilter('pujian')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                      mqSectionFilter === 'pujian'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    2. Asyroqol Badru
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMqSectionFilter('syauq')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                      mqSectionFilter === 'syauq'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    3. Kerinduan Alam
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMqSectionFilter('marhaban')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                      mqSectionFilter === 'marhaban'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    4. Marhaban
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMqSectionFilter('doa')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                      mqSectionFilter === 'doa'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    5. Doa Penutup
+                  </button>
+                </div>
+
+                {/* Salin Seluruh Teks Mahalul Qiyam Button */}
+                <div className="flex items-center justify-center gap-2 mt-3.5">
+                  <button
+                    type="button"
+                    onClick={handleCopyWholeMq}
+                    className="px-3 py-1 rounded-lg bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 text-xs font-bold flex items-center gap-1.5 border border-amber-300/40 transition-all cursor-pointer"
+                  >
+                    {isMqWholeCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    <span>{isMqWholeCopied ? 'Tersalin!' : 'Salin Seluruh Syair Mahalul Qiyam'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Verses of Mahalul Qiyam */}
+              <div className="space-y-4 my-2">
+                {filteredMahalulQiyam.map((item) => {
+                  const currentCount = mqCounts[item.id] || 0;
+                  return (
+                    <div
+                      key={item.id}
+                      className={`p-4 sm:p-5 rounded-2xl transition-all shadow-md ${
+                        item.isReff
+                          ? 'bg-gradient-to-br from-amber-950/80 via-slate-950 to-rose-950/60 border-2 border-amber-400/70 shadow-amber-950/40'
+                          : 'bg-slate-950/70 border border-slate-800 hover:border-amber-700/50'
+                      }`}
+                    >
+                      {/* Top Verse Bar */}
+                      <div className="flex items-center justify-between mb-3 border-b border-slate-800/80 pb-2">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`w-6 h-6 rounded-lg text-xs font-mono font-bold flex items-center justify-center ${
+                              item.isReff
+                                ? 'bg-amber-500 text-slate-950 shadow-xs'
+                                : 'bg-rose-950 border border-rose-600/40 text-rose-300'
+                            }`}
+                          >
+                            {item.id}
+                          </span>
+                          <div>
+                            <span className="text-xs font-bold text-amber-300 flex items-center gap-1">
+                              {item.isReff && <Sparkles className="w-3 h-3 text-amber-400" />}
+                              Bait ke-{item.id} {item.isReff ? '• Salam Utama (Reff)' : ''}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {/* Shalawat Clicker Counter for Mahalul Qiyam */}
+                          <div className="flex items-center gap-1 bg-slate-900 px-2 py-1 rounded-xl border border-amber-800/40">
+                            <button
+                              type="button"
+                              onClick={() => handleIncrementMq(item.id)}
+                              className="flex items-center gap-1 text-xs font-bold text-amber-300 hover:text-white cursor-pointer"
+                              title="Hitung Bacaan Bait Ini"
+                            >
+                              <Plus className="w-3 h-3" />
+                              <span>Lantun: {currentCount}x</span>
+                            </button>
+                            {currentCount > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => handleResetMq(item.id)}
+                                className="text-slate-500 hover:text-rose-400 ml-1 cursor-pointer"
+                                title="Reset Hitungan"
+                              >
+                                <RotateCcw className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleCopyMqItem(item)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-amber-300 hover:bg-slate-900 border border-slate-800 cursor-pointer"
+                            title="Salin Bait Ini"
+                          >
+                            {copiedMqId === item.id ? (
+                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            ) : (
+                              <Copy className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Arabic Text (Centered and Balanced for Qasidah / Syair) */}
+                      <p
+                        className={`text-right sm:text-center font-arabic font-bold text-white whitespace-pre-line ${getArabicSizeClass()}`}
+                        dir="rtl"
+                      >
+                        {item.arabic}
+                      </p>
+
+                      {/* Latin Transliteration */}
+                      {showLatin && (
+                        <p className="text-xs sm:text-sm font-sans font-medium text-amber-200/95 mt-3 text-left sm:text-center whitespace-pre-line leading-relaxed">
+                          {item.latin}
+                        </p>
+                      )}
+
+                      {/* Indonesian Translation */}
+                      {showTranslation && (
+                        <p className="text-xs sm:text-sm font-sans text-slate-300 mt-2 text-left sm:text-center whitespace-pre-line leading-relaxed italic">
+                          "{item.translation}"
                         </p>
                       )}
                     </div>
