@@ -82,10 +82,10 @@ export const PrayerTimeBannerCard: React.FC<PrayerTimeBannerCardProps> = ({
               type="button"
               onClick={onOpenSurahsModal}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-teal-500/20 via-emerald-400/25 to-teal-500/20 hover:from-teal-500/40 hover:to-emerald-400/40 text-emerald-100 hover:text-white border border-emerald-400/50 shadow-xs transition-all cursor-pointer"
-              title="Buka Pop-up Juz 'Amma, Surat Yasin & Tahlil Lengkap"
+              title="Buka Pop-up Juz 'Amma, Surat Yasin, Tahlil, Mahalul Qiyam, Dzikir Sholat & Doa Harian"
             >
               <BookOpen className="w-3.5 h-3.5 text-amber-300" />
-              <span>Surat, Yasin & Tahlil</span>
+              <span>Surat, Yasin, Dzikir & Doa</span>
             </button>
           )}
 

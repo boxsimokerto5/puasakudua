@@ -405,7 +405,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               className="w-full py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 bg-emerald-950/80 hover:bg-emerald-900/90 text-amber-200 border border-emerald-500/50 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
             >
               <BookOpen className="w-3.5 h-3.5 text-amber-300" />
-              <span>Juz 'Amma, Surat Yasin & Tahlil</span>
+              <span>Juz 'Amma, Yasin, Dzikir Sholat & Doa</span>
               <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30">
                 Lengkap
               </span>
