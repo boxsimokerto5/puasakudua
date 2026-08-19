@@ -15,15 +15,18 @@ import {
   ChevronDown,
   ChevronUp,
   Maximize2,
+  BookOpen,
 } from 'lucide-react';
 
 interface PrayerTimeBannerCardProps {
   onOpenModal: () => void;
+  onOpenSurahsModal?: () => void;
   city?: CityLocation;
 }
 
 export const PrayerTimeBannerCard: React.FC<PrayerTimeBannerCardProps> = ({
   onOpenModal,
+  onOpenSurahsModal,
   city = INDONESIA_CITIES[0],
 }) => {
   const [now, setNow] = useState<Date>(new Date());
@@ -72,25 +75,38 @@ export const PrayerTimeBannerCard: React.FC<PrayerTimeBannerCardProps> = ({
         </div>
 
         {/* Right: Quick Action Buttons */}
-        <div className="flex items-center gap-2 ml-auto sm:ml-0">
+        <div className="flex items-center gap-2 ml-auto sm:ml-0 flex-wrap">
+          {/* Quick Surat Pendek / Juz 'Amma Popup Trigger */}
+          {onOpenSurahsModal && (
+            <button
+              type="button"
+              onClick={onOpenSurahsModal}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-teal-500/20 via-emerald-400/25 to-teal-500/20 hover:from-teal-500/40 hover:to-emerald-400/40 text-emerald-100 hover:text-white border border-emerald-400/50 shadow-xs transition-all cursor-pointer"
+              title="Buka Pop-up Surat-Surat Pendek (Juz 'Amma)"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-amber-300" />
+              <span>Surat Pendek</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-950/70 hover:bg-emerald-900 text-emerald-200 border border-emerald-700/60 transition-colors cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-950/70 hover:bg-emerald-900 text-emerald-200 border border-emerald-700/60 transition-colors cursor-pointer"
             title={isExpanded ? 'Sembunyikan jadwal' : 'Lihat semua waktu sholat'}
           >
-            <span>{isExpanded ? 'Ringkas' : 'Lihat 8 Waktu'}</span>
+            <span>{isExpanded ? 'Ringkas' : '8 Waktu'}</span>
             {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           </button>
 
           <button
             type="button"
             onClick={onOpenModal}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-black bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-emerald-950 border border-amber-300 shadow-xs transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-emerald-950 border border-amber-300 shadow-xs transition-all cursor-pointer"
             title="Buka Jadwal Lengkap & Doa Berbuka"
           >
             <Maximize2 className="w-3 h-3" />
-            <span className="hidden xs:inline">Jadwal Lengkap</span>
+            <span className="hidden xs:inline">Jadwal</span>
             <Sparkles className="w-3 h-3 text-emerald-950 animate-pulse" />
           </button>
         </div>
@@ -113,6 +129,11 @@ export const PrayerTimeBannerCard: React.FC<PrayerTimeBannerCardProps> = ({
                 <div className="text-xs sm:text-sm font-mono font-black text-amber-200 mt-0.5">
                   {item.time}
                 </div>
+                {item.isNext && (
+                  <span className="inline-block mt-1 text-[9px] font-bold bg-amber-400 text-emerald-950 px-1.5 py-0.2 rounded-full">
+                    Berikutnya
+                  </span>
+                )}
               </div>
             ))}
           </div>

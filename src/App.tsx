@@ -36,7 +36,6 @@ import { SplashScreen } from './components/SplashScreen';
 import { FastingWisdomModal } from './components/FastingWisdomModal';
 import { PrayerTimesModal } from './components/PrayerTimesModal';
 import { PrayerTimeBannerCard } from './components/PrayerTimeBannerCard';
-import { ShortSurahsDashboardCard } from './components/ShortSurahsDashboardCard';
 import { ShortSurahsModal } from './components/ShortSurahsModal';
 import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { usePwaInstall } from './hooks/usePwaInstall';
@@ -610,12 +609,8 @@ export default function App() {
             {/* Live Ramadan Prayer Times & Imsakiyah Banner Card */}
             <PrayerTimeBannerCard
               onOpenModal={() => setShowPrayerModal(true)}
+              onOpenSurahsModal={() => setShowSurahsModal(true)}
               city={selectedCity}
-            />
-
-            {/* In-Dashboard Short Surahs (Juz Amma) Reader Card */}
-            <ShortSurahsDashboardCard
-              onOpenModal={() => setShowSurahsModal(true)}
             />
 
             {/* Session Selector / Creator Block (Shown on regular session workflows) */}
