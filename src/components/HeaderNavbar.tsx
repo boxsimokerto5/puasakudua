@@ -282,18 +282,18 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
               </button>
             )}
 
-            {/* Surat-Surat Pendek (Juz Amma) Button */}
+            {/* Surat-Surat Pendek, Yasin & Tahlil Button */}
             {onOpenSurahsModal && (
               <button
                 type="button"
                 onClick={onOpenSurahsModal}
-                title="Buka Kumpulan Surat-Surat Pendek (Juz 'Amma & Pilihan) Lengkap dengan Audio"
+                title="Buka Juz 'Amma, Surat Yasin & Susunan Tahlil Lengkap"
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-black bg-gradient-to-r from-teal-500/20 via-emerald-400/25 to-teal-500/20 hover:from-teal-500/40 hover:to-emerald-400/40 text-emerald-100 hover:text-white border border-emerald-400/50 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
               >
                 <BookOpen className="w-3.5 h-3.5 text-amber-300" />
-                <span className="hidden sm:inline">Surat Pendek</span>
+                <span className="hidden sm:inline">Surat & Yasin</span>
                 <span className="text-[10px] px-1 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                  Juz 'Amma
+                  Tahlil
                 </span>
               </button>
             )}
