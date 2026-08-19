@@ -34,7 +34,7 @@ interface HeaderNavbarProps {
   isPwaInstalled?: boolean;
   onOpenWisdomModal?: () => void;
   onOpenPrayerModal?: () => void;
-  onOpenSurahsModal?: () => void;
+  onOpenSurahsModal?: (tab?: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian') => void;
   selectedCity?: CityLocation;
 }
 
@@ -286,7 +286,7 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
             {onOpenSurahsModal && (
               <button
                 type="button"
-                onClick={onOpenSurahsModal}
+                onClick={() => onOpenSurahsModal('juz_amma')}
                 title="Buka Juz 'Amma, Surat Yasin, Tahlil, Mahalul Qiyam, Dzikir Sholat & Doa Harian"
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-black bg-gradient-to-r from-teal-500/20 via-emerald-400/25 to-teal-500/20 hover:from-teal-500/40 hover:to-emerald-400/40 text-emerald-100 hover:text-white border border-emerald-400/50 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
               >

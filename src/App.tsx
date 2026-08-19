@@ -60,6 +60,12 @@ export default function App() {
 
   // Short Surahs Modal State
   const [showSurahsModal, setShowSurahsModal] = useState(false);
+  const [surahsModalTab, setSurahsModalTab] = useState<'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian'>('juz_amma');
+
+  const handleOpenSurahsModal = (tab: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' = 'juz_amma') => {
+    setSurahsModalTab(tab);
+    setShowSurahsModal(true);
+  };
 
   // Selected Prayer City
   const [selectedCity, setSelectedCity] = useState<CityLocation>(() => {
@@ -600,7 +606,7 @@ export default function App() {
             isPwaInstalled={pwaState.isInstalled}
             onOpenWisdomModal={() => setShowWisdomModal(true)}
             onOpenPrayerModal={() => setShowPrayerModal(true)}
-            onOpenSurahsModal={() => setShowSurahsModal(true)}
+            onOpenSurahsModal={(tab) => handleOpenSurahsModal(tab || 'juz_amma')}
             selectedCity={selectedCity}
           />
 
@@ -609,7 +615,7 @@ export default function App() {
             {/* Live Ramadan Prayer Times & Imsakiyah Banner Card */}
             <PrayerTimeBannerCard
               onOpenModal={() => setShowPrayerModal(true)}
-              onOpenSurahsModal={() => setShowSurahsModal(true)}
+              onOpenSurahsModal={() => handleOpenSurahsModal('juz_amma')}
               city={selectedCity}
             />
 
@@ -804,10 +810,11 @@ export default function App() {
         onCityChange={handleCityChange}
       />
 
-      {/* Short Surahs (Juz 'Amma) Modal */}
+      {/* Short Surahs (Juz 'Amma, Yasin, Tahlil, Mahalul Qiyam, Dzikir & Doa) Modal */}
       <ShortSurahsModal
         isOpen={showSurahsModal}
         onClose={() => setShowSurahsModal(false)}
+        initialTab={surahsModalTab}
       />
     </>
   );
