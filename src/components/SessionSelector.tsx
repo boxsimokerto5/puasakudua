@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FastingSession } from '../types';
-import { Calendar, Plus, Check, ChevronDown, Sparkles, Trash2, AlertTriangle, X, Lock, Unlock } from 'lucide-react';
+import { Calendar, Plus, Check, ChevronDown, Sparkles, Trash2, AlertTriangle, X, Lock, Unlock, Moon } from 'lucide-react';
 
 interface SessionSelectorProps {
   sessions: Record<string, FastingSession>;
@@ -13,11 +13,12 @@ interface SessionSelectorProps {
 }
 
 const PRESET_TITLES = [
+  'Puasa Ramadhan 1447 H',
   'Puasa Sunnah Senin',
   'Puasa Sunnah Kamis',
   'Puasa Ayyamul Bidh',
   'Puasa Sunnah Dzulhijjah',
-  'Puasa Ramadhan',
+  'Puasa Sunnah Nisfu Sya\'ban',
 ];
 
 export const SessionSelector: React.FC<SessionSelectorProps> = ({
@@ -33,7 +34,7 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<FastingSession | null>(null);
 
-  const [newTitle, setNewTitle] = useState('Puasa Sunnah Senin');
+  const [newTitle, setNewTitle] = useState('Puasa Ramadhan 1447 H');
   const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0]);
   const [customTitle, setCustomTitle] = useState('');
 
@@ -89,44 +90,51 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
   };
 
   return (
-    <div className="bg-emerald-800 text-emerald-50 rounded-2xl p-4 shadow-lg border border-emerald-700/60 mb-6">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <div className="relative bg-gradient-to-br from-emerald-950 via-teal-950 to-emerald-900 text-emerald-50 rounded-2xl p-4 sm:p-5 shadow-xl border border-amber-500/35 ring-1 ring-amber-400/20 mb-6 z-30">
+      {/* Decorative ambient background accents for Ramadan */}
+      <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-400/10 rounded-full blur-2xl" />
+        <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-2xl" />
+      </div>
+
+      <div className="relative z-30 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         {/* Active Session Info */}
-        <div className="flex items-start sm:items-center gap-3">
-          <div className="p-3 bg-emerald-700/80 rounded-xl border border-emerald-500/40 text-amber-300 shrink-0">
-            <Calendar className="w-6 h-6" />
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="p-3.5 bg-gradient-to-br from-amber-400 via-amber-500 to-yellow-600 text-emerald-950 rounded-2xl shadow-lg shadow-amber-500/25 ring-2 ring-amber-300/40 shrink-0 flex items-center justify-center">
+            <Moon className="w-6 h-6 fill-emerald-950" />
           </div>
           <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs uppercase tracking-wider font-bold text-emerald-300">
-                Sesi Input Yang Aktif
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <span className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider font-extrabold text-amber-300 bg-amber-400/15 border border-amber-400/35 px-2.5 py-0.5 rounded-full shadow-xs">
+                <Sparkles className="w-3 h-3 text-amber-400" /> Sesi Input Aktif
               </span>
               {activeSession?.isLocked ? (
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-900/90 text-rose-200 border border-rose-600 flex items-center gap-1">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-950/90 text-rose-200 border border-rose-600/60 flex items-center gap-1 shadow-xs">
                   <Lock className="w-3 h-3" /> Terkunci (Read-Only)
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-900/80 text-emerald-200 border border-emerald-700 flex items-center gap-1">
-                  <Unlock className="w-3 h-3" /> Terbuka
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-900/90 text-emerald-200 border border-emerald-500/50 flex items-center gap-1 shadow-xs">
+                  <Unlock className="w-3 h-3 text-emerald-400" /> Terbuka
                 </span>
               )}
               {activeSession?.isVerified && (
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-400 text-emerald-950 border border-amber-300">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-gradient-to-r from-amber-400 to-amber-500 text-emerald-950 border border-amber-300 shadow-xs">
                   ✓ Terverifikasi
                 </span>
               )}
             </div>
-            <h2 className="text-lg sm:text-xl font-bold text-white mt-0.5">
-              {activeSession?.title || 'Puasa Sunnah Senin'}
+            <h2 className="text-lg sm:text-xl font-black text-white tracking-tight flex items-center gap-2">
+              <span>{activeSession?.title || 'Puasa Ramadhan 1447 H'}</span>
             </h2>
-            <p className="text-xs text-emerald-200 font-medium">
-              Tanggal:{' '}
-              <span className="font-semibold text-amber-300">
+            <p className="text-xs text-emerald-200/90 font-medium mt-0.5 flex items-center gap-1.5 flex-wrap">
+              <Calendar className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Tanggal:</span>
+              <span className="font-bold text-amber-300">
                 {activeSession ? formatDateIndo(activeSession.date) : '27 Agustus 2026'}
               </span>
               {activeSession?.inputDeadline && (
-                <span className="ml-2 text-amber-200">
-                  • Batas Jam: {activeSession.inputDeadline} WIB
+                <span className="ml-1 text-amber-200/90 bg-emerald-900/60 px-2 py-0.5 rounded-md border border-emerald-700/50 text-[11px]">
+                  Batas Jam: <strong className="text-amber-300">{activeSession.inputDeadline} WIB</strong>
                 </span>
               )}
             </p>
@@ -136,28 +144,30 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
         {/* Actions & Selector Dropdown */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Custom History Selector Dropdown with Trash icons (Admin only) */}
-          <div className="relative flex-1 sm:flex-initial min-w-[220px]" ref={dropdownRef}>
+          <div className="relative flex-1 sm:flex-initial w-full sm:w-auto min-w-[240px] z-40" ref={dropdownRef}>
             <button
               type="button"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="w-full bg-emerald-900/90 hover:bg-emerald-950 text-emerald-100 text-xs font-semibold px-3.5 py-2.5 rounded-xl border border-emerald-600 focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all flex items-center justify-between gap-2 cursor-pointer"
+              className="w-full bg-emerald-900/90 hover:bg-emerald-950 text-emerald-100 text-xs font-semibold px-3.5 py-2.5 rounded-xl border border-amber-500/35 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-inner transition-all flex items-center justify-between gap-2 cursor-pointer"
             >
               <div className="truncate text-left">
-                <span className="font-bold text-white">
+                <span className="font-bold text-amber-100">
                   {activeSession ? activeSession.title : 'Pilih Sesi'}
                 </span>
-                <span className="text-emerald-300 text-[11px] ml-1.5 font-normal">
+                <span className="text-amber-300/80 text-[11px] ml-1.5 font-normal">
                   ({activeSession?.date})
                 </span>
               </div>
-              <ChevronDown className={`w-4 h-4 text-emerald-300 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-4 h-4 text-amber-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {/* Dropdown Menu Popup */}
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white text-gray-800 rounded-2xl shadow-2xl border border-gray-200 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
-                <div className="px-3.5 py-2.5 bg-emerald-900 text-white font-bold text-xs flex items-center justify-between border-b border-emerald-800">
-                  <span>Riwayat Sesi Puasa ({sessionList.length})</span>
+              <div className="absolute left-0 right-0 sm:left-auto sm:right-0 mt-2 sm:w-80 bg-white text-gray-900 rounded-2xl shadow-2xl border border-amber-300 ring-1 ring-black/10 z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+                <div className="px-3.5 py-2.5 bg-gradient-to-r from-emerald-950 to-teal-900 text-white font-bold text-xs flex items-center justify-between border-b border-amber-500/30">
+                  <span className="flex items-center gap-1.5 text-amber-300">
+                    <Moon className="w-3.5 h-3.5 fill-amber-300" /> Riwayat Sesi Puasa ({sessionList.length})
+                  </span>
                   <span className="text-[10px] font-normal text-emerald-200">
                     Klik untuk memilih
                   </span>
@@ -175,7 +185,7 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
                         }}
                         className={`p-3 flex items-center justify-between gap-2 cursor-pointer transition-colors ${
                           isActive
-                            ? 'bg-emerald-50 text-emerald-950 font-bold'
+                            ? 'bg-amber-50/90 text-emerald-950 font-bold border-l-4 border-amber-500'
                             : 'hover:bg-gray-50 text-gray-700'
                         }`}
                       >
@@ -225,7 +235,7 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
             <button
               type="button"
               onClick={() => setSessionToDelete(activeSession)}
-              className="p-2.5 bg-emerald-900/80 hover:bg-rose-900/80 text-emerald-300 hover:text-rose-200 rounded-xl border border-emerald-600 hover:border-rose-500 transition-all cursor-pointer"
+              className="p-2.5 bg-emerald-900/80 hover:bg-rose-900/80 text-amber-300 hover:text-rose-200 rounded-xl border border-amber-500/30 hover:border-rose-500 transition-all cursor-pointer shadow-xs"
               title="Hapus Sesi Aktif Ini (Khusus Admin)"
             >
               <Trash2 className="w-4 h-4" />
@@ -237,9 +247,9 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="px-3.5 py-2.5 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold text-xs rounded-xl shadow transition-all duration-150 flex items-center gap-1.5 cursor-pointer hover:scale-[1.02]"
+              className="px-4 py-2.5 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-emerald-950 font-black text-xs rounded-xl shadow-lg shadow-amber-400/20 transition-all duration-150 flex items-center gap-1.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 stroke-[3]" />
               <span>Buat Judul / Tanggal Baru</span>
             </button>
           )}
@@ -292,13 +302,18 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
       {/* Modal for Creating New Fasting Session Block */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white text-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white text-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-amber-200 space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b pb-3 border-gray-100">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-amber-500" />
-                <h3 className="font-bold text-emerald-950 text-base">
-                  Buat Judul & Tanggal Inputan Puasa
-                </h3>
+                <div className="p-2 bg-amber-100 text-amber-700 rounded-xl">
+                  <Moon className="w-5 h-5 fill-amber-500 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-emerald-950 text-base">
+                    Buat Sesi Inputan Puasa Baru
+                  </h3>
+                  <p className="text-[11px] text-gray-500 font-medium">Tema Ramadhan & Puasa Sunnah</p>
+                </div>
               </div>
               <button
                 type="button"
@@ -317,7 +332,7 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
                 <select
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full p-2.5 text-sm bg-gray-50 border border-gray-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  className="w-full p-2.5 text-sm bg-gray-50 border border-gray-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
                 >
                   {PRESET_TITLES.map((t) => (
                     <option key={t} value={t}>
@@ -337,8 +352,8 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
                     type="text"
                     value={customTitle}
                     onChange={(e) => setCustomTitle(e.target.value)}
-                    placeholder="Contoh: Puasa Sunnah Nisfu Sya'ban"
-                    className="w-full p-2.5 text-sm bg-gray-50 border border-gray-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                    placeholder="Contoh: Puasa Ramadhan Hari Ke-1"
+                    className="w-full p-2.5 text-sm bg-gray-50 border border-gray-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
                     required
                   />
                 </div>
@@ -352,11 +367,11 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
                   type="date"
                   value={newDate}
                   onChange={(e) => setNewDate(e.target.value)}
-                  className="w-full p-2.5 text-sm bg-gray-50 border border-gray-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  className="w-full p-2.5 text-sm bg-gray-50 border border-gray-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
                   required
                 />
                 <p className="text-[11px] text-gray-500 mt-1">
-                  Format tampilan: {formatDateIndo(newDate)}
+                  Format tampilan: <strong className="text-emerald-800">{formatDateIndo(newDate)}</strong>
                 </p>
               </div>
 
@@ -370,9 +385,9 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-emerald-950 shadow-md shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <Check className="w-4 h-4" />
+                  <Check className="w-4 h-4 stroke-[3]" />
                   <span>Simpan Sesi Baru</span>
                 </button>
               </div>
