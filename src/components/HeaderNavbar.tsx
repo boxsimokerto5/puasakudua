@@ -313,12 +313,21 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
               </button>
             )}
 
-            {/* Supabase Status Indicator (Display Only, Protected from Edit) */}
-            <div
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold border select-none backdrop-blur-xs ${
+            {/* Supabase Status Indicator */}
+            <button
+              type="button"
+              onClick={isAdmin && onOpenSupabaseConfig ? onOpenSupabaseConfig : undefined}
+              title={
+                isSupabaseConnected
+                  ? 'Supabase Cloud Aktif (Tersinkronisasi Realtime). Klik untuk membuka pengaturan database.'
+                  : 'Database Supabase Belum Terhubung (Data tersimpan di perangkat lokal). Klik untuk menghubungkan Supabase.'
+              }
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold border backdrop-blur-xs transition-all ${
+                isAdmin && onOpenSupabaseConfig ? 'cursor-pointer hover:scale-105' : 'cursor-default'
+              } ${
                 isSupabaseConnected
                   ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50 shadow-xs'
-                  : 'bg-emerald-950/50 text-emerald-400 border-emerald-700/40'
+                  : 'bg-emerald-950/50 text-amber-300 border-amber-500/40 hover:bg-emerald-900/60'
               }`}
             >
               <Database className="w-3.5 h-3.5" />
@@ -329,11 +338,11 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                 </>
               ) : (
                 <>
-                  <CloudOff className="w-3 h-3 text-emerald-400" />
-                  <span className="hidden md:inline">Tersimpan</span>
+                  <CloudOff className="w-3 h-3 text-amber-400" />
+                  <span className="hidden md:inline">Hubungkan Cloud</span>
                 </>
               )}
-            </div>
+            </button>
 
             {/* PWA Install Button (If not installed) */}
             {!isPwaInstalled && onInstallPwa && (

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { Student } from '../types';
 import { Camera, User } from 'lucide-react';
+import { getOptimizedPhotoUrl } from '../utils/imageUtils';
 
 interface StudentCardItemProps {
   student: Student;
@@ -12,10 +13,12 @@ interface StudentCardItemProps {
 export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level, onUploadClick }) => {
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [imgError, setImgError] = useState<boolean>(false);
+  const [isUsingDirectFallback, setIsUsingDirectFallback] = useState<boolean>(false);
 
-  // Reset imgError if student foto changes
+  // Reset imgError & fallback if student foto changes
   useEffect(() => {
     setImgError(false);
+    setIsUsingDirectFallback(false);
   }, [student.foto]);
 
   // Generate QR Code based on student NIK (or fallback to student ID / No)
@@ -93,7 +96,7 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
           </div>
           <div>
             <h3 className="text-xs font-black tracking-wider leading-none text-amber-300">
-              KARTU SANTRI ASRAMA
+              KARTU PUASA WALI ASUH
             </h3>
             <p className="text-[8.5px] text-white/95 font-medium tracking-wide mt-0.5 whitespace-nowrap">
               SEKOLAH RAKYAT TERINTEGRASI 1 KEDIRI
@@ -109,8 +112,8 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
         </div>
       </div>
 
-      {/* Main Body with Student Avatar & Details */}
-      <div className="px-3.5 py-2 flex items-center gap-3 relative flex-1">
+      {/* Main Body with Student Avatar, Details & Prominent QR Code */}
+      <div className="px-3 py-1.5 flex items-center gap-2.5 relative flex-1">
         {/* Student Avatar / Photo Box */}
         <div
           onClick={(e) => {
@@ -119,24 +122,37 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
               onUploadClick(student, e);
             }
           }}
-          className={`w-16 h-20 rounded-xl bg-slate-100 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center shrink-0 relative overflow-hidden text-center group ${
+          className={`w-14 h-19 rounded-xl bg-slate-100 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center shrink-0 relative overflow-hidden text-center group ${
             onUploadClick ? 'cursor-pointer hover:border-emerald-500' : ''
           }`}
           title={onUploadClick ? 'Klik untuk mengganti / mengunggah foto santri' : undefined}
         >
           {student.foto && !imgError ? (
             <img
-              src={student.foto}
+              src={
+                isUsingDirectFallback
+                  ? student.foto
+                  : getOptimizedPhotoUrl(student.foto, { width: 220, height: 280, quality: 88, format: 'webp' })
+              }
               alt={student.nama}
-              onError={() => setImgError(true)}
+              referrerPolicy="no-referrer"
+              crossOrigin="anonymous"
+              loading="lazy"
+              onError={() => {
+                if (!isUsingDirectFallback && student.foto && student.foto.startsWith('http')) {
+                  setIsUsingDirectFallback(true);
+                } else {
+                  setImgError(true);
+                }
+              }}
               className="w-full h-full object-cover rounded-lg"
             />
           ) : (
-            <div className="flex flex-col items-center justify-center p-1">
-              <span className="text-xl">
+            <div className="flex flex-col items-center justify-center p-0.5">
+              <span className="text-lg">
                 {student.jenisKelamin === 'Perempuan' ? '🧕' : '👳'}
               </span>
-              <span className="text-[7.5px] font-bold text-gray-400 mt-0.5 uppercase leading-tight">
+              <span className="text-[7px] font-bold text-gray-400 mt-0.5 uppercase leading-tight">
                 Foto Santri
               </span>
             </div>
@@ -151,7 +167,7 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
           )}
 
           <span
-            className={`absolute bottom-0 inset-x-0 text-[7px] font-extrabold text-white py-0.5 text-center shadow-xs ${
+            className={`absolute bottom-0 inset-x-0 text-[6.5px] font-extrabold text-white py-0.5 text-center shadow-xs ${
               student.jenisKelamin === 'Perempuan' ? 'bg-pink-600' : 'bg-blue-600'
             }`}
           >
@@ -160,71 +176,67 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
         </div>
 
         {/* Student Bio Details */}
-        <div className="flex-1 min-w-0 space-y-1">
+        <div className="flex-1 min-w-0 space-y-0.5">
           <div>
-            <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider">
+            <p className="text-[7.5px] font-semibold text-gray-400 uppercase tracking-wider">
               Nama Lengkap
             </p>
-            <h4 className="text-xs font-black text-gray-900 truncate leading-tight">
+            <h4 className="text-[11px] font-black text-gray-900 truncate leading-tight">
               {student.nama}
             </h4>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-[10px]">
+          <div className="grid grid-cols-2 gap-1 text-[9px]">
             <div>
-              <p className="text-[8px] text-gray-400 font-semibold uppercase">Kelas</p>
-              <p className="font-extrabold text-emerald-800">{student.kelas}</p>
+              <p className="text-[7px] text-gray-400 font-semibold uppercase">Kelas</p>
+              <p className="font-extrabold text-emerald-800 leading-tight">{student.kelas}</p>
             </div>
             <div>
-              <p className="text-[8px] text-gray-400 font-semibold uppercase">No. Urut</p>
-              <p className="font-extrabold text-gray-800">#{student.no}</p>
+              <p className="text-[7px] text-gray-400 font-semibold uppercase">No. Urut</p>
+              <p className="font-extrabold text-gray-800 leading-tight">#{student.no}</p>
             </div>
           </div>
 
           <div>
-            <p className="text-[8px] text-gray-400 font-semibold uppercase">NIK / ID Siswa</p>
-            <p className="text-[10px] font-mono font-bold text-gray-900 tracking-wider">
+            <p className="text-[7px] text-gray-400 font-semibold uppercase">NIK / ID Siswa</p>
+            <p className="text-[9px] font-mono font-bold text-gray-900 tracking-wider truncate leading-tight">
               {student.nik || '-'}
             </p>
           </div>
         </div>
-      </div>
 
-      {/* QR Code Footer Container */}
-      <div className="bg-slate-50 border-t border-gray-200 px-3 py-1.5 flex items-center justify-between">
-        {/* QR Code Graphic & NIK Display */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-11 h-11 bg-white p-0.5 rounded-lg border border-gray-300 shadow-xs flex items-center justify-center shrink-0">
+        {/* Prominent Large QR Code on the Right */}
+        <div className="shrink-0 flex flex-col items-center bg-white p-1 rounded-xl border border-gray-300 shadow-xs">
+          <div className="bg-slate-900 text-amber-300 text-[6.5px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider mb-0.5 leading-none">
+            Scan QR NIK
+          </div>
+          <div className="w-16 h-16 bg-white flex items-center justify-center">
             {qrDataUrl ? (
               <img src={qrDataUrl} alt="QR Code NIK" className="w-full h-full object-contain" />
             ) : (
               <div className="w-full h-full bg-gray-100 animate-pulse rounded" />
             )}
           </div>
-          <div className="flex flex-col">
-            <span className="text-[8px] text-gray-500 font-bold uppercase tracking-wider">
-              QR Code NIK:
-            </span>
-            <span className="text-[9px] font-mono font-black text-gray-900 tracking-wider leading-tight">
-              {qrValue}
-            </span>
-          </div>
+          <span className="text-[7.5px] font-mono font-bold text-gray-900 tracking-tight leading-none mt-0.5 max-w-[70px] truncate">
+            {qrValue}
+          </span>
         </div>
+      </div>
 
-        {/* Logo and Puasaku.app Branding */}
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white border border-emerald-200/80 shadow-xs">
-          <div className="w-5 h-5 rounded-md bg-emerald-600 p-0.5 flex items-center justify-center shrink-0 shadow-xs">
+      {/* Footer Branding Bar */}
+      <div className="bg-slate-50 border-t border-gray-200 px-3 py-1 flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          <div className="w-4 h-4 rounded bg-emerald-600 p-0.5 flex items-center justify-center shrink-0 shadow-xs">
             <img src="/assets/logo.svg" alt="Puasaku Logo" className="w-full h-full object-contain filter brightness-0 invert" />
           </div>
-          <div className="flex flex-col text-left">
-            <span className="text-[10px] font-black text-emerald-800 tracking-tight leading-none">
-              puasaku.app
-            </span>
-            <span className="text-[7px] font-semibold text-gray-400 tracking-wider leading-tight mt-0.5">
-              SRT 1 KEDIRI
-            </span>
-          </div>
+          <span className="text-[8.5px] font-black text-emerald-800 tracking-tight">
+            puasaku.app <span className="font-normal text-gray-400 text-[7.5px]">• SRT 1 KEDIRI</span>
+          </span>
         </div>
+
+        <span className="text-[7.5px] font-bold text-slate-500 uppercase tracking-wider">
+          Kartu Puasa Wali Asuh
+        </span>
       </div>
     </div>
   );

@@ -439,10 +439,10 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
             <button
               onClick={() => setIsDormCardModalOpen(true)}
               className="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all shadow-sm border border-amber-400 cursor-pointer active:scale-95"
-              title="Buat dan Cetak Kartu Santri Asrama dengan Barcode NIK (SD Merah, SMP Biru, SMA Abu-abu)"
+              title="Buat dan Cetak Kartu Puasa Wali Asuh dengan Barcode NIK (SD Merah, SMP Biru, SMA Abu-abu)"
             >
               <CreditCard className="w-4 h-4 text-slate-900" />
-              <span>Cetak Kartu Asrama</span>
+              <span>Cetak Kartu Puasa Wali Asuh</span>
             </button>
 
             {/* Scan with Camera Button */}

@@ -5,6 +5,7 @@
  */
 
 const STORAGE_KEY = 'srt_imgbb_api_key';
+export const DEFAULT_IMGBB_API_KEY = '25db998cc0e1a5fae4cf5e310627ea53';
 
 export function getImgBbApiKey(): string {
   try {
@@ -13,7 +14,10 @@ export function getImgBbApiKey(): string {
   } catch {
     // Ignore localStorage errors
   }
-  return import.meta.env.VITE_IMGBB_API_KEY || '';
+  const envKey = (import.meta as any).env?.VITE_IMGBB_API_KEY;
+  if (envKey && envKey.trim()) return envKey.trim();
+  
+  return DEFAULT_IMGBB_API_KEY;
 }
 
 export function saveImgBbApiKey(key: string): void {
@@ -36,14 +40,25 @@ export interface ImgBbUploadResponse {
   error?: string;
 }
 
+export interface ImgBbUploadOptions {
+  apiKey?: string;
+  name?: string;
+  expirationSeconds?: number;
+}
+
 /**
  * Uploads a File, Blob, or base64 dataURL to ImgBB
  */
 export async function uploadToImgBb(
   fileOrBase64: File | Blob | string,
-  customApiKey?: string
+  optionsOrApiKey?: string | ImgBbUploadOptions
 ): Promise<ImgBbUploadResponse> {
-  const apiKey = customApiKey?.trim() || getImgBbApiKey();
+  const options: ImgBbUploadOptions =
+    typeof optionsOrApiKey === 'string'
+      ? { apiKey: optionsOrApiKey }
+      : optionsOrApiKey || {};
+
+  const apiKey = options.apiKey?.trim() || getImgBbApiKey();
 
   if (!apiKey) {
     return {
@@ -57,16 +72,25 @@ export async function uploadToImgBb(
 
     if (typeof fileOrBase64 === 'string') {
       // It's a base64 DataURL or raw base64
-      let base64Data = fileOrBase64;
+      let base64Data = fileOrBase64.trim();
       if (base64Data.startsWith('data:')) {
         const commaIndex = base64Data.indexOf(',');
         if (commaIndex !== -1) {
           base64Data = base64Data.substring(commaIndex + 1);
         }
       }
+      // Remove any whitespace/newlines
+      base64Data = base64Data.replace(/[\r\n\s]+/g, '');
       formData.append('image', base64Data);
     } else {
       formData.append('image', fileOrBase64);
+    }
+
+    if (options.name) {
+      formData.append('name', options.name);
+    }
+    if (options.expirationSeconds && options.expirationSeconds >= 60) {
+      formData.append('expiration', String(options.expirationSeconds));
     }
 
     const response = await fetch(`https://api.imgbb.com/1/upload?key=${encodeURIComponent(apiKey)}`, {
@@ -104,19 +128,22 @@ export async function uploadToImgBb(
 }
 
 /**
- * Test if the provided ImgBB API key is valid using a 1x1 transparent PNG
+ * Test if the provided ImgBB API key is valid using a 1x1 valid transparent PNG
  */
 export async function testImgBbApiKey(apiKey: string): Promise<{ valid: boolean; message: string }> {
   if (!apiKey.trim()) {
     return { valid: false, message: 'API Key tidak boleh kosong.' };
   }
 
-  // 1x1 transparent PNG base64
-  const tinyPngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAAPI=' +
-    'AA//9vQAPA';
+  // 1x1 valid PNG base64
+  const valid1x1Png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
 
   try {
-    const res = await uploadToImgBb(tinyPngBase64, apiKey);
+    const res = await uploadToImgBb(valid1x1Png, {
+      apiKey: apiKey.trim(),
+      name: 'api_test',
+      expirationSeconds: 60, // Automatically deletes after 60 seconds
+    });
     if (res.success) {
       return { valid: true, message: 'API Key ImgBB valid dan siap digunakan!' };
     } else {

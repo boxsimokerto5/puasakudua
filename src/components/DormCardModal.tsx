@@ -40,7 +40,12 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
     () => new Set(students.map((s) => s.id))
   );
   const [isExportingPdf, setIsExportingPdf] = useState(false);
-  const [exportProgress, setExportProgress] = useState<{ current: number; total: number } | null>(null);
+  const [exportProgress, setExportProgress] = useState<{
+    current: number;
+    total: number;
+    page?: number;
+    totalPages?: number;
+  } | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'print_preview'>('grid');
   const [cardScale, setCardScale] = useState<'normal' | 'compact'>('normal');
 
@@ -127,10 +132,15 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
     }
 
     setIsExportingPdf(true);
-    setExportProgress({ current: 0, total: studentsToPrint.length });
+    setExportProgress({
+      current: 0,
+      total: studentsToPrint.length,
+      page: 1,
+      totalPages: Math.ceil(studentsToPrint.length / 8),
+    });
     try {
-      await exportStudentCardsToPdf(studentsToPrint, (current, total) => {
-        setExportProgress({ current, total });
+      await exportStudentCardsToPdf(studentsToPrint, (current, total, page, totalPages) => {
+        setExportProgress({ current, total, page, totalPages });
       });
     } catch (err) {
       console.error('Failed to generate PDF:', err);
@@ -158,14 +168,14 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base sm:text-lg font-bold tracking-tight">
-                  Cetak & Buat Kartu Asrama Santri
+                  Cetak & Buat Kartu Puasa Wali Asuh
                 </h2>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-emerald-950 uppercase tracking-wider">
                   QR Code NIK
                 </span>
               </div>
               <p className="text-xs text-emerald-200">
-                Desain kartu santri otomatis dengan QR Code NIK siap scan untuk input cepat amalan puasa
+                Desain kartu santri otomatis dengan QR Code NIK siap scan untuk input cepat amalan puasa wali asuh
               </p>
             </div>
           </div>
@@ -401,7 +411,8 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
           <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 transition-all cursor-pointer"
+              disabled={isExportingPdf}
+              className="px-4 py-2 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 transition-all cursor-pointer disabled:opacity-50"
             >
               Tutup
             </button>
@@ -427,6 +438,61 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
           </div>
         </div>
       </div>
+
+      {/* High Performance Export Progress Overlay */}
+      {isExportingPdf && exportProgress && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-emerald-950/75 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-emerald-100 text-center space-y-5">
+            <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center animate-bounce shadow-inner">
+              <Download className="w-8 h-8" />
+            </div>
+
+            <div className="space-y-1.5">
+              <h3 className="text-lg font-black text-slate-900">
+                Membuat PDF Kartu Puasa Wali Asuh...
+              </h3>
+              <p className="text-xs text-slate-500">
+                Merender kartu beresolusi tinggi dengan optimasi kecepatan & kompresi cerdas.
+              </p>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold">
+                <span className="text-emerald-800">
+                  Kartu {exportProgress.current} dari {exportProgress.total}
+                </span>
+                <span className="text-emerald-600">
+                  {Math.round((exportProgress.current / Math.max(1, exportProgress.total)) * 100)}%
+                </span>
+              </div>
+              <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                <div
+                  className="h-full bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-500 rounded-full transition-all duration-150 ease-out"
+                  style={{
+                    width: `${Math.min(
+                      100,
+                      Math.round((exportProgress.current / Math.max(1, exportProgress.total)) * 100)
+                    )}%`,
+                  }}
+                />
+              </div>
+              {exportProgress.page && exportProgress.totalPages && (
+                <div className="text-[11px] font-semibold text-slate-400">
+                  Halaman {exportProgress.page} dari {exportProgress.totalPages}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-emerald-50 rounded-2xl p-3 border border-emerald-100 text-[11px] text-emerald-800 text-left flex items-start gap-2.5">
+              <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <span>
+                <strong>Akselerasi Multi-Threading:</strong> Kartu diproses secara paralel dengan rendering langsung ke layout kertas A4 (8 kartu/lembar).
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

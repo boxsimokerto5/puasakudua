@@ -158,10 +158,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             <button
               onClick={() => setIsDormCardModalOpen(true)}
               className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-emerald-950 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all shadow-md cursor-pointer active:scale-95"
-              title="Buat dan Cetak Kartu Santri Asrama (SD Merah, SMP Biru, SMA Abu-abu)"
+              title="Buat dan Cetak Kartu Puasa Wali Asuh (SD Merah, SMP Biru, SMA Abu-abu)"
             >
               <CreditCard className="w-4 h-4 text-emerald-950" />
-              <span>Cetak Kartu Asrama</span>
+              <span>Cetak Kartu Puasa Wali Asuh</span>
             </button>
             <button
               onClick={() => onSwitchView('input')}
