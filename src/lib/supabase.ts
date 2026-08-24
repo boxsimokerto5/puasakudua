@@ -47,17 +47,14 @@ export function clearSupabaseConfig(): void {
 export function isJwtToken(key: string): boolean {
   if (!key) return false;
   const parts = key.trim().split('.');
-  return parts.length === 3;
+  return parts.length === 3 || key.trim().length > 20;
 }
 
 export function isSupabaseConfigured(): boolean {
   const config = getSupabaseConfig();
   if (!config.url || !config.anonKey) return false;
   if (!config.url.startsWith('https://')) return false;
-  // If key is publishable key or not a 3-part JWT, it is not yet a valid Supabase anon key
-  if (config.anonKey.startsWith('sb_publishable_') || !isJwtToken(config.anonKey)) {
-    return false;
-  }
+  if (config.anonKey.trim().length < 20) return false;
   return true;
 }
 
