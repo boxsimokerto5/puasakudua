@@ -26,7 +26,8 @@ import {
   CreditCard,
   Camera,
   ScanBarcode,
-  Volume2
+  Volume2,
+  LogOut
 } from 'lucide-react';
 
 interface FastingInputterViewProps {
@@ -38,6 +39,7 @@ interface FastingInputterViewProps {
   onOpenPhotoModal?: () => void;
   isAdmin?: boolean;
   onToggleLockSession?: (sessionId: string, locked: boolean) => void;
+  onLogout?: () => void;
 }
 
 export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
@@ -49,6 +51,7 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
   onOpenPhotoModal,
   isAdmin = false,
   onToggleLockSession,
+  onLogout,
 }) => {
   const [selectedClass, setSelectedClass] = useState<string>('SEMUA');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -483,6 +486,18 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
               <FileText className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
               <span>PDF Rekap</span>
             </button>
+
+            {onLogout && (
+              <button
+                type="button"
+                onClick={onLogout}
+                className="px-2.5 py-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer whitespace-nowrap"
+                title="Keluar dari akun / Halaman Input"
+              >
+                <LogOut className="w-3.5 h-3.5 text-white shrink-0" />
+                <span>Keluar</span>
+              </button>
+            )}
           </div>
         </div>
 

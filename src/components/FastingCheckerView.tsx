@@ -16,6 +16,7 @@ import {
   CheckSquare,
   FileText,
   Moon,
+  LogOut,
 } from 'lucide-react';
 
 interface FastingCheckerViewProps {
@@ -23,12 +24,14 @@ interface FastingCheckerViewProps {
   activeSession: FastingSession;
   user: UserSession;
   onVerifySession: (verifiedBy: string, verifierNotes?: string) => void;
+  onLogout?: () => void;
 }
 
 export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
   students,
   activeSession,
   user,
+  onLogout,
 }) => {
   const [activeTab, setActiveTab] = useState<'sahur' | 'berbuka' | 'makan_siang'>('sahur');
   const [selectedClass, setSelectedClass] = useState<string>('SEMUA');
@@ -210,22 +213,22 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
   return (
     <div className="space-y-6">
       {/* View Mode Navigation Tabs & Rekap Report Button */}
-      <div className="bg-white p-2 rounded-2xl border border-gray-200/90 shadow-sm flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-2 flex-1">
+      <div className="bg-white p-2.5 sm:p-3 rounded-2xl border border-gray-200/90 shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2.5">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 flex-1">
           {/* TAB SAHUR */}
           <button
             type="button"
             onClick={() => setActiveTab('sahur')}
-            className={`flex-1 min-w-[140px] py-3 px-3 sm:px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
+            className={`flex-1 min-w-[110px] py-2.5 sm:py-3 px-2 sm:px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
               activeTab === 'sahur'
                 ? 'bg-indigo-950 text-white shadow-md ring-2 ring-indigo-400/50'
                 : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-950'
             }`}
           >
             <Moon className="w-4 h-4 text-amber-300 shrink-0" />
-            <span>🌙 Ceklist Sahur</span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-400 text-indigo-950 font-extrabold ml-1">
-              {totalStats.berpuasa} Siswa
+            <span className="truncate">Sahur</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-amber-400 text-indigo-950 font-extrabold ml-0.5 shrink-0">
+              {totalStats.berpuasa}
             </span>
           </button>
 
@@ -233,16 +236,16 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('berbuka')}
-            className={`flex-1 min-w-[140px] py-3 px-3 sm:px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
+            className={`flex-1 min-w-[110px] py-2.5 sm:py-3 px-2 sm:px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
               activeTab === 'berbuka'
                 ? 'bg-emerald-600 text-white shadow-md ring-2 ring-emerald-400/50'
                 : 'text-gray-600 hover:bg-emerald-50 hover:text-emerald-900'
             }`}
           >
             <Utensils className="w-4 h-4 text-amber-300 shrink-0" />
-            <span>🌅 Ceklist Berbuka</span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-400 text-emerald-950 font-extrabold ml-1">
-              {totalStats.berpuasa} Siswa
+            <span className="truncate">Berbuka</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-amber-400 text-emerald-950 font-extrabold ml-0.5 shrink-0">
+              {totalStats.berpuasa}
             </span>
           </button>
 
@@ -250,30 +253,44 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('makan_siang')}
-            className={`flex-1 min-w-[140px] py-3 px-3 sm:px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
+            className={`flex-1 min-w-[110px] py-2.5 sm:py-3 px-2 sm:px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
               activeTab === 'makan_siang'
                 ? 'bg-rose-700 text-white shadow-md ring-2 ring-rose-500/50'
                 : 'text-gray-600 hover:bg-rose-50 hover:text-rose-900'
             }`}
           >
             <Coffee className="w-4 h-4 text-amber-200 shrink-0" />
-            <span>🍱 Ceklist Makan Siang</span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-100 text-rose-900 font-extrabold ml-1">
-              {totalStats.total - totalStats.berpuasa} Siswa
+            <span className="truncate">Makan Siang</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-rose-100 text-rose-900 font-extrabold ml-0.5 shrink-0">
+              {totalStats.total - totalStats.berpuasa}
             </span>
           </button>
         </div>
 
-        {/* Global Laporan Rekapitulasi PDF Button */}
-        <button
-          type="button"
-          onClick={() => setIsPdfModalOpen(true)}
-          className="py-3 px-4 bg-emerald-900 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer shrink-0 border border-emerald-700 hover:border-emerald-500"
-          title="Cetak dan Unduh Laporan Rekapitulasi Puasa Lengkap (Semua Jenjang / Kelas)"
-        >
-          <FileText className="w-4 h-4 text-amber-300" />
-          <span>📄 Cetak Laporan Rekapitulasi PDF</span>
-        </button>
+        {/* Action Buttons: PDF & Logout */}
+        <div className="flex items-center gap-2 shrink-0 w-full lg:w-auto">
+          <button
+            type="button"
+            onClick={() => setIsPdfModalOpen(true)}
+            className="flex-1 lg:flex-initial py-2.5 sm:py-3 px-3 sm:px-4 bg-emerald-900 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all shadow-sm cursor-pointer shrink-0 border border-emerald-700 hover:border-emerald-500"
+            title="Cetak dan Unduh Laporan Rekapitulasi Puasa Lengkap (Semua Jenjang / Kelas)"
+          >
+            <FileText className="w-4 h-4 text-amber-300 shrink-0" />
+            <span className="truncate">📄 Rekap PDF</span>
+          </button>
+
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="py-2.5 sm:py-3 px-3 sm:px-4 bg-red-600 hover:bg-red-700 active:scale-95 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer shrink-0 border border-red-400"
+              title="Keluar dari Akun / Ganti Pengguna"
+            >
+              <LogOut className="w-4 h-4 text-white shrink-0" />
+              <span>Keluar</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ======================================================== */}
@@ -346,6 +363,18 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
                 <Printer className="w-4 h-4" />
                 <span>Cetak PDF ({selectedSahurLevel})</span>
               </button>
+
+              {onLogout && (
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow transition-all cursor-pointer flex items-center gap-1.5 border border-red-400"
+                  title="Keluar dari Akun"
+                >
+                  <LogOut className="w-4 h-4 text-white" />
+                  <span>Keluar</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -542,6 +571,18 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
                 <Printer className="w-4 h-4" />
                 <span>Cetak PDF ({selectedBerbukaLevel})</span>
               </button>
+
+              {onLogout && (
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow transition-all cursor-pointer flex items-center gap-1.5 border border-red-400"
+                  title="Keluar dari Akun"
+                >
+                  <LogOut className="w-4 h-4 text-white" />
+                  <span>Keluar</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -738,6 +779,18 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
                 <Printer className="w-4 h-4" />
                 <span>Cetak PDF ({selectedMakanSiangLevel})</span>
               </button>
+
+              {onLogout && (
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow transition-all cursor-pointer flex items-center gap-1.5 border border-red-400"
+                  title="Keluar dari Akun"
+                >
+                  <LogOut className="w-4 h-4 text-white" />
+                  <span>Keluar</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -875,14 +928,26 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
         </div>
       )}
 
-      {/* View Footer Note */}
-      <div className="pt-2 flex items-center justify-between text-xs text-slate-400 border-t border-slate-200/60">
+      {/* View Footer Note & Bottom Logout Button */}
+      <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 border-t border-slate-200/80">
         <span className="text-[11px] text-slate-500">
           Ceklist & Verifikasi Puasa Santri • SRT 1 Kediri
         </span>
-        <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
-          <span>Dibuat oleh</span>
-          <span className="font-bold text-emerald-800">eccko developer</span>
+        <div className="flex items-center gap-3">
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 hover:border-red-600 transition-all flex items-center gap-1 cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Keluar dari Akun</span>
+            </button>
+          )}
+          <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
+            <span>Dibuat oleh</span>
+            <span className="font-bold text-emerald-800">eccko developer</span>
+          </div>
         </div>
       </div>
 

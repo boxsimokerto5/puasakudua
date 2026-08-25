@@ -689,6 +689,7 @@ export default function App() {
                   onOpenPhotoModal={() => handleOpenPhotoModal()}
                   isAdmin={true}
                   onToggleLockSession={handleToggleLockSession}
+                  onLogout={handleLogout}
                 />
               ) : (
                 <FastingCheckerView
@@ -696,6 +697,7 @@ export default function App() {
                   activeSession={activeSession}
                   user={user}
                   onVerifySession={handleVerifySession}
+                  onLogout={handleLogout}
                 />
               )
             ) : isPenginput ? (
@@ -707,12 +709,14 @@ export default function App() {
                   onBulkUpdateRecords={handleBulkUpdateRecords}
                   onOpenPhotoModal={() => handleOpenPhotoModal()}
                   isAdmin={false}
+                  onLogout={handleLogout}
                 />
               ) : (
                 <RaportImtaqView
                   students={students}
                   sessions={sessions}
                   user={user}
+                  onLogout={handleLogout}
                 />
               )
             ) : (
@@ -722,12 +726,14 @@ export default function App() {
                   activeSession={activeSession}
                   user={user}
                   onVerifySession={handleVerifySession}
+                  onLogout={handleLogout}
                 />
               ) : (
                 <RaportImtaqView
                   students={students}
                   sessions={sessions}
                   user={user}
+                  onLogout={handleLogout}
                 />
               )
             )}
