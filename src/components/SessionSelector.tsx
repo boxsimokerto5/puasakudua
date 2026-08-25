@@ -90,51 +90,48 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
   };
 
   return (
-    <div className="relative bg-gradient-to-br from-emerald-950 via-teal-950 to-emerald-900 text-emerald-50 rounded-2xl p-4 sm:p-5 shadow-xl border border-amber-500/35 ring-1 ring-amber-400/20 mb-6 z-30">
+    <div className="relative bg-gradient-to-br from-emerald-950 via-teal-950 to-emerald-900 text-emerald-50 rounded-xl p-2.5 sm:p-3 shadow-md border border-amber-500/35 ring-1 ring-amber-400/20 mb-2.5 z-30">
       {/* Decorative ambient background accents for Ramadan */}
-      <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-400/10 rounded-full blur-2xl" />
         <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-2xl" />
       </div>
 
-      <div className="relative z-30 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="relative z-30 flex flex-col lg:flex-row lg:items-center justify-between gap-2 sm:gap-3">
         {/* Active Session Info */}
-        <div className="flex items-start sm:items-center gap-3.5">
-          <div className="p-3.5 bg-gradient-to-br from-amber-400 via-amber-500 to-yellow-600 text-emerald-950 rounded-2xl shadow-lg shadow-amber-500/25 ring-2 ring-amber-300/40 shrink-0 flex items-center justify-center">
-            <Moon className="w-6 h-6 fill-emerald-950" />
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="p-2 bg-gradient-to-br from-amber-400 via-amber-500 to-yellow-600 text-emerald-950 rounded-xl shadow-md shadow-amber-500/25 ring-1 ring-amber-300/40 shrink-0 flex items-center justify-center">
+            <Moon className="w-4 h-4 fill-emerald-950" />
           </div>
-          <div>
-            <div className="flex items-center gap-2 flex-wrap mb-1">
-              <span className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider font-extrabold text-amber-300 bg-amber-400/15 border border-amber-400/35 px-2.5 py-0.5 rounded-full shadow-xs">
-                <Sparkles className="w-3 h-3 text-amber-400" /> Sesi Input Aktif
-              </span>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h2 className="text-sm sm:text-base font-black text-white tracking-tight truncate">
+                {activeSession?.title || 'Puasa Ramadhan 1447 H'}
+              </h2>
               {activeSession?.isLocked ? (
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-950/90 text-rose-200 border border-rose-600/60 flex items-center gap-1 shadow-xs">
-                  <Lock className="w-3 h-3" /> Terkunci (Read-Only)
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-950/90 text-rose-200 border border-rose-600/60 flex items-center gap-0.5 shadow-xs">
+                  <Lock className="w-2.5 h-2.5" /> Terkunci
                 </span>
               ) : (
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-900/90 text-emerald-200 border border-emerald-500/50 flex items-center gap-1 shadow-xs">
-                  <Unlock className="w-3 h-3 text-emerald-400" /> Terbuka
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-emerald-900/90 text-emerald-200 border border-emerald-500/50 flex items-center gap-0.5 shadow-xs">
+                  <Unlock className="w-2.5 h-2.5 text-emerald-400" /> Terbuka
                 </span>
               )}
               {activeSession?.isVerified && (
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-gradient-to-r from-amber-400 to-amber-500 text-emerald-950 border border-amber-300 shadow-xs">
-                  ✓ Terverifikasi
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-amber-400 to-amber-500 text-emerald-950 border border-amber-300 shadow-xs">
+                  ✓ Sah
                 </span>
               )}
             </div>
-            <h2 className="text-lg sm:text-xl font-black text-white tracking-tight flex items-center gap-2">
-              <span>{activeSession?.title || 'Puasa Ramadhan 1447 H'}</span>
-            </h2>
-            <p className="text-xs text-emerald-200/90 font-medium mt-0.5 flex items-center gap-1.5 flex-wrap">
-              <Calendar className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <p className="text-[11px] text-emerald-200/90 font-medium flex items-center gap-1.5 flex-wrap truncate">
+              <Calendar className="w-3 h-3 text-amber-400 shrink-0" />
               <span>Tanggal:</span>
               <span className="font-bold text-amber-300">
                 {activeSession ? formatDateIndo(activeSession.date) : '27 Agustus 2026'}
               </span>
               {activeSession?.inputDeadline && (
-                <span className="ml-1 text-amber-200/90 bg-emerald-900/60 px-2 py-0.5 rounded-md border border-emerald-700/50 text-[11px]">
-                  Batas Jam: <strong className="text-amber-300">{activeSession.inputDeadline} WIB</strong>
+                <span className="text-amber-200/90 bg-emerald-900/60 px-1.5 py-0.2 rounded border border-emerald-700/50 text-[10px]">
+                  Batas: <strong className="text-amber-300">{activeSession.inputDeadline} WIB</strong>
                 </span>
               )}
             </p>
@@ -142,29 +139,29 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
         </div>
 
         {/* Actions & Selector Dropdown */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           {/* Custom History Selector Dropdown with Trash icons (Admin only) */}
-          <div className="relative flex-1 sm:flex-initial w-full sm:w-auto min-w-[240px] z-40" ref={dropdownRef}>
+          <div className="relative flex-1 sm:flex-initial w-full sm:w-auto min-w-[200px] z-40" ref={dropdownRef}>
             <button
               type="button"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="w-full bg-emerald-900/90 hover:bg-emerald-950 text-emerald-100 text-xs font-semibold px-3.5 py-2.5 rounded-xl border border-amber-500/35 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-inner transition-all flex items-center justify-between gap-2 cursor-pointer"
+              className="w-full bg-emerald-900/90 hover:bg-emerald-950 text-emerald-100 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-amber-500/35 focus:outline-none focus:ring-1 focus:ring-amber-400 shadow-inner transition-all flex items-center justify-between gap-2 cursor-pointer"
             >
               <div className="truncate text-left">
                 <span className="font-bold text-amber-100">
                   {activeSession ? activeSession.title : 'Pilih Sesi'}
                 </span>
-                <span className="text-amber-300/80 text-[11px] ml-1.5 font-normal">
+                <span className="text-amber-300/80 text-[10px] ml-1 font-normal">
                   ({activeSession?.date})
                 </span>
               </div>
-              <ChevronDown className={`w-4 h-4 text-amber-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-3.5 h-3.5 text-amber-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {/* Dropdown Menu Popup */}
             {isDropdownOpen && (
-              <div className="absolute left-0 right-0 sm:left-auto sm:right-0 mt-2 sm:w-80 bg-white text-gray-900 rounded-2xl shadow-2xl border border-amber-300 ring-1 ring-black/10 z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-100">
-                <div className="px-3.5 py-2.5 bg-gradient-to-r from-emerald-950 to-teal-900 text-white font-bold text-xs flex items-center justify-between border-b border-amber-500/30">
+              <div className="absolute left-0 right-0 sm:left-auto sm:right-0 mt-1.5 sm:w-80 bg-white text-gray-900 rounded-xl shadow-2xl border border-amber-300 ring-1 ring-black/10 z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+                <div className="px-3 py-2 bg-gradient-to-r from-emerald-950 to-teal-900 text-white font-bold text-xs flex items-center justify-between border-b border-amber-500/30">
                   <span className="flex items-center gap-1.5 text-amber-300">
                     <Moon className="w-3.5 h-3.5 fill-amber-300" /> Riwayat Sesi Puasa ({sessionList.length})
                   </span>
@@ -183,15 +180,15 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
                           onSelectSession(s.id);
                           setIsDropdownOpen(false);
                         }}
-                        className={`p-3 flex items-center justify-between gap-2 cursor-pointer transition-colors ${
+                        className={`p-2.5 flex items-center justify-between gap-2 cursor-pointer transition-colors ${
                           isActive
                             ? 'bg-amber-50/90 text-emerald-950 font-bold border-l-4 border-amber-500'
                             : 'hover:bg-gray-50 text-gray-700'
                         }`}
                       >
                         <div className="flex items-center gap-2 min-w-0">
-                          <div className="w-4 h-4 shrink-0 flex items-center justify-center">
-                            {isActive && <Check className="w-4 h-4 text-emerald-700 font-extrabold" />}
+                          <div className="w-3.5 h-3.5 shrink-0 flex items-center justify-center">
+                            {isActive && <Check className="w-3.5 h-3.5 text-emerald-700 font-extrabold" />}
                           </div>
                           <div className="truncate">
                             <div className="flex items-center gap-1.5">
@@ -202,7 +199,7 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
                                 </span>
                               )}
                             </div>
-                            <p className="text-[11px] text-gray-500 font-medium">
+                            <p className="text-[10.5px] text-gray-500 font-medium">
                               {formatDateIndo(s.date)} {s.isVerified && '• ✓ Disahkan'}
                             </p>
                           </div>
@@ -216,10 +213,10 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
                               e.stopPropagation();
                               setSessionToDelete(s);
                             }}
-                            className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer shrink-0"
+                            className="p-1 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer shrink-0"
                             title="Hapus Sesi Ini (Khusus Admin)"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         )}
                       </div>
@@ -235,10 +232,10 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
             <button
               type="button"
               onClick={() => setSessionToDelete(activeSession)}
-              className="p-2.5 bg-emerald-900/80 hover:bg-rose-900/80 text-amber-300 hover:text-rose-200 rounded-xl border border-amber-500/30 hover:border-rose-500 transition-all cursor-pointer shadow-xs"
+              className="p-1.5 bg-emerald-900/80 hover:bg-rose-900/80 text-amber-300 hover:text-rose-200 rounded-lg border border-amber-500/30 hover:border-rose-500 transition-all cursor-pointer shadow-xs"
               title="Hapus Sesi Aktif Ini (Khusus Admin)"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
           )}
 
@@ -247,10 +244,10 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2.5 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-emerald-950 font-black text-xs rounded-xl shadow-lg shadow-amber-400/20 transition-all duration-150 flex items-center gap-1.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+              className="px-3 py-1.5 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-emerald-950 font-bold text-xs rounded-lg shadow-md shadow-amber-400/20 transition-all duration-150 flex items-center gap-1 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
             >
-              <Plus className="w-4 h-4 stroke-[3]" />
-              <span>Buat Judul / Tanggal Baru</span>
+              <Plus className="w-3.5 h-3.5 stroke-[3]" />
+              <span>Sesi Baru</span>
             </button>
           )}
         </div>

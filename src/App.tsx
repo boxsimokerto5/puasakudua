@@ -613,8 +613,8 @@ export default function App() {
 
           {/* Main Container */}
           <main className="max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-3.5 sm:py-5 flex-1 space-y-4 sm:space-y-6">
-            {/* Live Ramadan Prayer Times & Imsakiyah Banner Card (Hidden on Form Input, Raport, and Calendar for a clean focused view) */}
-            {activeAdminTab !== 'calendar' && activeAdminTab !== 'input' && activeAdminTab !== 'raport' && (
+            {/* Live Ramadan Prayer Times & Imsakiyah Banner Card (Hidden on Ceklist, Form Input, Raport, and Calendar for a clean focused single-screen view) */}
+            {activeAdminTab !== 'calendar' && activeAdminTab !== 'input' && activeAdminTab !== 'raport' && activeAdminTab !== 'checker' && (
               <PrayerTimeBannerCard
                 onOpenModal={() => setShowPrayerModal(true)}
                 onOpenSurahsModal={() => handleOpenSurahsModal('juz_amma')}
