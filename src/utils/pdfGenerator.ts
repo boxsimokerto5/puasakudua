@@ -229,6 +229,7 @@ export function formatDateIndoLong(dateStr: string): string {
 
 /**
  * Generates PDF using jsPDF and jspdf-autotable
+ * Clean, compact 1-page layout for ~50 students
  */
 export function downloadFastingReportPDF(
   students: Student[],
@@ -242,169 +243,132 @@ export function downloadFastingReportPDF(
     format: 'a4',
   });
 
-  const greenDark = '#064e3b'; // emerald-900
-  const gold = '#d97706'; // amber-600
+  const greenDark: [number, number, number] = [6, 78, 59]; // emerald-900
+  const emeraldMid: [number, number, number] = [16, 185, 129]; // emerald-500
+  const bgLight: [number, number, number] = [240, 253, 244]; // emerald-50
 
-  // Header Title & Logo Box
-  doc.setFillColor(6, 78, 59); // Emerald 900
-  doc.rect(14, 12, 182, 24, 'F');
+  // 1. KOP HEADER (Tanpa Alamat/Jalan)
+  doc.setFillColor(...greenDark);
+  doc.rect(10, 8, 190, 15, 'F');
 
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text('SEKOLAH RAKYAT KABUPATEN KEDIRI', 105, 20, { align: 'center' });
-
-  doc.setFontSize(10);
+  doc.setFontSize(13);
+  doc.text('SEKOLAH RAKYAT TERINTEGRASI 1 KEDIRI', 105, 15, { align: 'center' });
+  doc.setFontSize(8.5);
   doc.setFont('helvetica', 'normal');
-  doc.text('LAPORAN REKAPITULASI AMALAN PUASA SISWA', 105, 26, { align: 'center' });
-  doc.setFontSize(8);
-  doc.text('Jl. Raya Kediri - Nganjuk, Kediri, Jawa Timur | Sistem Informasi Kedisiplinan & Amalan', 105, 31, { align: 'center' });
+  doc.setTextColor(253, 230, 138); // amber-200
+  doc.text('SISTEM INFORMASI PENCATATAN AMALAN PUASA SISWA (PUASAKU) - WALI ASUH', 105, 20, { align: 'center' });
 
-  // Session Metadata Box
-  doc.setFillColor(240, 253, 244); // emerald-50
-  doc.setDrawColor(187, 247, 208); // emerald-200
-  doc.roundedRect(14, 40, 182, 22, 2, 2, 'FD');
-
-  doc.setTextColor(15, 23, 42);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.text(`Judul Kegiatan : ${session.title}`, 18, 47);
-  doc.text(`Tanggal : ${formatDateIndoLong(session.date)} (${session.date})`, 18, 53);
-
-  const statusText = session.isVerified
-    ? `TERVERIFIKASI SAH (Oleh: ${session.verifiedBy || verifierName || 'Petugas Pengecek'})`
-    : 'DRAF BELUM DIVERIFIKASI';
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(session.isVerified ? 6 : 180, session.isVerified ? 78 : 83, session.isVerified ? 59 : 9);
-  doc.text(`Status Laporan : ${statusText}`, 18, 59);
-
-  // Table Title
+  // 2. JUDUL DOKUMEN
   doc.setTextColor(6, 78, 59);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.text('REKAPITULASI JUMLAH SISWA BERPUASA BERDASARKAN JENJANG & GENDER', 14, 69);
+  doc.text('LAPORAN REKAPITULASI SISWA BERPUASA', 105, 28, { align: 'center' });
 
-  // Table Data - Simplified to focus on fasting count
-  const tableHeaders = [
+  // Garis aksen bawah judul
+  doc.setDrawColor(16, 185, 129);
+  doc.setLineWidth(0.5);
+  doc.line(70, 30, 140, 30);
+
+  // 3. DESKRIPSI RESUME (Tanggal input, nama sesi kegiatan, total berpuasa)
+  doc.setFillColor(...bgLight);
+  doc.setDrawColor(167, 243, 208); // emerald-200
+  doc.setLineWidth(0.3);
+  doc.roundedRect(10, 32.5, 190, 12, 1.5, 1.5, 'FD');
+
+  doc.setFontSize(8);
+  doc.setTextColor(30, 41, 59);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Kegiatan / Sesi', 13, 37);
+  doc.text('Tanggal Input', 80, 37);
+  doc.text('Total Berpuasa', 145, 37);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(6, 78, 59);
+  doc.setFontSize(8.5);
+  doc.text(`: ${session.title}`, 35, 37);
+  doc.text(`: ${formatDateIndoLong(session.date)}`, 100, 37);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`: ${breakdown.totalSemua.berpuasa} dari ${students.length} Siswa (${breakdown.totalSemua.percentage}%)`, 166, 37);
+
+  // Verifikasi info jika ada di baris kedua resume
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(100, 116, 139);
+  doc.text(`Status: ${session.isVerified ? 'Terverifikasi' : 'Terdata'} • Dibuat secara otomatis oleh Sistem PUASAKU`, 13, 42);
+
+  // 4. TABEL HORIZONTAL REKAP JUMLAH BERPUASA PER JENJANG
+  const totalDark: [number, number, number] = [4, 47, 36];
+  const horizHeaders = [
     [
-      'NO',
-      'REKAP JENJANG & GENDER',
-      'TOTAL SISWA',
-      'JUMLAH BERPUASA',
-      '% BERPUASA',
+      { content: 'SD', colSpan: 3, styles: { halign: 'center' as const, fillColor: greenDark } },
+      { content: 'SMP', colSpan: 3, styles: { halign: 'center' as const, fillColor: greenDark } },
+      { content: 'SMA', colSpan: 3, styles: { halign: 'center' as const, fillColor: greenDark } },
+      { content: 'TOTAL', rowSpan: 2, styles: { halign: 'center' as const, fillColor: totalDark, fontStyle: 'bold' as const, valign: 'middle' as const } }
     ],
+    [
+      'Putra', 'Putri', 'Total SD',
+      'Putra', 'Putri', 'Total SMP',
+      'Putra', 'Putri', 'Total SMA'
+    ]
   ];
 
-  const tableBody = breakdown.allRows.map((row, idx) => {
-    return [
-      idx + 1,
-      row.label,
-      row.totalStudents,
-      row.berpuasa,
-      `${row.percentage}%`,
-    ];
-  });
+  const horizBody = [
+    [
+      breakdown.sdPutra.berpuasa.toString(),
+      breakdown.sdPutri.berpuasa.toString(),
+      breakdown.jumlahSd.berpuasa.toString(),
+      breakdown.smpPutra.berpuasa.toString(),
+      breakdown.smpPutri.berpuasa.toString(),
+      breakdown.jumlahSmp.berpuasa.toString(),
+      breakdown.smaPutra.berpuasa.toString(),
+      breakdown.smaPutri.berpuasa.toString(),
+      breakdown.jumlahSma.berpuasa.toString(),
+      `${breakdown.totalSemua.berpuasa} Siswa`
+    ]
+  ];
 
   autoTable(doc, {
-    startY: 72,
-    head: tableHeaders,
-    body: tableBody,
+    startY: 46.5,
+    head: horizHeaders,
+    body: horizBody,
     theme: 'grid',
+    margin: { left: 10, right: 10 },
+    styles: {
+      fontSize: 7.5,
+      cellPadding: 1.2,
+      textColor: [15, 23, 42],
+    },
     headStyles: {
-      fillColor: [6, 78, 59], // Emerald 900
+      fillColor: greenDark,
       textColor: [255, 255, 255],
       fontStyle: 'bold',
-      fontSize: 9,
       halign: 'center',
+      fontSize: 7,
     },
     bodyStyles: {
-      fontSize: 9,
-      textColor: [30, 41, 59],
+      halign: 'center',
+      fontStyle: 'bold',
+      fontSize: 8,
     },
     columnStyles: {
-      0: { halign: 'center', cellWidth: 12 },
-      1: { cellWidth: 70, fontStyle: 'bold' },
-      2: { halign: 'center', cellWidth: 32 },
-      3: { halign: 'center', cellWidth: 38, fontStyle: 'bold' },
-      4: { halign: 'center', cellWidth: 30, fontStyle: 'bold' },
-    },
-    didParseCell: (data) => {
-      // Highlight subtotals and grand total
-      const rowIdx = data.row.index;
-      const rowObj = breakdown.allRows[rowIdx];
-      if (rowObj) {
-        if (rowObj.isGrandTotal) {
-          data.cell.styles.fillColor = [6, 78, 59];
-          data.cell.styles.textColor = [255, 251, 235]; // amber light
-          data.cell.styles.fontStyle = 'bold';
-        } else if (rowObj.isSubtotal) {
-          data.cell.styles.fillColor = [209, 250, 229]; // emerald-100
-          data.cell.styles.textColor = [6, 78, 59];
-          data.cell.styles.fontStyle = 'bold';
-        }
-      }
-    },
+      0: { cellWidth: 17 },
+      1: { cellWidth: 17 },
+      2: { cellWidth: 20, fillColor: [209, 250, 229], textColor: [6, 78, 59] },
+      3: { cellWidth: 17 },
+      4: { cellWidth: 17 },
+      5: { cellWidth: 20, fillColor: [209, 250, 229], textColor: [6, 78, 59] },
+      6: { cellWidth: 17 },
+      7: { cellWidth: 17 },
+      8: { cellWidth: 20, fillColor: [209, 250, 229], textColor: [6, 78, 59] },
+      9: { cellWidth: 28, fillColor: [4, 47, 36], textColor: [254, 240, 138], fontStyle: 'bold' },
+    }
   });
 
-  // Summary Insights Box
-  const finalY = (doc as any).lastAutoTable?.finalY || 160;
+  const tableAfterY = (doc as any).lastAutoTable?.finalY || 62;
 
-  doc.setFillColor(248, 250, 252);
-  doc.setDrawColor(226, 232, 240);
-  doc.roundedRect(14, finalY + 6, 182, 22, 2, 2, 'FD');
-
-  doc.setTextColor(30, 41, 59);
-  doc.setFontSize(8.5);
-  doc.setFont('helvetica', 'bold');
-  doc.text('CATATAN KHUSUS & CATATAN VERIFIKASI:', 18, finalY + 12);
-  doc.setFont('helvetica', 'normal');
-
-  const vNotes = session.verifierNotes
-    ? session.verifierNotes
-    : 'Data rekapitulasi amalan puasa siswa telah dihitung secara otomatis berdasarkan sistem presensi Sekolah Rakyat Kabupaten Kediri.';
-  
-  const splitNotes = doc.splitTextToSize(vNotes, 174);
-  doc.text(splitNotes, 18, finalY + 17);
-
-  // Signatures Section - Single Signature for Wali Asuh
-  const sigY = finalY + 35;
-
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(30, 41, 59);
-
-  // Wali Asuh Signature Box
-  doc.text('Kediri, ' + formatDateIndoLong(new Date().toISOString().split('T')[0]), 135, sigY);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Wali Asuh,', 135, sigY + 6);
-  doc.setFont('helvetica', 'normal');
-  doc.text('(________________________)', 135, sigY + 28);
-
-  // Footer text Page 1
-  doc.setFontSize(7.5);
-  doc.setTextColor(148, 163, 184);
-  doc.text(
-    `Halaman 1 | Dicetak otomatis via Sistem Informasi Sekolah Rakyat Kediri pada ${new Date().toLocaleString('id-ID')}`,
-    105,
-    285,
-    { align: 'center' }
-  );
-
-  // ==========================================
-  // PAGE 2: LAMPIRAN DAFTAR NAMA-NAMA SISWA BERPUASA
-  // ==========================================
-  doc.addPage();
-
-  // Lampiran Header Banner
-  doc.setFillColor(6, 78, 59); // Emerald 900
-  doc.rect(14, 12, 182, 16, 'F');
-
-  doc.setTextColor(255, 255, 255);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.text('LAMPIRAN: DAFTAR NAMA SISWA YANG BERPUASA', 105, 22, { align: 'center' });
-
-  // Sorted list of ONLY fasting students
+  // 5. DAFTAR NAMA SISWA YANG BERPUASA (2 KOLOM KOMPAK & RAPAT)
   const fastingStudents = students
     .filter((s) => session.records[s.id]?.status === 'berpuasa')
     .sort((a, b) => {
@@ -412,83 +376,114 @@ export function downloadFastingReportPDF(
       return a.nama.localeCompare(b.nama);
     });
 
+  // Label Section
+  doc.setTextColor(6, 78, 59);
+  doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(71, 85, 105);
-  doc.text(
-    `Kegiatan: ${session.title}  |  Tanggal: ${formatDateIndoLong(session.date)}  |  Jumlah Berpuasa: ${fastingStudents.length} Siswa`,
-    14,
-    34
-  );
+  doc.text(`DAFTAR SISWA YANG BERPUASA (${fastingStudents.length} SISWA)`, 10, tableAfterY + 4);
 
-  const studentTableHeaders = [
-    ['NO', 'NAMA SISWA', 'KELAS', 'L/P', 'NIK / NO', 'STATUS AMALAN', 'CATATAN']
-  ];
-
-  const studentTableBody = fastingStudents.map((s, idx) => {
-    const rec = session.records[s.id];
-    const gender =
-      s.jenisKelamin === 'Perempuan' || s.jenisKelamin?.toLowerCase().startsWith('p') ? 'P' : 'L';
-
-    return [
-      idx + 1,
-      s.nama,
-      s.kelas,
-      gender,
-      s.nik || s.no.toString(),
-      'Berpuasa (✓)',
-      rec?.notes || '-'
-    ];
-  });
+  // Build 2-column paired rows so 50+ students fit on 1 page
+  const halfCount = Math.ceil(fastingStudents.length / 2);
+  const twoColBody: any[][] = [];
 
   if (fastingStudents.length === 0) {
-    studentTableBody.push([1, 'Tidak ada siswa yang berpuasa pada sesi ini', '-', '-', '-', '-', '-']);
+    twoColBody.push([
+      { content: 'Tidak ada siswa yang berpuasa pada sesi ini.', colSpan: 8, styles: { halign: 'center' as const, fontStyle: 'italic' as const } }
+    ]);
+  } else {
+    for (let i = 0; i < halfCount; i++) {
+      const left = fastingStudents[i];
+      const right = fastingStudents[i + halfCount];
+
+      const leftGender = left.jenisKelamin === 'Perempuan' || left.jenisKelamin?.toLowerCase().startsWith('p') ? 'P' : 'L';
+      const rightGender = right ? (right.jenisKelamin === 'Perempuan' || right.jenisKelamin?.toLowerCase().startsWith('p') ? 'P' : 'L') : '';
+
+      twoColBody.push([
+        (i + 1).toString(),
+        left.nama,
+        left.kelas,
+        leftGender,
+        right ? (i + halfCount + 1).toString() : '',
+        right ? right.nama : '',
+        right ? right.kelas : '',
+        right ? rightGender : ''
+      ]);
+    }
   }
 
+  const twoColHeaders = [
+    [
+      'No', 'Nama Siswa', 'Kelas', 'L/P',
+      'No', 'Nama Siswa', 'Kelas', 'L/P'
+    ]
+  ];
+
   autoTable(doc, {
-    startY: 38,
-    head: studentTableHeaders,
-    body: studentTableBody,
+    startY: tableAfterY + 5.5,
+    head: twoColHeaders,
+    body: twoColBody,
     theme: 'grid',
-    headStyles: {
-      fillColor: [6, 78, 59],
-      textColor: [255, 255, 255],
-      fontStyle: 'bold',
-      fontSize: 8,
-      halign: 'center',
-    },
-    bodyStyles: {
-      fontSize: 7.5,
+    margin: { left: 10, right: 10, bottom: 12 },
+    styles: {
+      fontSize: 7,
+      cellPadding: 1,
       textColor: [30, 41, 59],
     },
+    headStyles: {
+      fillColor: greenDark,
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      fontSize: 7,
+      halign: 'center',
+      cellPadding: 1.2,
+    },
     columnStyles: {
-      0: { halign: 'center', cellWidth: 10 },
-      1: { cellWidth: 48, fontStyle: 'bold' },
-      2: { halign: 'center', cellWidth: 18 },
-      3: { halign: 'center', cellWidth: 12 },
-      4: { halign: 'center', cellWidth: 26 },
-      5: { halign: 'center', cellWidth: 28, fontStyle: 'bold' },
-      6: { cellWidth: 40 },
+      0: { halign: 'center', cellWidth: 7 },
+      1: { cellWidth: 54, fontStyle: 'bold' },
+      2: { halign: 'center', cellWidth: 26, textColor: [6, 78, 59] },
+      3: { halign: 'center', cellWidth: 8 },
+      4: { halign: 'center', cellWidth: 7 },
+      5: { cellWidth: 54, fontStyle: 'bold' },
+      6: { halign: 'center', cellWidth: 26, textColor: [6, 78, 59] },
+      7: { halign: 'center', cellWidth: 8 },
     },
     didParseCell: (data) => {
-      if (data.section === 'body' && data.column.index === 5) {
-        data.cell.styles.textColor = [6, 120, 80];
+      if (data.section === 'body') {
+        if (data.row.index % 2 === 1) {
+          data.cell.styles.fillColor = [248, 250, 252]; // subtle alternate row
+        }
       }
     },
   });
 
-  // Footer text Page 2
-  doc.setFontSize(7.5);
-  doc.setTextColor(148, 163, 184);
-  doc.text(
-    `Halaman 2 (Lampiran) | Dicetak via Sistem Informasi Sekolah Rakyat Kediri`,
-    105,
-    285,
-    { align: 'center' }
-  );
+  // 6. FOOTER (Hanya "Didata oleh Wali Asuh", tanpa penanda tangan)
+  const pageCount = (doc as any).internal.getNumberOfPages();
+  for (let p = 1; p <= pageCount; p++) {
+    doc.setPage(p);
+
+    // Garis tipis footer
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.2);
+    doc.line(10, 289, 200, 289);
+
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 116, 139);
+    doc.text('Didata oleh Wali Asuh', 10, 293);
+
+    doc.setFontSize(7);
+    doc.setTextColor(148, 163, 184);
+    doc.text(
+      `PUASAKU • Hal. ${p}/${pageCount} • Dicetak: ${new Date().toLocaleDateString('id-ID')}`,
+      200,
+      293,
+      { align: 'right' }
+    );
+  }
 
   // Save the PDF file
-  const fileName = `Rekap_Puasa_SR_Kediri_${session.date}_${session.title.replace(/\s+/g, '_')}.pdf`;
+  const cleanTitle = session.title.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const fileName = `Rekap_Puasa_${session.date}_${cleanTitle}.pdf`;
   doc.save(fileName);
 }
 

@@ -76,223 +76,211 @@ export const PdfExportModal: React.FC<PdfExportModalProps> = ({
           {/* Printable Report Sheet Layout */}
           <div
             id="printable-report-sheet"
-            className="bg-white p-6 rounded-2xl border border-gray-200 shadow-xs space-y-5 print:border-none print:shadow-none print:p-0"
+            className="bg-white p-6 rounded-xl border border-gray-200 shadow-xs space-y-4 print:border-none print:shadow-none print:p-2 text-gray-900"
           >
-            {/* Kop Surat / Letterhead */}
-            <div className="border-b-2 border-emerald-900 pb-4 text-center space-y-1">
-              <div className="flex items-center justify-center gap-2 text-emerald-950 font-black text-lg sm:text-xl uppercase tracking-wide">
-                <Building2 className="w-6 h-6 text-emerald-800 shrink-0" />
-                <span>SEKOLAH RAKYAT KABUPATEN KEDIRI</span>
+            {/* Kop Header (Tanpa Jalan/Alamat) */}
+            <div className="bg-emerald-900 text-white p-3 rounded-lg text-center space-y-0.5">
+              <div className="flex items-center justify-center gap-2 font-black text-sm sm:text-base tracking-wide uppercase">
+                <Building2 className="w-5 h-5 text-amber-300 shrink-0" />
+                <span>SEKOLAH RAKYAT TERINTEGRASI 1 KEDIRI</span>
               </div>
-              <h4 className="font-bold text-gray-800 text-sm sm:text-base">
-                LAPORAN REKAPITULASI AMALAN PUASA SISWA
-              </h4>
-              <p className="text-xs text-gray-500">
-                Jl. Raya Kediri - Nganjuk, Kediri, Jawa Timur | Sistem Informasi Kedisiplinan & Amalan
+              <p className="text-[11px] text-amber-200 font-medium tracking-wider">
+                SISTEM INFORMASI PENCATATAN AMALAN PUASA SISWA (PUASAKU) - WALI ASUH
               </p>
             </div>
 
-            {/* Session Details Info Grid */}
-            <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            {/* Judul Dokumen */}
+            <div className="text-center pt-1 pb-0.5 border-b-2 border-emerald-800">
+              <h4 className="font-extrabold text-emerald-950 text-sm sm:text-base tracking-wide uppercase">
+                LAPORAN REKAPITULASI SISWA BERPUASA
+              </h4>
+            </div>
+
+            {/* Session Resume Info Grid */}
+            <div className="bg-emerald-50/80 border border-emerald-200 rounded-lg p-3 grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
               <div>
                 <p className="text-gray-500 font-semibold uppercase text-[10px]">
-                  Judul Kegiatan
+                  Kegiatan / Sesi
                 </p>
-                <p className="font-bold text-gray-900 text-sm">{session.title}</p>
+                <p className="font-bold text-gray-900 text-xs sm:text-sm">{session.title}</p>
               </div>
               <div>
                 <p className="text-gray-500 font-semibold uppercase text-[10px]">
-                  Tanggal Pelaksanaan
+                  Tanggal Input
                 </p>
-                <p className="font-bold text-gray-900 text-sm">
-                  {formatDateIndoLong(session.date)} ({session.date})
+                <p className="font-bold text-gray-900 text-xs sm:text-sm">
+                  {formatDateIndoLong(session.date)}
                 </p>
               </div>
               <div>
                 <p className="text-gray-500 font-semibold uppercase text-[10px]">
-                  Status Verifikasi
+                  Total Berpuasa
                 </p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  {session.isVerified ? (
-                    <span className="inline-flex items-center gap-1 text-emerald-800 font-bold bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-lg text-xs">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      Terverifikasi ({session.verifiedBy || verifierName})
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 text-amber-800 font-bold bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-lg text-xs">
-                      <Clock className="w-3.5 h-3.5" />
-                      Belum Diverifikasi
-                    </span>
-                  )}
-                </div>
+                <p className="font-bold text-emerald-900 text-xs sm:text-sm">
+                  {breakdown.totalSemua.berpuasa} dari {students.length} Siswa ({breakdown.totalSemua.percentage}%)
+                </p>
               </div>
             </div>
 
-            {/* Summary Breakdown Table (Exact Order Requested) */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h5 className="font-bold text-gray-900 text-sm flex items-center gap-1.5">
-                  <Users className="w-4 h-4 text-emerald-700" />
-                  <span>Rekapitulasi Jumlah Siswa Berpuasa (SD, SMP, SMA)</span>
-                </h5>
-                <span className="text-xs text-gray-500 italic">
-                  Total {students.length} Siswa Terdaftar
-                </span>
-              </div>
-
-              <div className="overflow-x-auto border border-gray-200 rounded-xl shadow-2xs">
-                <table className="w-full text-xs text-left divide-y divide-gray-200">
-                  <thead className="bg-emerald-900 text-white font-bold uppercase text-[11px]">
-                    <tr>
-                      <th className="py-2.5 px-3 text-center w-10">No</th>
-                      <th className="py-2.5 px-3">Kategori Jenjang & Gender</th>
-                      <th className="py-2.5 px-3 text-center">Total Siswa</th>
-                      <th className="py-2.5 px-3 text-center text-emerald-300 font-extrabold">
-                        Jumlah Berpuasa (✓)
+            {/* Tabel Horizontal Rekap Jumlah Berpuasa Saja */}
+            <div className="space-y-1.5">
+              <p className="text-xs font-bold text-emerald-950 uppercase tracking-wide">
+                Rekapitulasi Jumlah Berpuasa Per Jenjang
+              </p>
+              <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-2xs">
+                <table className="w-full text-xs text-center border-collapse">
+                  <thead>
+                    <tr className="bg-emerald-900 text-white font-bold text-[11px]">
+                      <th colSpan={3} className="py-1.5 px-2 border-r border-emerald-800">SD</th>
+                      <th colSpan={3} className="py-1.5 px-2 border-r border-emerald-800">SMP</th>
+                      <th colSpan={3} className="py-1.5 px-2 border-r border-emerald-800">SMA</th>
+                      <th rowSpan={2} className="py-1.5 px-3 bg-emerald-950 text-amber-300 font-extrabold border-l border-emerald-800 align-middle">
+                        TOTAL SEMUA
                       </th>
-                      <th className="py-2.5 px-3 text-center">% Berpuasa</th>
+                    </tr>
+                    <tr className="bg-emerald-800 text-emerald-100 font-semibold text-[10px]">
+                      <th className="py-1 px-1.5 border-r border-emerald-700">Putra</th>
+                      <th className="py-1 px-1.5 border-r border-emerald-700">Putri</th>
+                      <th className="py-1 px-1.5 bg-emerald-700 text-white font-bold border-r border-emerald-800">Jml SD</th>
+                      <th className="py-1 px-1.5 border-r border-emerald-700">Putra</th>
+                      <th className="py-1 px-1.5 border-r border-emerald-700">Putri</th>
+                      <th className="py-1 px-1.5 bg-emerald-700 text-white font-bold border-r border-emerald-800">Jml SMP</th>
+                      <th className="py-1 px-1.5 border-r border-emerald-700">Putra</th>
+                      <th className="py-1 px-1.5 border-r border-emerald-700">Putri</th>
+                      <th className="py-1 px-1.5 bg-emerald-700 text-white font-bold border-r border-emerald-800">Jml SMA</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100 bg-white">
-                    {breakdown.allRows.map((row, idx) => {
-                      return (
-                        <tr
-                          key={row.key}
-                          className={`transition-colors ${
-                            row.isGrandTotal
-                              ? 'bg-emerald-950 text-white font-bold text-xs'
-                              : row.isSubtotal
-                              ? 'bg-emerald-100/80 text-emerald-950 font-bold text-xs'
-                              : 'hover:bg-gray-50 text-gray-800 font-medium'
-                          }`}
-                        >
-                          <td className="py-2.5 px-3 text-center">{idx + 1}</td>
-                          <td className="py-2.5 px-3 flex items-center gap-1.5 font-bold">
-                            {row.label}
-                          </td>
-                          <td className="py-2.5 px-3 text-center">{row.totalStudents}</td>
-                          <td className="py-2.5 px-3 text-center font-bold text-emerald-700 text-sm print:text-emerald-900">
-                            {row.berpuasa}
-                          </td>
-                          <td className="py-2.5 px-3 text-center font-bold">
-                            <span
-                              className={`px-2 py-0.5 rounded-md ${
-                                row.isGrandTotal
-                                  ? 'bg-amber-400 text-emerald-950 font-black'
-                                  : row.isSubtotal
-                                  ? 'bg-emerald-200 text-emerald-900'
-                                  : 'bg-gray-100 text-gray-800'
-                              }`}
-                            >
-                              {row.percentage}%
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                  <tbody className="bg-white font-bold text-gray-900 text-xs">
+                    <tr className="divide-x divide-gray-200">
+                      <td className="py-2 px-1.5">{breakdown.sdPutra.berpuasa}</td>
+                      <td className="py-2 px-1.5">{breakdown.sdPutri.berpuasa}</td>
+                      <td className="py-2 px-1.5 bg-emerald-100 text-emerald-900">{breakdown.jumlahSd.berpuasa}</td>
+                      <td className="py-2 px-1.5">{breakdown.smpPutra.berpuasa}</td>
+                      <td className="py-2 px-1.5">{breakdown.smpPutri.berpuasa}</td>
+                      <td className="py-2 px-1.5 bg-emerald-100 text-emerald-900">{breakdown.jumlahSmp.berpuasa}</td>
+                      <td className="py-2 px-1.5">{breakdown.smaPutra.berpuasa}</td>
+                      <td className="py-2 px-1.5">{breakdown.smaPutri.berpuasa}</td>
+                      <td className="py-2 px-1.5 bg-emerald-100 text-emerald-900">{breakdown.jumlahSma.berpuasa}</td>
+                      <td className="py-2 px-2 bg-emerald-950 text-amber-300 text-sm font-black">
+                        {breakdown.totalSemua.berpuasa} Siswa
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
             </div>
 
-            {/* Verifier & Operational Notes */}
-            <div className="p-3.5 bg-gray-50 rounded-xl border border-gray-200 text-xs text-gray-700 space-y-1">
-              <p className="font-bold text-gray-900 flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                Catatan Pengesahan Laporan:
-              </p>
-              <p className="text-gray-600 leading-relaxed">
-                {session.verifierNotes ||
-                  'Laporan ini diterbitkan secara resmi melalui Sistem Informasi Presensi Amalan Puasa Sekolah Rakyat Kabupaten Kediri dan digunakan sebagai bukti pengawasan kedisiplinan ibadah siswa.'}
-              </p>
-            </div>
+            {/* Daftar Nama Siswa yang Berpuasa (2 Kolom Rapat & Rapi) */}
+            {(() => {
+              const fastingList = students
+                .filter((s) => session.records[s.id]?.status === 'berpuasa')
+                .sort((a, b) => {
+                  if (a.kelas !== b.kelas) return a.kelas.localeCompare(b.kelas);
+                  return a.nama.localeCompare(b.nama);
+                });
 
-            {/* Single Signature Line for Wali Asuh */}
-            <div className="pt-6 flex justify-end text-xs text-gray-800 pr-4">
-              <div className="text-center min-w-[220px]">
-                <p>Kediri, {formatDateIndoLong(new Date().toISOString().split('T')[0])}</p>
-                <p className="font-bold text-gray-900 mt-1">Wali Asuh,</p>
-                <div className="h-16"></div>
-                <p className="font-bold text-gray-900">(________________________)</p>
-              </div>
-            </div>
+              const half = Math.ceil(fastingList.length / 2);
 
-            {/* Lampiran Section: Daftar Detail Siswa YANG BERPUASA */}
-            <div className="pt-8 border-t-2 border-emerald-900/30 space-y-3 print:break-before-page">
-              <div className="bg-emerald-900 text-white p-3 rounded-xl flex items-center justify-between">
-                <h5 className="font-bold text-sm uppercase flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-emerald-300" />
-                  <span>Lampiran: Daftar Nama Siswa Yang Berpuasa</span>
-                </h5>
-                <span className="text-xs text-emerald-200 font-semibold">
-                  Total {students.filter((s) => session.records[s.id]?.status === 'berpuasa').length} Siswa Berpuasa
-                </span>
-              </div>
+              return (
+                <div className="space-y-1.5 pt-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-bold text-emerald-950 uppercase tracking-wide">
+                      Daftar Nama Siswa Yang Berpuasa ({fastingList.length} Siswa)
+                    </p>
+                    <span className="text-[10px] text-gray-500 italic">
+                      Susunan 2 Kolom Kompak
+                    </span>
+                  </div>
 
-              <div className="overflow-x-auto border border-gray-200 rounded-xl">
-                <table className="w-full text-xs text-left divide-y divide-gray-200">
-                  <thead className="bg-gray-100 text-gray-800 font-bold uppercase text-[10px]">
-                    <tr>
-                      <th className="py-2 px-2.5 text-center w-8">No</th>
-                      <th className="py-2 px-2.5">Nama Siswa</th>
-                      <th className="py-2 px-2.5 text-center">Kelas</th>
-                      <th className="py-2 px-2.5 text-center">L/P</th>
-                      <th className="py-2 px-2.5 text-center">NIK / No</th>
-                      <th className="py-2 px-2.5 text-center">Status Amalan</th>
-                      <th className="py-2 px-2.5">Catatan</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 bg-white">
-                    {(() => {
-                      const fastingList = students
-                        .filter((s) => session.records[s.id]?.status === 'berpuasa')
-                        .sort((a, b) => {
-                          if (a.kelas !== b.kelas) return a.kelas.localeCompare(b.kelas);
-                          return a.nama.localeCompare(b.nama);
-                        });
-
-                      if (fastingList.length === 0) {
-                        return (
+                  <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-2xs">
+                    <table className="w-full text-xs text-left border-collapse">
+                      <thead className="bg-emerald-900 text-white font-bold text-[10.5px]">
+                        <tr className="divide-x divide-emerald-800">
+                          <th className="py-1 px-2 text-center w-7">No</th>
+                          <th className="py-1 px-2">Nama Siswa</th>
+                          <th className="py-1 px-2 text-center w-16">Kelas</th>
+                          <th className="py-1 px-2 text-center w-8">L/P</th>
+                          <th className="py-1 px-2 text-center w-7">No</th>
+                          <th className="py-1 px-2">Nama Siswa</th>
+                          <th className="py-1 px-2 text-center w-16">Kelas</th>
+                          <th className="py-1 px-2 text-center w-8">L/P</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 bg-white text-[11px]">
+                        {fastingList.length === 0 ? (
                           <tr>
-                            <td colSpan={7} className="py-6 text-center text-gray-500 italic">
+                            <td colSpan={8} className="py-6 text-center text-gray-500 italic">
                               Tidak ada siswa yang berpuasa pada sesi ini.
                             </td>
                           </tr>
-                        );
-                      }
+                        ) : (
+                          Array.from({ length: half }).map((_, i) => {
+                            const left = fastingList[i];
+                            const right = fastingList[i + half];
 
-                      return fastingList.map((s, index) => {
-                        const rec = session.records[s.id];
-                        const isFemale =
-                          s.jenisKelamin === 'Perempuan' ||
-                          s.jenisKelamin?.toLowerCase().startsWith('p');
+                            const leftGender =
+                              left.jenisKelamin === 'Perempuan' ||
+                              left.jenisKelamin?.toLowerCase().startsWith('p')
+                                ? 'P'
+                                : 'L';
+                            const rightGender = right
+                              ? right.jenisKelamin === 'Perempuan' ||
+                                right.jenisKelamin?.toLowerCase().startsWith('p')
+                                ? 'P'
+                                : 'L'
+                              : '';
 
-                        return (
-                          <tr key={s.id} className="hover:bg-gray-50 text-gray-800">
-                            <td className="py-1.5 px-2.5 text-center font-medium">{index + 1}</td>
-                            <td className="py-1.5 px-2.5 font-bold text-gray-900">{s.nama}</td>
-                            <td className="py-1.5 px-2.5 text-center font-semibold text-emerald-800">
-                              {s.kelas}
-                            </td>
-                            <td className="py-1.5 px-2.5 text-center">{isFemale ? 'P' : 'L'}</td>
-                            <td className="py-1.5 px-2.5 text-center text-gray-500 font-mono text-[10px]">
-                              {s.nik || s.no}
-                            </td>
-                            <td className="py-1.5 px-2.5 text-center font-bold">
-                              <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                                ✓ Berpuasa
-                              </span>
-                            </td>
-                            <td className="py-1.5 px-2.5 text-gray-600 text-[11px] italic">
-                              {rec?.notes || '-'}
-                            </td>
-                          </tr>
-                        );
-                      });
-                    })()}
-                  </tbody>
-                </table>
-              </div>
+                            return (
+                              <tr
+                                key={`row-${i}`}
+                                className={`divide-x divide-gray-100 ${
+                                  i % 2 === 1 ? 'bg-gray-50/60' : 'bg-white'
+                                }`}
+                              >
+                                <td className="py-1 px-1.5 text-center font-medium text-gray-500">
+                                  {i + 1}
+                                </td>
+                                <td className="py-1 px-2 font-bold text-gray-900 truncate max-w-[140px]">
+                                  {left.nama}
+                                </td>
+                                <td className="py-1 px-1.5 text-center font-semibold text-emerald-800">
+                                  {left.kelas}
+                                </td>
+                                <td className="py-1 px-1 text-center text-gray-600">
+                                  {leftGender}
+                                </td>
+
+                                <td className="py-1 px-1.5 text-center font-medium text-gray-500">
+                                  {right ? i + half + 1 : ''}
+                                </td>
+                                <td className="py-1 px-2 font-bold text-gray-900 truncate max-w-[140px]">
+                                  {right ? right.nama : ''}
+                                </td>
+                                <td className="py-1 px-1.5 text-center font-semibold text-emerald-800">
+                                  {right ? right.kelas : ''}
+                                </td>
+                                <td className="py-1 px-1 text-center text-gray-600">
+                                  {right ? rightGender : ''}
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Footer Sederhana: Didata oleh Wali Asuh (Tanpa Penanda Tangan) */}
+            <div className="pt-3 border-t border-gray-200 flex items-center justify-between text-xs text-gray-500">
+              <span className="font-semibold text-gray-700">
+                Didata oleh Wali Asuh
+              </span>
+              <span className="text-[11px] text-gray-400">
+                Sistem Informasi PUASAKU • SRT 1 Kediri
+              </span>
             </div>
           </div>
         </div>

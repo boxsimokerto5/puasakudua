@@ -69,22 +69,34 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
 
   const uniqueClasses = useMemo(() => getUniqueClasses(students), [students]);
 
-  // Play subtle feedback beep on barcode scan
+  // Play distinctive pleasant success chime sound on barcode scan
   const playScanBeep = () => {
     try {
-      const audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
-      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.12);
+      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      
+      // Multi-tone cheerful chime (E5 -> G#5 -> B5)
+      const notes = [659.25, 830.61, 987.77];
+      notes.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const startTime = audioCtx.currentTime + idx * 0.07;
+        const duration = 0.14;
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, startTime);
+        gain.gain.setValueAtTime(0.2, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      });
     } catch {
-      // AudioContext might be blocked or unsupported
+      // AudioContext might be blocked by browser policy until interaction
     }
   };
 
@@ -284,25 +296,25 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-4">
       {/* Session Lock Banner Alert for Regular Penginput */}
       {isReadOnly && (
-        <div className="p-4 rounded-2xl bg-rose-50 border-2 border-rose-300 text-rose-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md animate-in fade-in duration-200">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-rose-200 text-rose-800 shrink-0">
-              <Lock className="w-5 h-5" />
+        <div className="p-3 sm:p-3.5 rounded-xl bg-rose-50 border-2 border-rose-300 text-rose-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-sm animate-in fade-in duration-200">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-lg bg-rose-200 text-rose-800 shrink-0">
+              <Lock className="w-4 h-4" />
             </div>
             <div>
-              <h4 className="font-bold text-sm text-rose-950 flex items-center gap-2">
+              <h4 className="font-bold text-xs sm:text-sm text-rose-950 flex items-center gap-2">
                 <span>Penginputan Sesi Ini Telah DIKUNCI oleh Admin</span>
               </h4>
-              <p className="text-xs text-rose-800 mt-0.5">
-                Batas waktu penginputan telah selesai atau dikunci oleh Administrator demi menjaga keaslian data. Anda saat ini dalam mode <strong>Hanya Lihat (Read-Only)</strong>.
+              <p className="text-[11px] text-rose-800 mt-0.5">
+                Batas waktu penginputan telah selesai atau dikunci oleh Administrator. Mode <strong>Hanya Lihat (Read-Only)</strong>.
               </p>
             </div>
           </div>
           {activeSession.inputDeadline && (
-            <div className="px-3 py-1.5 rounded-xl bg-rose-100 border border-rose-200 text-rose-900 text-xs font-bold shrink-0 flex items-center gap-1.5">
+            <div className="px-2.5 py-1 rounded-lg bg-rose-100 border border-rose-200 text-rose-900 text-[11px] font-bold shrink-0 flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5" />
               <span>Batas: {activeSession.inputDeadline} WIB</span>
             </div>
@@ -312,17 +324,17 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
 
       {/* Admin Quick Control Banner */}
       {isAdmin && onToggleLockSession && (
-        <div className="p-4 rounded-2xl bg-purple-50 border border-purple-200 text-purple-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-purple-200 text-purple-800 shrink-0">
-              <ShieldAlert className="w-5 h-5" />
+        <div className="p-2.5 sm:p-3 rounded-xl bg-purple-50 border border-purple-200 text-purple-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-xs">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-lg bg-purple-200 text-purple-800 shrink-0">
+              <ShieldAlert className="w-4 h-4" />
             </div>
             <div>
               <p className="text-xs font-bold text-purple-950">
                 Mode Administrator Aktif (Akses Penuh Penginputan)
               </p>
-              <p className="text-[11px] text-purple-800">
-                Status saat ini: {isLocked ? '🔒 Dikunci untuk Penginput biasa' : '🔓 Terbuka (Penginput bisa mengisi)'}
+              <p className="text-[10.5px] text-purple-800">
+                Status: {isLocked ? '🔒 Dikunci untuk Penginput biasa' : '🔓 Terbuka (Penginput bisa mengisi)'}
               </p>
             </div>
           </div>
@@ -330,7 +342,7 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
           <button
             type="button"
             onClick={() => onToggleLockSession(activeSession.id, !isLocked)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer ${
               isLocked
                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                 : 'bg-rose-600 hover:bg-rose-700 text-white'
@@ -342,48 +354,54 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
         </div>
       )}
 
-      {/* Top Banner Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-        <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-100">
-            <Users className="w-5 h-5" />
+      {/* Top Banner Stats Cards - 2 Columns on Mobile for Zero-Scroll Compactness */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <div className="bg-white p-2.5 sm:p-3 rounded-xl border border-gray-100 shadow-xs flex items-center gap-2 sm:gap-3">
+          <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 shrink-0">
+            <Users className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-              Total Siswa ({selectedClass === 'SEMUA' ? 'Semua Kelas' : selectedClass})
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate">
+              Total Siswa ({selectedClass === 'SEMUA' ? 'Semua' : selectedClass})
             </p>
-            <p className="text-xl font-bold text-gray-900">{stats.total} Siswa</p>
+            <p className="text-base sm:text-lg font-bold text-gray-900 leading-tight">
+              {stats.total} <span className="text-xs font-normal text-gray-500 hidden sm:inline">Siswa</span>
+            </p>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-200">
-            <CheckCircle2 className="w-5 h-5" />
+        <div className="bg-white p-2.5 sm:p-3 rounded-xl border border-emerald-100 shadow-xs flex items-center gap-2 sm:gap-3">
+          <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
+            <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <p className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">
-              Siswa Berpuasa Terinput
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-[11px] font-bold text-emerald-700 uppercase tracking-wider truncate">
+              Siswa Berpuasa
             </p>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-xl font-bold text-emerald-950">{stats.berpuasa}</span>
-              <span className="text-xs text-emerald-600 font-semibold">({stats.percentPuasa}% dari total siswa)</span>
+            <div className="flex items-baseline gap-1 sm:gap-1.5 flex-wrap">
+              <span className="text-base sm:text-lg font-bold text-emerald-950 leading-tight">
+                {stats.berpuasa}
+              </span>
+              <span className="text-[10px] sm:text-xs text-emerald-600 font-bold">
+                ({stats.percentPuasa}%)
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Progress Bar & Class Filter Bar */}
-      <div className="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm space-y-4">
-        {/* Progress Bar */}
-        <div className="space-y-1.5">
-          <div className="flex justify-between items-center text-xs">
-            <span className="font-bold text-gray-700 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              Siswa Terdata Berpuasa ({stats.berpuasa} dari {stats.total} Siswa)
+      {/* Progress Bar, Filters & Action Buttons Unified Container */}
+      <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200/80 shadow-xs space-y-2.5 sm:space-y-3">
+        {/* Compact Progress Bar */}
+        <div className="space-y-1">
+          <div className="flex justify-between items-center text-[11px] sm:text-xs">
+            <span className="font-bold text-gray-700 flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>Siswa Berpuasa ({stats.berpuasa}/{stats.total})</span>
             </span>
-            <span className="font-bold text-emerald-800">{stats.percentPuasa}% Berpuasa</span>
+            <span className="font-bold text-emerald-800">{stats.percentPuasa}%</span>
           </div>
-          <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
             <div
               className="h-full bg-emerald-600 rounded-full transition-all duration-300"
               style={{ width: `${stats.percentPuasa}%` }}
@@ -391,15 +409,15 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
           </div>
         </div>
 
-        {/* Filter Controls Bar */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-2 border-t border-gray-100">
+        {/* Filter Controls Bar & Actions */}
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2 pt-2 border-t border-gray-100">
           {/* Class Select Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          <div className="flex items-center gap-1 overflow-x-auto pb-0.5 no-scrollbar shrink-0">
             <button
               onClick={() => setSelectedClass('SEMUA')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap cursor-pointer ${
                 selectedClass === 'SEMUA'
-                  ? 'bg-emerald-800 text-white shadow-sm'
+                  ? 'bg-emerald-800 text-white shadow-xs'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -409,9 +427,9 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
               <button
                 key={cls}
                 onClick={() => setSelectedClass(cls)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap cursor-pointer ${
                   selectedClass === cls
-                    ? 'bg-emerald-800 text-white shadow-sm'
+                    ? 'bg-emerald-800 text-white shadow-xs'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -420,17 +438,17 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
             ))}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2 shrink-0 flex-wrap">
+          {/* Action Buttons - Compact Row */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 py-0.5">
             {/* Foto Santri (ImgBB Cloud) Button */}
             {onOpenPhotoModal && (
               <button
                 type="button"
                 onClick={onOpenPhotoModal}
-                className="px-3.5 py-1.5 bg-gradient-to-r from-teal-700 to-emerald-800 hover:from-teal-800 hover:to-emerald-900 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs border border-emerald-600/60 cursor-pointer active:scale-95"
+                className="px-2.5 py-1 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-all shadow-xs border border-emerald-600/60 cursor-pointer active:scale-95 whitespace-nowrap"
                 title="Kelola & Upload Foto Santri ke Cloud ImgBB / Galeri"
               >
-                <Camera className="w-4 h-4 text-amber-300" />
+                <Camera className="w-3.5 h-3.5 text-amber-300 shrink-0" />
                 <span>Foto Santri</span>
               </button>
             )}
@@ -438,71 +456,73 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
             {/* Generate & Print Dorm Cards Button */}
             <button
               onClick={() => setIsDormCardModalOpen(true)}
-              className="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all shadow-sm border border-amber-400 cursor-pointer active:scale-95"
-              title="Buat dan Cetak Kartu Puasa Wali Asuh dengan Barcode NIK (SD Merah, SMP Biru, SMA Abu-abu)"
+              className="px-2.5 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 rounded-lg text-[11px] font-black flex items-center justify-center gap-1 transition-all shadow-xs border border-amber-400 cursor-pointer active:scale-95 whitespace-nowrap"
+              title="Buat dan Cetak Kartu Puasa Wali Asuh dengan Barcode NIK"
             >
-              <CreditCard className="w-4 h-4 text-slate-900" />
-              <span>Cetak Kartu Puasa Wali Asuh</span>
+              <CreditCard className="w-3.5 h-3.5 text-slate-900 shrink-0" />
+              <span>Cetak Kartu</span>
             </button>
 
             {/* Scan with Camera Button */}
             {!isReadOnly && (
               <button
                 onClick={() => setIsCameraScannerOpen(true)}
-                className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95"
+                className="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer active:scale-95 whitespace-nowrap"
                 title="Buka Kamera untuk Scan Barcode Kartu Santri"
               >
-                <Camera className="w-4 h-4 text-emerald-200" />
+                <Camera className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
                 <span>Scan Kamera</span>
               </button>
             )}
 
             <button
               onClick={() => setIsPdfModalOpen(true)}
-              className="px-3 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
-              title="Cetak/Unduh Laporan Rekapitulasi PDF (SD, SMP, SMA)"
+              className="px-2.5 py-1 bg-emerald-900 hover:bg-emerald-950 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer whitespace-nowrap"
+              title="Cetak/Unduh Laporan Rekapitulasi PDF"
             >
-              <FileText className="w-4 h-4 text-emerald-200" />
-              <span>PDF Rekapitulasi</span>
+              <FileText className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
+              <span>PDF Rekap</span>
             </button>
           </div>
         </div>
 
-        {/* Scan Success Quick Toast Notification */}
+        {/* Floating Success Toast on Top Center */}
         {scanToast && (
-          <div className="p-3 bg-emerald-700 text-white rounded-2xl shadow-lg border border-emerald-500 flex items-center justify-between animate-in slide-in-from-top-2 duration-200">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
-                <Volume2 className="w-4 h-4 text-amber-300" />
+          <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-sm w-[92%] sm:w-auto px-4 py-3 bg-gradient-to-r from-emerald-800 via-emerald-900 to-teal-950 text-white rounded-2xl shadow-2xl border-2 border-amber-400 flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-md">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-amber-400/20 border border-amber-300/40 flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4 text-amber-300 animate-spin" style={{ animationDuration: '3s' }} />
               </div>
-              <div>
-                <p className="text-xs font-bold">⚡ Berhasil Scan Barcode Santri!</p>
-                <p className="text-sm font-extrabold text-amber-200">{scanToast.studentName}</p>
+              <div className="min-w-0">
+                <p className="text-[11px] font-bold text-amber-300 flex items-center gap-1">
+                  <span>✓ Berhasil Scan</span>
+                  <span className="text-emerald-300 font-mono text-[10px]">({scanToast.time})</span>
+                </p>
+                <p className="text-xs sm:text-sm font-extrabold text-white truncate">
+                  {scanToast.studentName}
+                </p>
               </div>
             </div>
-            <div className="text-right">
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-900 text-emerald-100">
-                {scanToast.time}
-              </span>
-              <p className="text-[10px] text-emerald-200 mt-0.5">Status: Berpuasa</p>
-            </div>
+            <span className="px-2 py-0.5 rounded-lg text-[10px] font-black bg-emerald-600/90 text-white border border-emerald-400/40 shrink-0">
+              ✓ Berpuasa
+            </span>
           </div>
         )}
 
-        {/* Search Bar with Live Suggestions Dropdown (MURNI INPUT DARI PENCARIAN) */}
-        <div className="pt-2 space-y-2">
+        {/* Search Bar with Live Suggestions Dropdown */}
+        <div className="pt-1.5 space-y-1.5">
           <div className="flex items-center justify-between">
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
-              Input Nama Siswa Berpuasa (Cari & Scan Barcode NIK)
+            <label className="block text-[11px] font-bold text-gray-700 uppercase tracking-wider">
+              Input Siswa Berpuasa (Cari / Scan Barcode NIK)
             </label>
-            <span className="text-[11px] text-emerald-700 font-semibold hidden sm:inline">
-              ✨ Dukungan Scanner USB / Nirkabel & Kamera Aktif
+            <span className="text-[10px] text-emerald-700 font-semibold hidden sm:inline">
+              ✨ Scanner USB / Kamera Aktif
             </span>
           </div>
 
           <div ref={searchContainerRef} className="relative">
             <div className="relative">
-              <Search className="w-4 h-4 text-emerald-600 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-emerald-600 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -513,10 +533,10 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
                   setSearchQuery(e.target.value);
                   setIsSearchFocused(true);
                 }}
-                placeholder="Ketik nama siswa, NIK, atau scan kartu barcode santri di sini..."
-                className="w-full pl-10 pr-24 py-3 text-sm bg-emerald-50/40 border-2 border-emerald-200 rounded-2xl focus:bg-white focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100 transition-all shadow-xs"
+                placeholder="Ketik nama, NIK, atau scan kartu santri di sini..."
+                className="w-full pl-9 pr-20 py-2 text-xs sm:text-sm bg-emerald-50/40 border border-emerald-200 rounded-xl focus:bg-white focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 transition-all shadow-xs"
               />
-              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                 {searchQuery && (
                   <button
                     onClick={() => {
@@ -526,32 +546,32 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
                     className="text-gray-400 hover:text-gray-600 p-1 cursor-pointer"
                     title="Hapus pencarian"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5" />
                   </button>
                 )}
                 <button
                   type="button"
                   onClick={() => setIsCameraScannerOpen(true)}
-                  className="p-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-all cursor-pointer"
+                  className="p-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-all cursor-pointer"
                   title="Scan via Kamera"
                 >
-                  <ScanBarcode className="w-4 h-4" />
+                  <ScanBarcode className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
 
             {/* Auto-Suggest Dropdown */}
             {isSearchFocused && searchQuery.trim().length > 0 && (
-              <div className="absolute left-0 right-0 top-full mt-2 z-40 bg-white border border-emerald-200 rounded-2xl shadow-2xl overflow-hidden max-h-96 overflow-y-auto divide-y divide-gray-100 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="px-4 py-2.5 bg-emerald-900 text-white text-[11px] font-bold flex justify-between items-center">
-                  <span>Hasil Pencarian Siswa ({searchSuggestions.length})</span>
-                  <span className="text-emerald-300 font-normal">
-                    {isReadOnly ? 'Mode Hanya Lihat' : 'Klik nama atau tombol untuk menandai puasa'}
+              <div className="absolute left-0 right-0 top-full mt-1.5 z-40 bg-white border border-emerald-200 rounded-xl shadow-xl overflow-hidden max-h-80 overflow-y-auto divide-y divide-gray-100 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="px-3 py-2 bg-emerald-900 text-white text-[10.5px] font-bold flex justify-between items-center">
+                  <span>Hasil Pencarian ({searchSuggestions.length})</span>
+                  <span className="text-emerald-300 font-normal text-[10px]">
+                    {isReadOnly ? 'Hanya Lihat' : 'Klik untuk tandai puasa'}
                   </span>
                 </div>
 
                 {searchSuggestions.length === 0 ? (
-                  <div className="p-5 text-center text-xs text-gray-500">
+                  <div className="p-4 text-center text-xs text-gray-500">
                     Siswa tidak ditemukan dengan kata kunci &quot;{searchQuery}&quot;
                   </div>
                 ) : (
@@ -563,7 +583,7 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
                     return (
                       <div
                         key={s.id}
-                        className={`p-3.5 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
+                        className={`p-2.5 sm:p-3 transition-colors flex items-center justify-between gap-2 ${
                           isFasting ? 'bg-emerald-50/70 hover:bg-emerald-50' : 'hover:bg-gray-50'
                         }`}
                       >
@@ -573,12 +593,12 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
                               handleMarkPuasaFromSuggest(s.id);
                             }
                           }}
-                          className={`flex items-center gap-3 flex-1 min-w-0 ${
+                          className={`flex items-center gap-2.5 flex-1 min-w-0 ${
                             !isReadOnly && !isFasting ? 'cursor-pointer' : ''
                           }`}
                         >
                           <div
-                            className={`w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 ${
+                            className={`w-6 h-6 rounded-md font-bold text-[11px] flex items-center justify-center shrink-0 ${
                               isFasting
                                 ? 'bg-emerald-600 text-white'
                                 : 'bg-gray-100 text-gray-700'
@@ -587,15 +607,15 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
                             {s.no}
                           </div>
                           <div className="min-w-0">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5">
                               <p className="font-bold text-gray-900 text-xs truncate">{s.nama}</p>
                               {isFasting && (
-                                <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-emerald-600 text-white">
-                                  ✓ Sedang Puasa
+                                <span className="px-1.5 py-0.2 rounded text-[9.5px] font-extrabold bg-emerald-600 text-white shrink-0">
+                                  ✓ Puasa
                                 </span>
                               )}
                             </div>
-                            <p className="text-[11px] text-gray-500 mt-0.5">
+                            <p className="text-[10.5px] text-gray-500">
                               Kelas: <strong className="text-emerald-800">{s.kelas}</strong>
                               {s.jenisKelamin && ` • ${s.jenisKelamin}`}
                               {s.nik && ` • NIK: ${s.nik}`}
@@ -604,31 +624,31 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
                         </div>
 
                         {/* Direct Action Buttons inside Dropdown */}
-                        <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                        <div className="flex items-center gap-1 shrink-0">
                           {isFasting ? (
                             <button
                               type="button"
                               disabled={isReadOnly}
                               onClick={() => handleToggleStatusFromSuggest(s.id, 'berpuasa')}
-                              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+                              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
                                 isReadOnly ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
                               } bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 shadow-xs`}
                               title="Batalkan status puasa"
                             >
-                              <RotateCcw className="w-3.5 h-3.5" />
-                              <span>Batal Puasa</span>
+                              <RotateCcw className="w-3 h-3" />
+                              <span>Batal</span>
                             </button>
                           ) : (
                             <button
                               type="button"
                               disabled={isReadOnly}
                               onClick={() => handleMarkPuasaFromSuggest(s.id)}
-                              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+                              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
                                 isReadOnly ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
                               } bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs`}
                             >
-                              <Plus className="w-3.5 h-3.5" />
-                              <span>Tandai Puasa</span>
+                              <Plus className="w-3 h-3" />
+                              <span>Tandai</span>
                             </button>
                           )}
                         </div>
@@ -641,39 +661,38 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
           </div>
         </div>
       </div>
-
       {/* Main Student Checklist Table / Selected Fasting List */}
-      <div className="bg-white rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden">
-        <div className="px-5 py-3.5 bg-gray-50/80 border-b border-gray-200 flex items-center justify-between">
-          <h3 className="font-bold text-gray-800 text-sm flex items-center gap-2">
-            <UserCheck className="w-4 h-4 text-emerald-700" />
+      <div className="bg-white rounded-xl border border-gray-200/80 shadow-xs overflow-hidden">
+        <div className="px-3.5 sm:px-4 py-2 sm:py-2.5 bg-gray-50/90 border-b border-gray-200 flex items-center justify-between">
+          <h3 className="font-bold text-gray-800 text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2">
+            <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 shrink-0" />
             <span>
-              Daftar Siswa Berpuasa yang Telah Diinput ({displayedStudents.length} Siswa)
+              Siswa Berpuasa Terinput ({displayedStudents.length} Siswa)
             </span>
           </h3>
 
           {displayedStudents.length > 0 && !isReadOnly && (
             <button
               onClick={handleBulkResetAll}
-              className="px-2.5 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-50 border border-rose-200 rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+              className="px-2 py-0.5 sm:py-1 text-[11px] font-semibold text-rose-700 hover:bg-rose-50 border border-rose-200 rounded-md transition-all flex items-center gap-1 cursor-pointer"
               title="Batalkan semua siswa yang sudah diinput puasa di kelas ini"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="w-3 h-3" />
               <span>Reset Semua</span>
             </button>
           )}
         </div>
 
         {displayedStudents.length === 0 ? (
-          <div className="p-12 text-center space-y-3">
-            <div className="p-3.5 bg-emerald-50 text-emerald-700 rounded-2xl w-14 h-14 mx-auto flex items-center justify-center border border-emerald-100 shadow-xs">
-              <UserPlus className="w-7 h-7" />
+          <div className="p-6 sm:p-8 text-center space-y-2">
+            <div className="p-2.5 bg-emerald-50 text-emerald-700 rounded-xl w-10 h-10 mx-auto flex items-center justify-center border border-emerald-100 shadow-xs">
+              <UserPlus className="w-5 h-5" />
             </div>
-            <p className="text-base font-bold text-gray-800">
+            <p className="text-xs sm:text-sm font-bold text-gray-800">
               Belum Ada Siswa yang Diinput Berpuasa
             </p>
-            <p className="text-xs text-gray-500 max-w-md mx-auto leading-relaxed">
-              Ketik nama, NIK, atau nomor urut siswa pada <strong>kolom pencarian di atas</strong> untuk mencari dan menandai siswa yang berpuasa hari ini. Siswa yang terpilih akan tampil di daftar ini.
+            <p className="text-[11px] text-gray-500 max-w-sm mx-auto leading-normal">
+              Ketik nama, NIK, atau scan kartu pada kolom pencarian di atas untuk menandai siswa berpuasa hari ini.
             </p>
           </div>
         ) : (
@@ -686,24 +705,24 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
               return (
                 <div
                   key={s.id}
-                  className="p-4 transition-colors hover:bg-emerald-50/40 bg-emerald-50/15 flex flex-col md:flex-row md:items-center justify-between gap-3"
+                  className="p-2.5 sm:p-3 transition-colors hover:bg-emerald-50/40 bg-emerald-50/15 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
                 >
                   {/* Student Info */}
-                  <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                  <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-emerald-600 text-white font-bold text-[11px] sm:text-xs flex items-center justify-center shrink-0 shadow-xs">
                       {s.no || index + 1}
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="font-bold text-gray-900 text-sm truncate">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h4 className="font-bold text-gray-900 text-xs sm:text-sm truncate">
                           {s.nama}
                         </h4>
-                        <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-white text-emerald-800 border border-emerald-200">
+                        <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-white text-emerald-800 border border-emerald-200">
                           {s.kelas}
                         </span>
                         <span
-                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                          className={`px-1.5 py-0.2 rounded text-[9.5px] font-bold ${
                             s.jenisKelamin === 'Perempuan'
                               ? 'bg-pink-50 text-pink-700 border border-pink-200'
                               : 'bg-blue-50 text-blue-700 border border-blue-200'
@@ -711,20 +730,20 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
                         >
                           {s.jenisKelamin === 'Perempuan' ? 'P' : 'L'}
                         </span>
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        <span className="px-1.5 py-0.2 rounded text-[9.5px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
                           ✓ Berpuasa
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-3 text-xs text-gray-500 mt-0.5">
+                      <div className="flex items-center gap-2 text-[10.5px] text-gray-500 mt-0.5">
                         {s.nik && <span>NIK: {s.nik}</span>}
-                        {s.namaIbu && <span>Ibu: {s.namaIbu}</span>}
+                        {s.namaIbu && <span>• Ibu: {s.namaIbu}</span>}
                       </div>
 
                       {/* Display Note if exists */}
                       {hasNote && (
-                        <div className="mt-1.5 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2 inline-flex items-center gap-1.5">
-                          <Bookmark className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                        <div className="mt-1 text-[10.5px] text-amber-800 bg-amber-50 border border-amber-200 rounded p-1 inline-flex items-center gap-1">
+                          <Bookmark className="w-3 h-3 text-amber-600 shrink-0" />
                           <span>
                             <strong>Catatan:</strong> {record.notes}
                           </span>
@@ -734,16 +753,16 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
                   </div>
 
                   {/* Fasting Status Controls */}
-                  <div className="flex items-center gap-2 self-end md:self-center shrink-0">
+                  <div className="flex items-center gap-1.5 self-end sm:self-center shrink-0">
                     <button
                       disabled={isReadOnly}
                       onClick={() => handleRemoveFasting(s.id)}
-                      className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
                         isReadOnly ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'
                       } bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 shadow-xs active:scale-95`}
-                      title="Batalkan tanda puasa untuk siswa ini (keluarkan dari daftar)"
+                      title="Batalkan tanda puasa untuk siswa ini"
                     >
-                      <RotateCcw className="w-3.5 h-3.5 text-amber-800" />
+                      <RotateCcw className="w-3 h-3 text-amber-800" />
                       <span>Batal Puasa</span>
                     </button>
 
@@ -754,12 +773,14 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
                         setActiveNoteStudentId(s.id);
                         setNoteText(record?.notes || '');
                       }}
-                      className={`p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-emerald-100 hover:text-emerald-800 transition-all ${
-                        isReadOnly ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
+                      className={`p-1.5 rounded-lg border text-xs transition-all ${
+                        hasNote
+                          ? 'bg-amber-100 border-amber-300 text-amber-800'
+                          : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
                       }`}
-                      title={isReadOnly ? 'Hanya Lihat' : 'Tambah / Edit Catatan'}
+                      title={hasNote ? 'Edit catatan siswa' : 'Tambah catatan'}
                     >
-                      <MessageSquare className="w-4 h-4" />
+                      <MessageSquare className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>

@@ -173,111 +173,182 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
       </div>
 
       {/* Main Header Content Container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Logo & School Title */}
-          <div className="flex items-center space-x-3">
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-amber-400/20 rounded-xl blur-xs" />
-              <div className="relative w-10 h-10 rounded-xl bg-emerald-950/90 border border-amber-400/60 p-1 flex items-center justify-center shadow-[0_0_12px_rgba(251,191,36,0.25)] shrink-0">
-                <img src="/assets/logo.svg" alt="Logo Puasaku" className="w-full h-full object-contain drop-shadow-sm" />
+      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-2">
+        {/* Desktop Layout: Single/Double Balanced Row */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+          
+          {/* Top Row on Mobile / Left on Desktop: Brand + Profile & Actions */}
+          <div className="flex items-center justify-between gap-3">
+            {/* Logo & School Title */}
+            <div className="flex items-center space-x-2.5">
+              <div className="relative group shrink-0">
+                <div className="absolute -inset-1 bg-amber-400/20 rounded-xl blur-xs" />
+                <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-950/90 border border-amber-400/60 p-1 flex items-center justify-center shadow-[0_0_10px_rgba(251,191,36,0.25)] shrink-0">
+                  <img src="/assets/logo.svg" alt="Logo Puasaku" className="w-full h-full object-contain drop-shadow-sm" />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h1 className="text-base sm:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300 tracking-wide font-sans drop-shadow-[0_1px_3px_rgba(251,191,36,0.3)]">
+                    PUASAKU
+                  </h1>
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-950 text-amber-300 border border-amber-400/40 shadow-xs">
+                    SRT 1 KEDIRI
+                  </span>
+                </div>
+                <p className="hidden sm:block text-[10.5px] text-emerald-300 font-medium -mt-0.5">
+                  Pencatatan & Verifikasi Amalan Puasa Siswa
+                </p>
               </div>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300 tracking-wide font-sans drop-shadow-[0_1px_4px_rgba(251,191,36,0.3)]">
-                  PUASAKU
-                </h1>
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-black bg-emerald-950/90 text-amber-300 border border-amber-400/40 shadow-xs">
-                  SRT 1 KEDIRI
-                </span>
+
+            {/* Mobile-only User & Logout Quick Strip */}
+            <div className="flex lg:hidden items-center gap-1.5 shrink-0">
+              {/* Supabase Mini Indicator */}
+              <button
+                type="button"
+                onClick={isAdmin && onOpenSupabaseConfig ? onOpenSupabaseConfig : undefined}
+                title={
+                  isSupabaseConnected
+                    ? 'Supabase Cloud Terhubung'
+                    : 'Supabase Offline (Lokal)'
+                }
+                className={`p-1.5 rounded-lg border text-xs transition-all ${
+                  isSupabaseConnected
+                    ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/50'
+                    : 'bg-emerald-950/60 text-amber-300 border-amber-500/40'
+                }`}
+              >
+                {isSupabaseConnected ? <Cloud className="w-3.5 h-3.5" /> : <CloudOff className="w-3.5 h-3.5" />}
+              </button>
+
+              {/* PWA Mobile Install button */}
+              {!isPwaInstalled && onInstallPwa && (
+                <button
+                  type="button"
+                  onClick={onInstallPwa}
+                  title="Pasang Aplikasi (PWA)"
+                  className="p-1.5 rounded-lg bg-amber-500 text-emerald-950 border border-amber-300 text-xs font-bold"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                </button>
+              )}
+
+              {/* User Chip */}
+              <div
+                className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[11px] font-bold shadow-xs ${
+                  isAdmin
+                    ? 'bg-purple-950/80 border-purple-500/60 text-purple-200'
+                    : isPenginput
+                    ? 'bg-amber-950/80 border-amber-500/60 text-amber-200'
+                    : 'bg-emerald-950/80 border-emerald-600/60 text-emerald-200'
+                }`}
+              >
+                {isAdmin ? (
+                  <KeyRound className="w-3 h-3 text-purple-300 shrink-0" />
+                ) : isPenginput ? (
+                  <UserCheck className="w-3 h-3 text-amber-300 shrink-0" />
+                ) : (
+                  <ShieldCheck className="w-3 h-3 text-emerald-300 shrink-0" />
+                )}
+                <span className="max-w-[70px] sm:max-w-[90px] truncate text-white">{user.name}</span>
               </div>
-              <p className="text-[11px] text-emerald-300 font-medium">
-                Pencatatan & Verifikasi Amalan Puasa Siswa
-              </p>
+
+              {/* Prominent Mobile Logout Button */}
+              <button
+                type="button"
+                onClick={onLogout}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-950/90 hover:bg-red-600 active:scale-95 text-red-200 hover:text-white border border-red-500/60 text-xs font-bold transition-all cursor-pointer shadow-xs"
+                title="Keluar dari Akun"
+              >
+                <LogOut className="w-3.5 h-3.5 text-red-300 group-hover:text-white" />
+                <span className="text-[11px]">Keluar</span>
+              </button>
             </div>
           </div>
 
-          {/* Navigation Tabs for All Roles */}
+          {/* Navigation Tabs - Proportional Segmented Control */}
           {onSelectAdminTab && (
-            <div className="flex items-center bg-emerald-950/90 p-1 rounded-xl border border-emerald-700/70 shadow-inner backdrop-blur-xs flex-wrap gap-1">
-              {isAdmin && (
+            <nav className="w-full lg:w-auto bg-emerald-950/90 p-1 rounded-xl border border-emerald-700/60 shadow-inner backdrop-blur-xs">
+              <div className="grid grid-flow-col auto-cols-fr sm:flex sm:flex-wrap items-center gap-1">
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => onSelectAdminTab('admin')}
+                    className={`px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                      activeAdminTab === 'admin'
+                        ? 'bg-purple-600 text-white shadow-md'
+                        : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
+                    }`}
+                  >
+                    <Sliders className="w-3.5 h-3.5 shrink-0" />
+                    <span>Admin</span>
+                  </button>
+                )}
+
+                {(isAdmin || isPenginput) && (
+                  <button
+                    type="button"
+                    onClick={() => onSelectAdminTab('input')}
+                    className={`px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                      activeAdminTab === 'input'
+                        ? 'bg-emerald-600 text-white shadow-md'
+                        : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
+                    }`}
+                  >
+                    <Edit3 className="w-3.5 h-3.5 shrink-0" />
+                    <span>Form Input</span>
+                  </button>
+                )}
+
+                {(isAdmin || isPengecek) && (
+                  <button
+                    type="button"
+                    onClick={() => onSelectAdminTab('checker')}
+                    className={`px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                      activeAdminTab === 'checker'
+                        ? 'bg-amber-500 text-emerald-950 shadow-md font-black'
+                        : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
+                    }`}
+                  >
+                    <CheckSquare className="w-3.5 h-3.5 shrink-0" />
+                    <span>Ceklist</span>
+                  </button>
+                )}
+
+                {/* Raport & Sertifikat Imtaq Tab */}
                 <button
                   type="button"
-                  onClick={() => onSelectAdminTab('admin')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                    activeAdminTab === 'admin'
-                      ? 'bg-purple-600 text-white shadow'
-                      : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
+                  onClick={() => onSelectAdminTab('raport')}
+                  className={`px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                    activeAdminTab === 'raport'
+                      ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-emerald-950 shadow-md ring-1 ring-amber-300 font-black'
+                      : 'text-amber-300 hover:text-amber-200 hover:bg-emerald-800/70'
                   }`}
                 >
-                  <Sliders className="w-3.5 h-3.5" />
-                  <span>Panel Admin</span>
+                  <Trophy className="w-3.5 h-3.5 text-amber-400 fill-amber-400/30 shrink-0" />
+                  <span>Raport</span>
                 </button>
-              )}
 
-              {(isAdmin || isPenginput) && (
+                {/* Kalender Puasa & Hijriah Tab */}
                 <button
                   type="button"
-                  onClick={() => onSelectAdminTab('input')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                    activeAdminTab === 'input'
-                      ? 'bg-emerald-600 text-white shadow'
-                      : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
+                  onClick={() => onSelectAdminTab('calendar')}
+                  className={`px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                    activeAdminTab === 'calendar'
+                      ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-md ring-1 ring-teal-300 font-black'
+                      : 'text-teal-300 hover:text-white hover:bg-emerald-800/70'
                   }`}
                 >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  <span>Form Input</span>
+                  <CalendarCheck className="w-3.5 h-3.5 text-teal-300 shrink-0" />
+                  <span>Kalender</span>
                 </button>
-              )}
-
-              {(isAdmin || isPengecek) && (
-                <button
-                  type="button"
-                  onClick={() => onSelectAdminTab('checker')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                    activeAdminTab === 'checker'
-                      ? 'bg-amber-500 text-emerald-950 shadow'
-                      : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
-                  }`}
-                >
-                  <CheckSquare className="w-3.5 h-3.5" />
-                  <span>Ceklist Puasa</span>
-                </button>
-              )}
-
-              {/* Raport & Sertifikat Imtaq Tab (Accessible to Everyone) */}
-              <button
-                type="button"
-                onClick={() => onSelectAdminTab('raport')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  activeAdminTab === 'raport'
-                    ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-emerald-950 shadow-md ring-2 ring-amber-300/60 font-black'
-                    : 'text-amber-300 hover:text-amber-200 hover:bg-emerald-800/80'
-                }`}
-              >
-                <Trophy className="w-3.5 h-3.5 text-amber-400 fill-amber-400/30" />
-                <span>Raport & Piagam</span>
-              </button>
-
-              {/* Kalender Puasa & Hijriah Tab (Accessible to Everyone) */}
-              <button
-                type="button"
-                onClick={() => onSelectAdminTab('calendar')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  activeAdminTab === 'calendar'
-                    ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-md ring-2 ring-teal-300/60 font-black'
-                    : 'text-teal-300 hover:text-white hover:bg-emerald-800/80'
-                }`}
-              >
-                <CalendarCheck className="w-3.5 h-3.5 text-amber-300" />
-                <span>Kalender Puasa</span>
-              </button>
-            </div>
+              </div>
+            </nav>
           )}
 
-          {/* Active Session Badge, Cloud DB Status & Role Info */}
-          <div className="flex items-center justify-between sm:justify-end gap-2.5 flex-wrap">
+          {/* Quick Islamic Tools & Desktop Actions Bar */}
+          <div className="flex items-center justify-between sm:justify-end gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5">
             {/* Live Prayer Times Pill */}
             {onOpenPrayerModal && (
               <PrayerTimeHeaderPill onOpenModal={onOpenPrayerModal} city={selectedCity} />
@@ -288,88 +359,75 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
               <button
                 type="button"
                 onClick={onOpenWisdomModal}
-                title="Buka Kata Mutiara & Hikmah Puasa (Berganti tiap 1 jam)"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-black bg-gradient-to-r from-amber-400/20 via-yellow-300/25 to-amber-400/20 hover:from-amber-400/40 hover:to-yellow-300/40 text-amber-200 hover:text-white border border-amber-400/50 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
+                title="Buka Kata Mutiara & Hikmah Puasa"
+                className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-bold bg-amber-400/15 hover:bg-amber-400/30 text-amber-200 hover:text-white border border-amber-400/40 shadow-xs transition-all cursor-pointer whitespace-nowrap shrink-0"
               >
-                <Moon className="w-3.5 h-3.5 text-amber-300 fill-amber-300/40" />
-                <span className="hidden sm:inline">Hikmah Puasa</span>
-                <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
+                <Moon className="w-3 h-3 text-amber-300 fill-amber-300/40 shrink-0" />
+                <span>Hikmah</span>
+                <Sparkles className="w-2.5 h-2.5 text-amber-300 animate-pulse" />
               </button>
             )}
 
-            {/* Surat-Surat Pendek, Yasin, Tahlil, Mahalul Qiyam, Dzikir & Doa Button */}
+            {/* Dzikir & Doa Button */}
             {onOpenSurahsModal && (
               <button
                 type="button"
                 onClick={() => onOpenSurahsModal('juz_amma')}
                 title="Buka Juz 'Amma, Surat Yasin, Tahlil, Mahalul Qiyam, Dzikir Sholat & Doa Harian"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-black bg-gradient-to-r from-teal-500/20 via-emerald-400/25 to-teal-500/20 hover:from-teal-500/40 hover:to-emerald-400/40 text-emerald-100 hover:text-white border border-emerald-400/50 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
+                className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-bold bg-teal-500/15 hover:bg-teal-500/30 text-emerald-200 hover:text-white border border-emerald-400/40 shadow-xs transition-all cursor-pointer whitespace-nowrap shrink-0"
               >
-                <BookOpen className="w-3.5 h-3.5 text-amber-300" />
-                <span className="hidden sm:inline">Surat & Yasin</span>
-                <span className="text-[10px] px-1 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                  Dzikir & Doa
-                </span>
+                <BookOpen className="w-3 h-3 text-amber-300 shrink-0" />
+                <span>Dzikir & Doa</span>
               </button>
             )}
 
-            {/* Supabase Status Indicator */}
+            {/* Desktop Only: Supabase Cloud Button */}
             <button
               type="button"
               onClick={isAdmin && onOpenSupabaseConfig ? onOpenSupabaseConfig : undefined}
               title={
                 isSupabaseConnected
-                  ? 'Supabase Cloud Aktif (Tersinkronisasi Realtime). Klik untuk membuka pengaturan database.'
-                  : 'Database Supabase Belum Terhubung (Data tersimpan di perangkat lokal). Klik untuk menghubungkan Supabase.'
+                  ? 'Supabase Cloud Aktif (Tersinkronisasi Realtime). Klik untuk pengaturan.'
+                  : 'Supabase Belum Terhubung (Lokal). Klik untuk menghubungkan.'
               }
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold border backdrop-blur-xs transition-all ${
-                isAdmin && onOpenSupabaseConfig ? 'cursor-pointer hover:scale-105' : 'cursor-default'
+              className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border transition-all shrink-0 ${
+                isAdmin && onOpenSupabaseConfig ? 'cursor-pointer hover:bg-emerald-900/80' : 'cursor-default'
               } ${
                 isSupabaseConnected
-                  ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50 shadow-xs'
-                  : 'bg-emerald-950/50 text-amber-300 border-amber-500/40 hover:bg-emerald-900/60'
+                  ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50'
+                  : 'bg-emerald-950/50 text-amber-300 border-amber-500/40'
               }`}
             >
               <Database className="w-3.5 h-3.5" />
               {isSupabaseConnected ? (
                 <>
                   <Cloud className="w-3 h-3 text-emerald-400" />
-                  <span className="hidden md:inline">Supabase Cloud</span>
+                  <span className="hidden xl:inline">Cloud</span>
                 </>
               ) : (
                 <>
                   <CloudOff className="w-3 h-3 text-amber-400" />
-                  <span className="hidden md:inline">Hubungkan Cloud</span>
+                  <span className="hidden xl:inline">Cloud</span>
                 </>
               )}
             </button>
 
-            {/* PWA Install Button (If not installed) */}
+            {/* Desktop Only: PWA Install Button */}
             {!isPwaInstalled && onInstallPwa && (
               <button
                 type="button"
                 onClick={onInstallPwa}
-                title="Pasang aplikasi PUASAKU ke HP/Desktop untuk akses cepat dan offline"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-400 text-emerald-950 shadow-sm transition-all border border-amber-300 cursor-pointer animate-pulse"
+                title="Pasang aplikasi PUASAKU"
+                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-400 text-emerald-950 shadow-sm border border-amber-300 cursor-pointer shrink-0"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Pasang PWA</span>
+                <span className="hidden xl:inline">Pasang PWA</span>
               </button>
             )}
 
-            {activeSessionTitle && (
-              <div className="hidden 2xl:flex items-center gap-2 bg-emerald-950/70 border border-emerald-700/60 rounded-lg px-3 py-1.5 text-xs text-emerald-200 backdrop-blur-xs">
-                <Calendar className="w-3.5 h-3.5 text-amber-400" />
-                <span className="font-semibold text-emerald-100">{activeSessionTitle}</span>
-                {activeSessionDate && (
-                  <span className="text-emerald-400 font-mono">({activeSessionDate})</span>
-                )}
-              </div>
-            )}
-
-            {/* Role Badge */}
+            {/* Desktop Only: Role Badge */}
             <div
-              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 border shadow-xs backdrop-blur-xs ${
+              className={`hidden lg:flex items-center gap-2 rounded-lg px-2.5 py-1 border shadow-xs ${
                 isAdmin
                   ? 'bg-purple-950/80 border-purple-500/70'
                   : isPenginput
@@ -378,34 +436,31 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
               }`}
             >
               {isAdmin ? (
-                <KeyRound className="w-4 h-4 text-purple-300" />
+                <KeyRound className="w-3.5 h-3.5 text-purple-300" />
               ) : isPenginput ? (
-                <UserCheck className="w-4 h-4 text-amber-300" />
+                <UserCheck className="w-3.5 h-3.5 text-amber-300" />
               ) : (
-                <ShieldCheck className="w-4 h-4 text-emerald-300" />
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
               )}
               <div className="text-left">
-                <p className="text-xs font-bold text-white leading-none">
+                <p className="text-xs font-bold text-white leading-none truncate max-w-[110px]">
                   {user.name}
                 </p>
-                <p className="text-[10px] text-emerald-200 font-medium mt-0.5">
-                  {isAdmin
-                    ? '👑 Administrator Utama'
-                    : isPenginput
-                    ? '✍️ Penginput Data'
-                    : '🛡️ Petugas Pengecek'}
+                <p className="text-[9.5px] text-emerald-200 font-medium leading-tight">
+                  {isAdmin ? 'Admin' : isPenginput ? 'Penginput' : 'Pengecek'}
                 </p>
               </div>
             </div>
 
-            {/* Logout Button */}
+            {/* Desktop Only: Logout Button */}
             <button
+              type="button"
               onClick={onLogout}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/70 hover:bg-red-600/90 text-emerald-100 hover:text-white border border-emerald-700/80 hover:border-red-500 text-xs font-semibold transition-all duration-150 cursor-pointer shadow-xs"
-              title="Keluar dari sistem"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-950/80 hover:bg-red-600 active:scale-95 text-red-100 hover:text-white border border-red-500/60 text-xs font-bold transition-all cursor-pointer shadow-xs shrink-0"
+              title="Keluar dari akun / Ganti Pengguna"
             >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Keluar</span>
+              <LogOut className="w-3.5 h-3.5 text-red-300 group-hover:text-white" />
+              <span>Keluar</span>
             </button>
           </div>
         </div>
