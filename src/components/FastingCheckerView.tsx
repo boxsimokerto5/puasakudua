@@ -357,7 +357,8 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
                     students,
                     activeSession,
                     selectedSahurLevel,
-                    user.name
+                    user.name,
+                    checkedSahurIds
                   )
                 }
                 className="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-400 hover:bg-amber-300 text-indigo-950 shadow-xs transition-all cursor-pointer flex items-center gap-1"

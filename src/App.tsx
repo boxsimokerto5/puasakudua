@@ -40,6 +40,8 @@ import { ShortSurahsModal } from './components/ShortSurahsModal';
 import { CalendarView } from './components/CalendarView';
 import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { usePwaInstall } from './hooks/usePwaInstall';
+import { useAutoUpdate } from './hooks/useAutoUpdate';
+import { UpdateNotificationToast } from './components/UpdateNotificationToast';
 import { INDONESIA_CITIES, CityLocation } from './utils/prayerTimes';
 import { Sparkles, Cloud, CloudCheck, RefreshCw, Download } from 'lucide-react';
 
@@ -47,6 +49,9 @@ const USER_SESSION_KEY = 'sr_kediri_user_session_v1';
 const PRAYER_CITY_KEY = 'sr_kediri_prayer_city_v1';
 
 export default function App() {
+  // Cloudflare Auto Update Detector
+  const autoUpdate = useAutoUpdate();
+
   // PWA Install State & Detection
   const pwaState = usePwaInstall();
 
@@ -847,6 +852,13 @@ export default function App() {
         isOpen={showSurahsModal}
         onClose={() => setShowSurahsModal(false)}
         initialTab={surahsModalTab}
+      />
+
+      {/* Cloudflare Pages Auto Update Notification Toast */}
+      <UpdateNotificationToast
+        hasUpdate={autoUpdate.hasUpdate}
+        isUpdating={autoUpdate.isUpdating}
+        onUpdate={autoUpdate.applyUpdate}
       />
     </>
   );

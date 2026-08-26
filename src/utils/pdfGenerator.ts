@@ -488,13 +488,24 @@ export function downloadFastingReportPDF(
 }
 
 /**
+ * Helper to get clean level title
+ */
+function getLevelLabel(level: 'SEMUA' | 'SD' | 'SMP' | 'SMA'): string {
+  if (level === 'SEMUA') return 'Semua Jenjang (SD, SMP, SMA)';
+  return `Jenjang ${level}`;
+}
+
+/**
  * PDF Generator for Ceklist Berbuka Puasa per Level (SD, SMP, SMA, SEMUA)
+ * Slim, dense, proportional, fitting 35-40 students per A4 page cleanly.
+ * Signature removed, includes checked marks for claimed status.
  */
 export function generateBerbukaChecklistPdf(
   students: Student[],
   session: FastingSession,
   level: 'SEMUA' | 'SD' | 'SMP' | 'SMA' = 'SEMUA',
-  verifierName: string = 'Wali Asuh'
+  verifierName: string = 'Wali Asuh',
+  checkedIds?: Set<number> | Set<string>
 ) {
   const doc = new jsPDF({
     orientation: 'portrait',
@@ -502,20 +513,33 @@ export function generateBerbukaChecklistPdf(
     format: 'a4',
   });
 
-  // Header Banner
-  doc.setFillColor(6, 78, 59); // Emerald 900
-  doc.rect(14, 12, 182, 20, 'F');
+  const greenDark: [number, number, number] = [6, 78, 59]; // Emerald 900
+  const amberGold: [number, number, number] = [245, 158, 11]; // Amber 500
+
+  // 1. KOP HEADER SLIM (16 mm height)
+  doc.setFillColor(...greenDark);
+  doc.rect(10, 8, 190, 16, 'F');
+
+  // Accent Line
+  doc.setFillColor(...amberGold);
+  doc.rect(10, 24, 190, 1, 'F');
 
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(13);
-  doc.text('SEKOLAH RAKYAT KABUPATEN KEDIRI', 105, 21, { align: 'center' });
-  doc.setFontSize(10);
-  doc.setTextColor(253, 230, 138); // Amber 200
-  const levelTitle = level === 'SEMUA' ? 'SEMUA JENJANG (SD, SMP, SMA)' : `JENJANG ${level}`;
-  doc.text(`DAFTAR PRESENSI & CEKLIST BERBUKA PUASA - ${levelTitle}`, 105, 27, { align: 'center' });
+  doc.setFontSize(11.5);
+  doc.text('SEKOLAH RAKYAT TERINTEGRASI 1 KEDIRI', 105, 14.5, { align: 'center' });
 
-  // Sorted list of ONLY fasting students (filtered by level if chosen)
+  doc.setFontSize(8.5);
+  doc.setTextColor(253, 230, 138); // Amber 200
+  const levelTitle = getLevelLabel(level);
+  doc.text(
+    `LAPORAN & CEKLIST BERBUKA PUASA SANTRI • ${levelTitle.toUpperCase()}`,
+    105,
+    20.5,
+    { align: 'center' }
+  );
+
+  // 2. FILTER & SORT STUDENTS (Hanya yang berpuasa)
   const fastingStudents = students
     .filter((s) => {
       const isFasting = session.records[s.id]?.status === 'berpuasa';
@@ -528,92 +552,176 @@ export function generateBerbukaChecklistPdf(
       return a.nama.localeCompare(b.nama);
     });
 
-  doc.setFontSize(8.5);
+  let putraCount = 0;
+  let putriCount = 0;
+  let sudahBerbukaCount = 0;
+
+  fastingStudents.forEach((s) => {
+    const isFemale =
+      s.jenisKelamin === 'Perempuan' || s.jenisKelamin?.toLowerCase().startsWith('p');
+    if (isFemale) putriCount++;
+    else putraCount++;
+
+    if (checkedIds && ((checkedIds as any).has(s.id) || (checkedIds as any).has(String(s.id)))) {
+      sudahBerbukaCount++;
+    }
+  });
+
+  // 3. SLIM METADATA RESUME BAR (Height ~9 mm)
+  doc.setFillColor(240, 253, 244); // Emerald 50
+  doc.setDrawColor(187, 247, 208); // Emerald 200
+  doc.setLineWidth(0.3);
+  doc.roundedRect(10, 27, 190, 9, 1.5, 1.5, 'FD');
+
+  doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(51, 65, 85);
+
+  doc.text(`Sesi:`, 13, 32.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(6, 78, 59);
+  doc.text(`${session.title}`, 20, 32.5);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(51, 65, 85);
+  doc.text(`Tanggal:`, 75, 32.5);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${formatDateIndoLong(session.date)}`, 88, 32.5);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(51, 65, 85);
+  doc.text(`Total Berpuasa:`, 132, 32.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(6, 78, 59);
   doc.text(
-    `Sesi: ${session.title}  |  Tanggal: ${formatDateIndoLong(session.date)}  |  Total Berpuasa: ${fastingStudents.length} Siswa (${levelTitle})`,
-    14,
-    38
+    `${fastingStudents.length} Santri (L: ${putraCount}, P: ${putriCount})${
+      checkedIds ? ` | Tercentang: ${sudahBerbukaCount}` : ''
+    }`,
+    152,
+    32.5
   );
 
+  // 4. TABEL CEKLIST SLIM & PROPORIONAL
   const studentTableHeaders = [
-    ['NO', 'NAMA SISWA', 'KELAS', 'L/P', 'NIK / NO', 'CEKLIST BERBUKA', 'PARAF / CATATAN']
+    ['NO', 'NAMA SANTRI', 'KELAS', 'L/P', 'STATUS PUASA', 'CEKLIST BERBUKA', 'PARAF / CATATAN']
   ];
 
   const studentTableBody = fastingStudents.map((s, idx) => {
     const rec = session.records[s.id];
     const gender =
-      s.jenisKelamin === 'Perempuan' || s.jenisKelamin?.toLowerCase().startsWith('p') ? 'P' : 'L';
+      s.jenisKelamin === 'Perempuan' || s.jenisKelamin?.toLowerCase().startsWith('p')
+        ? 'P'
+        : 'L';
+    const isChecked = checkedIds ? ((checkedIds as any).has(s.id) || (checkedIds as any).has(String(s.id))) : true;
+    const checklistText = isChecked ? '[ ✓ ] Sudah Berbuka' : '[    ] Belum Berbuka';
 
     return [
       idx + 1,
       s.nama,
       s.kelas,
       gender,
-      s.nik || s.no.toString(),
-      '[   ]  Sudah Berbuka',
+      '[ ✓ ] Berpuasa',
+      checklistText,
       rec?.notes || ''
     ];
   });
 
   if (fastingStudents.length === 0) {
-    studentTableBody.push([1, 'Tidak ada siswa yang berpuasa pada sesi ini', '-', '-', '-', '-', '-']);
+    studentTableBody.push([
+      {
+        content: `Tidak ada data santri yang berpuasa untuk ${levelTitle} pada sesi ini.`,
+        colSpan: 7,
+        styles: { halign: 'center' as const, fontStyle: 'italic' as const }
+      } as any
+    ]);
   }
 
   autoTable(doc, {
-    startY: 42,
+    startY: 38,
     head: studentTableHeaders,
     body: studentTableBody,
     theme: 'grid',
+    margin: { left: 10, right: 10, bottom: 12 },
+    styles: {
+      fontSize: 7.5,
+      cellPadding: { top: 1.1, bottom: 1.1, left: 1.5, right: 1.5 },
+      textColor: [30, 41, 59],
+      lineColor: [226, 232, 240],
+      lineWidth: 0.2,
+    },
     headStyles: {
-      fillColor: [6, 78, 59],
+      fillColor: greenDark,
       textColor: [255, 255, 255],
       fontStyle: 'bold',
-      fontSize: 8.5,
+      fontSize: 7.5,
       halign: 'center',
-    },
-    bodyStyles: {
-      fontSize: 8,
-      textColor: [30, 41, 59],
+      cellPadding: { top: 1.5, bottom: 1.5, left: 1.5, right: 1.5 },
     },
     columnStyles: {
-      0: { halign: 'center', cellWidth: 10 },
-      1: { cellWidth: 50, fontStyle: 'bold' },
-      2: { halign: 'center', cellWidth: 20 },
-      3: { halign: 'center', cellWidth: 12 },
-      4: { halign: 'center', cellWidth: 26 },
-      5: { halign: 'center', cellWidth: 34, fontStyle: 'bold' },
-      6: { cellWidth: 30 },
+      0: { halign: 'center', cellWidth: 8 },
+      1: { cellWidth: 64, fontStyle: 'bold' },
+      2: { halign: 'center', cellWidth: 18 },
+      3: { halign: 'center', cellWidth: 10 },
+      4: { halign: 'center', cellWidth: 26, textColor: [6, 78, 59], fontStyle: 'bold' },
+      5: { halign: 'center', cellWidth: 34, fontStyle: 'bold', textColor: [15, 23, 42] },
+      6: { cellWidth: 30, textColor: [100, 116, 139] },
+    },
+    didParseCell: (data) => {
+      if (data.section === 'body') {
+        if (data.row.index % 2 === 1) {
+          data.cell.styles.fillColor = [248, 250, 252];
+        }
+        // Highlight checked status in cell
+        if (data.column.index === 5) {
+          const val = String(data.cell.raw || '');
+          if (val.includes('[ ✓ ]')) {
+            data.cell.styles.textColor = [6, 78, 59];
+          }
+        }
+      }
     },
   });
 
-  // Signature Section
-  const finalY = (doc as any).lastAutoTable?.finalY || 180;
-  const sigY = Math.min(finalY + 15, 245);
+  // 5. FOOTER HALAMAN (Tanpa Tanda Tangan Sesuai Instruksi)
+  const pageCount = (doc as any).internal.getNumberOfPages();
+  for (let p = 1; p <= pageCount; p++) {
+    doc.setPage(p);
 
-  doc.setFontSize(8.5);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(30, 41, 59);
-  doc.text('Kediri, ' + formatDateIndoLong(new Date().toISOString().split('T')[0]), 135, sigY);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Wali Asuh / Petugas,', 135, sigY + 5);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`( ${verifierName} )`, 135, sigY + 24);
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.2);
+    doc.line(10, 289, 200, 289);
+
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 116, 139);
+    doc.text('PUASAKU • SRT 1 KEDIRI • Laporan Ceklist Berbuka Puasa', 10, 293);
+
+    doc.setTextColor(148, 163, 184);
+    doc.text(
+      `Hal. ${p}/${pageCount} • Dicetak: ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`,
+      200,
+      293,
+      { align: 'right' }
+    );
+  }
 
   // Save PDF
-  const fileName = `Ceklist_Berbuka_SR_Kediri_${session.date}.pdf`;
+  const cleanTitle = session.title.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const fileName = `Ceklist_Berbuka_${level}_${session.date}_${cleanTitle}.pdf`;
   doc.save(fileName);
 }
 
 /**
  * PDF Generator for Ceklist Makan Siang (Tidak Berpuasa) per Level (SD, SMP, SMA, SEMUA)
+ * Slim, dense, proportional, fitting 35-40 students per A4 page cleanly.
+ * Signature removed, includes checked marks for claimed status.
  */
 export function generateMakanSiangChecklistPdf(
   students: Student[],
   session: FastingSession,
   level: 'SEMUA' | 'SD' | 'SMP' | 'SMA' = 'SEMUA',
-  verifierName: string = 'Wali Asuh'
+  verifierName: string = 'Wali Asuh',
+  checkedIds?: Set<number> | Set<string>
 ) {
   const doc = new jsPDF({
     orientation: 'portrait',
@@ -621,20 +729,33 @@ export function generateMakanSiangChecklistPdf(
     format: 'a4',
   });
 
-  // Header Banner
-  doc.setFillColor(159, 18, 57); // Rose 900
-  doc.rect(14, 12, 182, 20, 'F');
+  const maroonDark: [number, number, number] = [136, 19, 55]; // Rose 900
+  const roseAccent: [number, number, number] = [244, 63, 94]; // Rose 500
+
+  // 1. KOP HEADER SLIM (16 mm height)
+  doc.setFillColor(...maroonDark);
+  doc.rect(10, 8, 190, 16, 'F');
+
+  // Accent Line
+  doc.setFillColor(...roseAccent);
+  doc.rect(10, 24, 190, 1, 'F');
 
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(13);
-  doc.text('SEKOLAH RAKYAT KABUPATEN KEDIRI', 105, 21, { align: 'center' });
-  doc.setFontSize(10);
-  doc.setTextColor(254, 205, 211); // Rose 200
-  const levelTitle = level === 'SEMUA' ? 'SEMUA JENJANG (SD, SMP, SMA)' : `JENJANG ${level}`;
-  doc.text(`DAFTAR CEKLIST MAKAN SIANG (TIDAK BERPUASA) - ${levelTitle}`, 105, 27, { align: 'center' });
+  doc.setFontSize(11.5);
+  doc.text('SEKOLAH RAKYAT TERINTEGRASI 1 KEDIRI', 105, 14.5, { align: 'center' });
 
-  // Filter non-fasting students (anyone whose status is NOT 'berpuasa')
+  doc.setFontSize(8.5);
+  doc.setTextColor(254, 205, 211); // Rose 200
+  const levelTitle = getLevelLabel(level);
+  doc.text(
+    `LAPORAN & CEKLIST PENYEDIAAN MAKAN SIANG (NON-PUASA) • ${levelTitle.toUpperCase()}`,
+    105,
+    20.5,
+    { align: 'center' }
+  );
+
+  // 2. FILTER & SORT NON-FASTING STUDENTS
   const nonFastingStudents = students
     .filter((s) => {
       const rec = session.records[s.id];
@@ -649,29 +770,73 @@ export function generateMakanSiangChecklistPdf(
       return a.nama.localeCompare(b.nama);
     });
 
-  doc.setFontSize(8.5);
+  let halanganCount = 0;
+  let tidakPuasaCount = 0;
+  let sudahMakanCount = 0;
+
+  nonFastingStudents.forEach((s) => {
+    const rec = session.records[s.id];
+    if (rec?.status === 'halangan') halanganCount++;
+    else tidakPuasaCount++;
+
+    if (checkedIds && ((checkedIds as any).has(s.id) || (checkedIds as any).has(String(s.id)))) {
+      sudahMakanCount++;
+    }
+  });
+
+  // 3. SLIM METADATA RESUME BAR (Height ~9 mm)
+  doc.setFillColor(255, 241, 242); // Rose 50
+  doc.setDrawColor(254, 205, 211); // Rose 200
+  doc.setLineWidth(0.3);
+  doc.roundedRect(10, 27, 190, 9, 1.5, 1.5, 'FD');
+
+  doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(51, 65, 85);
+
+  doc.text(`Sesi:`, 13, 32.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(136, 19, 55);
+  doc.text(`${session.title}`, 20, 32.5);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(51, 65, 85);
+  doc.text(`Tanggal:`, 75, 32.5);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${formatDateIndoLong(session.date)}`, 88, 32.5);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(51, 65, 85);
+  doc.text(`Total Makan Siang:`, 130, 32.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(136, 19, 55);
   doc.text(
-    `Sesi: ${session.title}  |  Tanggal: ${formatDateIndoLong(session.date)}  |  Jenjang: ${level}  |  Total Makan Siang: ${nonFastingStudents.length} Siswa`,
-    14,
-    38
+    `${nonFastingStudents.length} Santri (Halangan: ${halanganCount}, Tidak Puasa: ${tidakPuasaCount})${
+      checkedIds ? ` | Tercentang: ${sudahMakanCount}` : ''
+    }`,
+    154,
+    32.5
   );
 
+  // 4. TABEL CEKLIST SLIM & PROPORIONAL
   const studentTableHeaders = [
-    ['NO', 'NAMA SISWA', 'KELAS', 'L/P', 'KETERANGAN', 'CEKLIST MAKAN SIANG', 'PARAF / CATATAN']
+    ['NO', 'NAMA SANTRI', 'KELAS', 'L/P', 'KATEGORI / ALASAN', 'CEKLIST MAKAN SIANG', 'PARAF / CATATAN']
   ];
 
   const studentTableBody = nonFastingStudents.map((s, idx) => {
     const rec = session.records[s.id];
     const gender =
-      s.jenisKelamin === 'Perempuan' || s.jenisKelamin?.toLowerCase().startsWith('p') ? 'P' : 'L';
+      s.jenisKelamin === 'Perempuan' || s.jenisKelamin?.toLowerCase().startsWith('p')
+        ? 'P'
+        : 'L';
     const reason =
       rec?.status === 'halangan'
-        ? 'Halangan / Uzur'
+        ? '[ ✓ ] Halangan / Uzur'
         : rec?.status === 'tidak_puasa'
-        ? 'Tidak Puasa'
-        : 'Tidak Puasa';
+        ? '[ ✓ ] Tidak Puasa'
+        : '[ — ] Belum Diisi';
+    const isChecked = checkedIds ? ((checkedIds as any).has(s.id) || (checkedIds as any).has(String(s.id))) : true;
+    const checklistText = isChecked ? '[ ✓ ] Terlayani Makan' : '[    ] Belum Makan';
 
     return [
       idx + 1,
@@ -679,68 +844,106 @@ export function generateMakanSiangChecklistPdf(
       s.kelas,
       gender,
       reason,
-      '[   ]  Sudah Makan',
+      checklistText,
       rec?.notes || ''
     ];
   });
 
   if (nonFastingStudents.length === 0) {
-    studentTableBody.push([1, `Tidak ada siswa ${level === 'SEMUA' ? '' : level} yang memerlukan makan siang`, '-', '-', '-', '-', '-']);
+    studentTableBody.push([
+      {
+        content: `Tidak ada data santri yang memerlukan makan siang untuk ${levelTitle} pada sesi ini.`,
+        colSpan: 7,
+        styles: { halign: 'center' as const, fontStyle: 'italic' as const }
+      } as any
+    ]);
   }
 
   autoTable(doc, {
-    startY: 42,
+    startY: 38,
     head: studentTableHeaders,
     body: studentTableBody,
     theme: 'grid',
+    margin: { left: 10, right: 10, bottom: 12 },
+    styles: {
+      fontSize: 7.5,
+      cellPadding: { top: 1.1, bottom: 1.1, left: 1.5, right: 1.5 },
+      textColor: [30, 41, 59],
+      lineColor: [226, 232, 240],
+      lineWidth: 0.2,
+    },
     headStyles: {
-      fillColor: [159, 18, 57], // Rose 900
+      fillColor: maroonDark,
       textColor: [255, 255, 255],
       fontStyle: 'bold',
-      fontSize: 8.5,
+      fontSize: 7.5,
       halign: 'center',
-    },
-    bodyStyles: {
-      fontSize: 8,
-      textColor: [30, 41, 59],
+      cellPadding: { top: 1.5, bottom: 1.5, left: 1.5, right: 1.5 },
     },
     columnStyles: {
-      0: { halign: 'center', cellWidth: 10 },
-      1: { cellWidth: 50, fontStyle: 'bold' },
-      2: { halign: 'center', cellWidth: 20 },
-      3: { halign: 'center', cellWidth: 12 },
-      4: { halign: 'center', cellWidth: 30 },
-      5: { halign: 'center', cellWidth: 34, fontStyle: 'bold' },
-      6: { cellWidth: 26 },
+      0: { halign: 'center', cellWidth: 8 },
+      1: { cellWidth: 62, fontStyle: 'bold' },
+      2: { halign: 'center', cellWidth: 18 },
+      3: { halign: 'center', cellWidth: 10 },
+      4: { halign: 'center', cellWidth: 32, textColor: [136, 19, 55], fontStyle: 'bold' },
+      5: { halign: 'center', cellWidth: 30, fontStyle: 'bold', textColor: [15, 23, 42] },
+      6: { cellWidth: 30, textColor: [100, 116, 139] },
+    },
+    didParseCell: (data) => {
+      if (data.section === 'body') {
+        if (data.row.index % 2 === 1) {
+          data.cell.styles.fillColor = [255, 241, 242];
+        }
+        if (data.column.index === 5) {
+          const val = String(data.cell.raw || '');
+          if (val.includes('[ ✓ ]')) {
+            data.cell.styles.textColor = [136, 19, 55];
+          }
+        }
+      }
     },
   });
 
-  // Signature Section
-  const finalY = (doc as any).lastAutoTable?.finalY || 180;
-  const sigY = Math.min(finalY + 15, 245);
+  // 5. FOOTER HALAMAN (Tanpa Tanda Tangan Sesuai Instruksi)
+  const pageCount = (doc as any).internal.getNumberOfPages();
+  for (let p = 1; p <= pageCount; p++) {
+    doc.setPage(p);
 
-  doc.setFontSize(8.5);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(30, 41, 59);
-  doc.text('Kediri, ' + formatDateIndoLong(new Date().toISOString().split('T')[0]), 135, sigY);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Wali Asuh / Petugas,', 135, sigY + 5);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`( ${verifierName} )`, 135, sigY + 24);
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.2);
+    doc.line(10, 289, 200, 289);
+
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 116, 139);
+    doc.text('PUASAKU • SRT 1 KEDIRI • Laporan Ceklist Makan Siang (Non-Puasa)', 10, 293);
+
+    doc.setTextColor(148, 163, 184);
+    doc.text(
+      `Hal. ${p}/${pageCount} • Dicetak: ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`,
+      200,
+      293,
+      { align: 'right' }
+    );
+  }
 
   // Save PDF
-  const fileName = `Ceklist_Makan_Siang_${level}_SR_Kediri_${session.date}.pdf`;
+  const cleanTitle = session.title.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const fileName = `Ceklist_Makan_Siang_${level}_${session.date}_${cleanTitle}.pdf`;
   doc.save(fileName);
 }
 
 /**
  * PDF Generator for Ceklist Sahur (Data Siswa Berpuasa) per Level (SD, SMP, SMA, SEMUA)
+ * Slim, dense, proportional, fitting 35-40 students per A4 page cleanly.
+ * Signature removed, includes checked marks for claimed status.
  */
 export function generateSahurChecklistPdf(
   students: Student[],
   session: FastingSession,
   level: 'SEMUA' | 'SD' | 'SMP' | 'SMA' = 'SEMUA',
-  verifierName: string = 'Wali Asuh'
+  verifierName: string = 'Wali Asuh',
+  checkedIds?: Set<number> | Set<string>
 ) {
   const doc = new jsPDF({
     orientation: 'portrait',
@@ -748,20 +951,33 @@ export function generateSahurChecklistPdf(
     format: 'a4',
   });
 
-  // Header Banner - Navy / Indigo Theme
-  doc.setFillColor(30, 27, 75); // Indigo 950
-  doc.rect(14, 12, 182, 20, 'F');
+  const navyDark: [number, number, number] = [30, 27, 75]; // Indigo 950
+  const amberGold: [number, number, number] = [245, 158, 11]; // Amber 500
+
+  // 1. KOP HEADER SLIM (16 mm height)
+  doc.setFillColor(...navyDark);
+  doc.rect(10, 8, 190, 16, 'F');
+
+  // Accent Line
+  doc.setFillColor(...amberGold);
+  doc.rect(10, 24, 190, 1, 'F');
 
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(13);
-  doc.text('SEKOLAH RAKYAT TERINTEGRASI 1 KEDIRI', 105, 21, { align: 'center' });
-  doc.setFontSize(10);
-  doc.setTextColor(253, 230, 138); // Amber 200
-  const levelTitle = level === 'SEMUA' ? 'SEMUA JENJANG (SD, SMP, SMA)' : `JENJANG ${level}`;
-  doc.text(`DAFTAR PRESENSI & CEKLIST SANTAP SAHUR - ${levelTitle}`, 105, 27, { align: 'center' });
+  doc.setFontSize(11.5);
+  doc.text('SEKOLAH RAKYAT TERINTEGRASI 1 KEDIRI', 105, 14.5, { align: 'center' });
 
-  // Sorted list of fasting students (filtered by level if chosen)
+  doc.setFontSize(8.5);
+  doc.setTextColor(253, 230, 138); // Amber 200
+  const levelTitle = getLevelLabel(level);
+  doc.text(
+    `LAPORAN & CEKLIST SANTAP SAHUR SANTRI • ${levelTitle.toUpperCase()}`,
+    105,
+    20.5,
+    { align: 'center' }
+  );
+
+  // 2. FILTER & SORT FASTING STUDENTS
   const fastingStudents = students
     .filter((s) => {
       const isFasting = session.records[s.id]?.status === 'berpuasa';
@@ -774,81 +990,161 @@ export function generateSahurChecklistPdf(
       return a.nama.localeCompare(b.nama);
     });
 
-  doc.setFontSize(8.5);
+  let putraCount = 0;
+  let putriCount = 0;
+  let sudahSahurCount = 0;
+
+  fastingStudents.forEach((s) => {
+    const isFemale =
+      s.jenisKelamin === 'Perempuan' || s.jenisKelamin?.toLowerCase().startsWith('p');
+    if (isFemale) putriCount++;
+    else putraCount++;
+
+    if (checkedIds && ((checkedIds as any).has(s.id) || (checkedIds as any).has(String(s.id)))) {
+      sudahSahurCount++;
+    }
+  });
+
+  // 3. SLIM METADATA RESUME BAR (Height ~9 mm)
+  doc.setFillColor(238, 242, 255); // Indigo 50
+  doc.setDrawColor(199, 210, 254); // Indigo 200
+  doc.setLineWidth(0.3);
+  doc.roundedRect(10, 27, 190, 9, 1.5, 1.5, 'FD');
+
+  doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(51, 65, 85);
+
+  doc.text(`Sesi:`, 13, 32.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 27, 75);
+  doc.text(`${session.title}`, 20, 32.5);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(51, 65, 85);
+  doc.text(`Tanggal:`, 75, 32.5);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${formatDateIndoLong(session.date)}`, 88, 32.5);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(51, 65, 85);
+  doc.text(`Total Sahur:`, 132, 32.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 27, 75);
   doc.text(
-    `Sesi: ${session.title}  |  Tanggal: ${formatDateIndoLong(session.date)}  |  Total Santri Sahur: ${fastingStudents.length} Siswa (${levelTitle})`,
-    14,
-    38
+    `${fastingStudents.length} Santri (L: ${putraCount}, P: ${putriCount})${
+      checkedIds ? ` | Tercentang: ${sudahSahurCount}` : ''
+    }`,
+    152,
+    32.5
   );
 
+  // 4. TABEL CEKLIST SLIM & PROPORIONAL
   const studentTableHeaders = [
-    ['NO', 'NAMA SISWA', 'KELAS', 'L/P', 'NIK / NO', 'CEKLIST SAHUR', 'PARAF / CATATAN']
+    ['NO', 'NAMA SANTRI', 'KELAS', 'L/P', 'STATUS PUASA', 'CEKLIST SANTAP SAHUR', 'PARAF / CATATAN']
   ];
 
   const studentTableBody = fastingStudents.map((s, idx) => {
     const rec = session.records[s.id];
     const gender =
-      s.jenisKelamin === 'Perempuan' || s.jenisKelamin?.toLowerCase().startsWith('p') ? 'P' : 'L';
+      s.jenisKelamin === 'Perempuan' || s.jenisKelamin?.toLowerCase().startsWith('p')
+        ? 'P'
+        : 'L';
+    const isChecked = checkedIds ? ((checkedIds as any).has(s.id) || (checkedIds as any).has(String(s.id))) : true;
+    const checklistText = isChecked ? '[ ✓ ] Sudah Sahur' : '[    ] Belum Sahur';
 
     return [
       idx + 1,
       s.nama,
       s.kelas,
       gender,
-      s.nik || s.no.toString(),
-      '[   ]  Sudah Sahur',
+      '[ ✓ ] Berpuasa',
+      checklistText,
       rec?.notes || ''
     ];
   });
 
   if (fastingStudents.length === 0) {
-    studentTableBody.push([1, 'Tidak ada data siswa berpuasa/sahur pada sesi ini', '-', '-', '-', '-', '-']);
+    studentTableBody.push([
+      {
+        content: `Tidak ada data santri yang berpuasa untuk ${levelTitle} pada sesi ini.`,
+        colSpan: 7,
+        styles: { halign: 'center' as const, fontStyle: 'italic' as const }
+      } as any
+    ]);
   }
 
   autoTable(doc, {
-    startY: 42,
+    startY: 38,
     head: studentTableHeaders,
     body: studentTableBody,
     theme: 'grid',
+    margin: { left: 10, right: 10, bottom: 12 },
+    styles: {
+      fontSize: 7.5,
+      cellPadding: { top: 1.1, bottom: 1.1, left: 1.5, right: 1.5 },
+      textColor: [30, 41, 59],
+      lineColor: [226, 232, 240],
+      lineWidth: 0.2,
+    },
     headStyles: {
-      fillColor: [30, 27, 75], // Indigo 950
+      fillColor: navyDark,
       textColor: [255, 255, 255],
       fontStyle: 'bold',
-      fontSize: 8.5,
+      fontSize: 7.5,
       halign: 'center',
-    },
-    bodyStyles: {
-      fontSize: 8,
-      textColor: [30, 41, 59],
+      cellPadding: { top: 1.5, bottom: 1.5, left: 1.5, right: 1.5 },
     },
     columnStyles: {
-      0: { halign: 'center', cellWidth: 10 },
-      1: { cellWidth: 50, fontStyle: 'bold' },
-      2: { halign: 'center', cellWidth: 20 },
-      3: { halign: 'center', cellWidth: 12 },
-      4: { halign: 'center', cellWidth: 26 },
-      5: { halign: 'center', cellWidth: 34, fontStyle: 'bold' },
-      6: { cellWidth: 30 },
+      0: { halign: 'center', cellWidth: 8 },
+      1: { cellWidth: 64, fontStyle: 'bold' },
+      2: { halign: 'center', cellWidth: 18 },
+      3: { halign: 'center', cellWidth: 10 },
+      4: { halign: 'center', cellWidth: 26, textColor: [30, 27, 75], fontStyle: 'bold' },
+      5: { halign: 'center', cellWidth: 34, fontStyle: 'bold', textColor: [15, 23, 42] },
+      6: { cellWidth: 30, textColor: [100, 116, 139] },
+    },
+    didParseCell: (data) => {
+      if (data.section === 'body') {
+        if (data.row.index % 2 === 1) {
+          data.cell.styles.fillColor = [248, 250, 252];
+        }
+        if (data.column.index === 5) {
+          const val = String(data.cell.raw || '');
+          if (val.includes('[ ✓ ]')) {
+            data.cell.styles.textColor = [30, 27, 75];
+          }
+        }
+      }
     },
   });
 
-  // Signature Section
-  const finalY = (doc as any).lastAutoTable?.finalY || 180;
-  const sigY = Math.min(finalY + 15, 245);
+  // 5. FOOTER HALAMAN (Tanpa Tanda Tangan Sesuai Instruksi)
+  const pageCount = (doc as any).internal.getNumberOfPages();
+  for (let p = 1; p <= pageCount; p++) {
+    doc.setPage(p);
 
-  doc.setFontSize(8.5);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(30, 41, 59);
-  doc.text('Kediri, ' + formatDateIndoLong(new Date().toISOString().split('T')[0]), 135, sigY);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Wali Asuh / Petugas Sahur,', 135, sigY + 5);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`( ${verifierName} )`, 135, sigY + 24);
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.2);
+    doc.line(10, 289, 200, 289);
+
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 116, 139);
+    doc.text('PUASAKU • SRT 1 KEDIRI • Laporan Ceklist Santap Sahur', 10, 293);
+
+    doc.setTextColor(148, 163, 184);
+    doc.text(
+      `Hal. ${p}/${pageCount} • Dicetak: ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`,
+      200,
+      293,
+      { align: 'right' }
+    );
+  }
 
   // Save PDF
-  const fileName = `Ceklist_Sahur_SRT1_Kediri_${session.date}.pdf`;
+  const cleanTitle = session.title.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const fileName = `Ceklist_Sahur_${level}_${session.date}_${cleanTitle}.pdf`;
   doc.save(fileName);
 }
 
