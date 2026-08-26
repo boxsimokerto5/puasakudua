@@ -10,6 +10,7 @@ import {
   deleteSession,
   getStoredAdminSettings,
   saveStoredAdminSettings,
+  build101FastingRecords,
 } from './data/students';
 import { isSupabaseConfigured } from './lib/supabase';
 import {
@@ -534,11 +535,49 @@ export default function App() {
     }
   };
 
+  // Helper to restore 101 official fasting records for 27 Agustus 2026
+  const handleRestore101Records = async (targetSessionId?: string) => {
+    const defaultSessionId = '2026-08-27_Puasa_Sunnah_Kamis';
+    const sId = targetSessionId || activeSessionId || defaultSessionId;
+    const recs101 = build101FastingRecords(students);
+    const existing = sessions[sId] || {
+      id: sId,
+      title: 'Puasa Sunnah Kamis',
+      date: '2026-08-27',
+      records: {},
+      isVerified: true,
+      isLocked: false,
+      inputDeadline: '15:00',
+      updatedAt: new Date().toISOString(),
+    };
+
+    const restoredSession: FastingSession = {
+      ...existing,
+      records: {
+        ...existing.records,
+        ...recs101,
+      },
+      updatedAt: new Date().toISOString(),
+    };
+
+    saveSession(restoredSession);
+    setSessions((prev) => ({
+      ...prev,
+      [sId]: restoredSession,
+    }));
+    setActiveSessionId(sId);
+    showToast(`✅ Berhasil memulihkan 101 data santri berpuasa (27 Agustus 2026)!`);
+
+    if (isSupabaseConfigured()) {
+      upsertSessionToSupabase(restoredSession);
+    }
+  };
+
   // Get active session object safely
   const activeSession = sessions[activeSessionId] || {
     id: activeSessionId,
-    title: 'Puasa Sunnah Senin',
-    date: new Date().toISOString().split('T')[0],
+    title: 'Puasa Sunnah Kamis',
+    date: '2026-08-27',
     records: {},
     isVerified: false,
     isLocked: false,
@@ -680,6 +719,7 @@ export default function App() {
                   onSwitchView={(tab) => setActiveAdminTab(tab)}
                   onOpenStudentModal={() => setIsStudentModalOpen(true)}
                   onOpenPhotoModal={handleOpenPhotoModal}
+                  onRestore101Records={handleRestore101Records}
                   onUpdateStudents={handleUpdateStudents}
                   isSupabaseConnected={isCloudConnected}
                   onOpenSupabaseConfig={() => setIsSupabaseModalOpen(true)}
@@ -692,6 +732,7 @@ export default function App() {
                   onBulkUpdateRecords={handleBulkUpdateRecords}
                   onOpenStudentModal={() => setIsStudentModalOpen(true)}
                   onOpenPhotoModal={() => handleOpenPhotoModal()}
+                  onRestore101Records={handleRestore101Records}
                   isAdmin={true}
                   onToggleLockSession={handleToggleLockSession}
                   onLogout={handleLogout}
@@ -713,6 +754,7 @@ export default function App() {
                   onUpdateRecord={handleUpdateRecord}
                   onBulkUpdateRecords={handleBulkUpdateRecords}
                   onOpenPhotoModal={() => handleOpenPhotoModal()}
+                  onRestore101Records={handleRestore101Records}
                   isAdmin={false}
                   onLogout={handleLogout}
                 />

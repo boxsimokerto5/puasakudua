@@ -73,24 +73,178 @@ export function getUniqueClasses(students: Student[]): string[] {
 }
 
 // Storage helpers for Fasting Sessions
+export const EXACT_101_STUDENT_NAMES: string[] = [
+  'Ahmad Syaiful Arsyad',
+  'Alfaredo Samuel Mukti',
+  'Iraqia Thursina',
+  'Krysna Galang Saputra',
+  'Misbahul Munir',
+  'Muhamad Kiske Adi Robani',
+  'Syahdan Nur Arifin',
+  'Wachid Zusron Fahmi',
+  'Ahmad Danu Prasetiya',
+  'Kukuh Hadi Wijaya',
+  'Muhammad Satria Panoto Jiwo',
+  'Putri Ayu Sukma Pertiwi',
+  'Randi Maulana',
+  'Yuda Tri Bhakti',
+  'Yuliantika Sukma Dewi',
+  'Zufar Al-Baihaqi',
+  'Ahmad Kasiful Birri',
+  'Cahyono',
+  'Efan Zamzami',
+  'Hanesa Putra Aprilianto',
+  'Khoirul Arfan Asnawi',
+  'Meyra Tri Salsabila Keyla Putri',
+  'Mikaela Primaisha',
+  'Mochamad Fairuz Akmal Pasya',
+  'Muhammad Bashith Annafi',
+  'Muhammad Romadhon',
+  'Qalbi Nata Nabila',
+  'Yumna Jihan Ahnaf',
+  'Ahmad Sobahus Surur',
+  'Khalisa Hasna Sajidah',
+  'Muhammad Sapto Prastiyo',
+  'Muhammad Zafri',
+  'Raihan Al Sabri',
+  'Salsabella Assifa Salamah',
+  'Wahyu Nur Salam',
+  'Zahrotulsifa',
+  'Cristin Dea Musa',
+  'Dewi Sartika Nengrum',
+  'Elisa Syara Junita',
+  'Faiza Alvi Qirani',
+  'Hani Sasmitia Putri',
+  'Litsa Nailil Amani',
+  'Moch. Dama Abyyu Tsani',
+  'Mohammad Azril Fahreza',
+  'Mohammad Zilbran Sudarsono Pranoto',
+  'Muhammad Angga Saputra',
+  'Muhammad Saepudin',
+  'Nafa Raidatul Kusna',
+  "Nur 'Aini",
+  'Sela Fitriani',
+  'Wahyu Hidayat Agung',
+  'Duwi Cahyono',
+  'Johan Pratama Dani',
+  'Khoirul Mustaqim',
+  'M. Mahesa Ilyas Wibisono',
+  'Moh. Rizqi Qodari',
+  'Moh. Zakaria Yahya Azzuba',
+  'Mohamad Zidan Nur Riski',
+  'Rizqi Melinda Aura Putri',
+  'Sukma Arsy Wira Dharma',
+  'Zakira Ar Raihan',
+  'Zhilvian Avrillio Pramudya Pratama',
+  'Cici Lia Kurnia Wati',
+  'Elsa Rusmaida Putri',
+  'Frida Mustikawati',
+  'Laelia Aris Susanti',
+  'M. Nasikhul Amin',
+  'Moh. Adila Ihsan',
+  'Muhammad Alvino Akbar',
+  'Risky Kurniawan',
+  'Shafaina Windyarta',
+  'Yahya Ahlil Qolbi',
+  'Zainun Nur Afifah',
+  'Abimanyu Satria Pamungkas',
+  'Ananda Putri Aulya',
+  'Bintang Widya Safara',
+  'Eko Budi Santoso',
+  'Elok Ragil Meiza',
+  'Firdo Fernando',
+  'Jihan Emilia',
+  'Muhammad Nur Zaky',
+  'Riko',
+  'Yuwand Fernanda',
+  'ANGGRAINI ALIFIANA WAHONO',
+  'Anggun Putri Noviati',
+  'MICKO SANDIKA PRATAMA',
+  'RIZKINA SALWA AZIZAH',
+  'SATRIA RIZKI RAMADHAN',
+  'BANGKIT ADITIA DANI',
+  'Claura Bintang Maretzka Santoso',
+  'FAJAR JUNIANANTA',
+  'LAILA FEBRI NUR FATIN',
+  'MOH. FARDAN ALBRIAN SYAHPUTRA',
+  'OSKA DEWI AGUSTINA',
+  'YASMIN OKTAVIA',
+  'ACHMAD DEVA ADIANSA',
+  'Alfalandhika Tauryson Evangelical',
+  'M. PRADITIA TRI SUCAHYO',
+  'Mutya Ningsih',
+  'SODIKIN NUR ROKHIM',
+  'VANESYA MELIANA SAFARA',
+];
+
+export function build101FastingRecords(studentList: Student[]) {
+  const records: Record<number, { studentId: number; status: 'berpuasa'; updatedAt: string }> = {};
+
+  const normalizedMap = new Map<string, Student>();
+  studentList.forEach((s) => {
+    normalizedMap.set(s.nama.toLowerCase().trim().replace(/['"`\s]/g, ''), s);
+  });
+
+  EXACT_101_STUDENT_NAMES.forEach((name) => {
+    const key = name.toLowerCase().trim().replace(/['"`\s]/g, '');
+    const found =
+      normalizedMap.get(key) ||
+      studentList.find(
+        (s) =>
+          s.nama.toLowerCase().includes(name.toLowerCase()) ||
+          name.toLowerCase().includes(s.nama.toLowerCase())
+      );
+    if (found) {
+      records[found.id] = {
+        studentId: found.id,
+        status: 'berpuasa',
+        updatedAt: new Date().toISOString(),
+      };
+    }
+  });
+
+  return records;
+}
+
 export function getStoredSessions(): Record<string, FastingSession> {
+  const defaultSessionId = '2026-08-27_Puasa_Sunnah_Kamis';
+  const records101 = build101FastingRecords(DEFAULT_STUDENTS);
+
   try {
     const raw = localStorage.getItem(SESSIONS_STORAGE_KEY);
     if (raw) {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+        // Ensure the official 101-student session on 27 Agustus 2026 is preserved with its data
+        if (!parsed[defaultSessionId] || Object.keys(parsed[defaultSessionId].records || {}).length === 0) {
+          parsed[defaultSessionId] = {
+            id: defaultSessionId,
+            title: 'Puasa Sunnah Kamis',
+            date: '2026-08-27',
+            records: records101,
+            isVerified: true,
+            isLocked: false,
+            inputDeadline: '15:00',
+            updatedAt: new Date().toISOString(),
+          };
+          saveAllStoredSessions(parsed);
+        }
+        return parsed;
+      }
     }
   } catch (e) {
     console.error('Error reading stored sessions:', e);
   }
 
-  // Pre-seed an initial session for 27 Agustus 2026 (or sample date) if empty
-  const defaultSessionId = '2026-08-27_Puasa Senin';
+  // Pre-seed the official session for 27 Agustus 2026 with the complete 101 fasting students
   const sampleSession: FastingSession = {
     id: defaultSessionId,
-    title: 'Puasa Sunnah Senin',
+    title: 'Puasa Sunnah Kamis',
     date: '2026-08-27',
-    records: {},
-    isVerified: false,
+    records: records101,
+    isVerified: true,
+    isLocked: false,
+    inputDeadline: '15:00',
     updatedAt: new Date().toISOString(),
   };
 
