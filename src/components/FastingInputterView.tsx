@@ -27,8 +27,14 @@ import {
   Camera,
   ScanBarcode,
   Volume2,
-  LogOut
+  LogOut,
+  AlertTriangle
 } from 'lucide-react';
+import {
+  playScanSuccessSound,
+  playScanErrorSound,
+  playQuickChirpSound,
+} from '../utils/audioNotification';
 
 interface FastingInputterViewProps {
   students: Student[];
@@ -60,7 +66,7 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
   const [isPdfModalOpen, setIsPdfModalOpen] = useState<boolean>(false);
   const [isDormCardModalOpen, setIsDormCardModalOpen] = useState<boolean>(false);
   const [isCameraScannerOpen, setIsCameraScannerOpen] = useState<boolean>(false);
-  const [scanToast, setScanToast] = useState<{ studentName: string; time: string } | null>(null);
+  const [scanToast, setScanToast] = useState<{ studentName: string; time: string; isError?: boolean } | null>(null);
   
   const isLocked = Boolean(activeSession.isLocked);
   const isReadOnly = isLocked && !isAdmin;
@@ -71,37 +77,6 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const uniqueClasses = useMemo(() => getUniqueClasses(students), [students]);
-
-  // Play distinctive pleasant success chime sound on barcode scan
-  const playScanBeep = () => {
-    try {
-      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (!AudioContextClass) return;
-      const audioCtx = new AudioContextClass();
-      
-      // Multi-tone cheerful chime (E5 -> G#5 -> B5)
-      const notes = [659.25, 830.61, 987.77];
-      notes.forEach((freq, idx) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        const startTime = audioCtx.currentTime + idx * 0.07;
-        const duration = 0.14;
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, startTime);
-        gain.gain.setValueAtTime(0.2, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        osc.start(startTime);
-        osc.stop(startTime + duration);
-      });
-    } catch {
-      // AudioContext might be blocked by browser policy until interaction
-    }
-  };
 
   // Process barcode input (from scanner or camera)
   const processBarcodeInput = useCallback((code: string) => {
@@ -118,17 +93,28 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
 
     if (foundStudent) {
       if (isReadOnly) {
+        playScanErrorSound();
         alert('Sesi ini terkunci. Tidak dapat menginput data.');
         return;
       }
       onUpdateRecord(foundStudent.id, 'berpuasa');
-      playScanBeep();
+      playScanSuccessSound();
       setScanToast({
         studentName: `${foundStudent.nama} (${foundStudent.kelas})`,
         time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        isError: false,
       });
       setTimeout(() => setScanToast(null), 3500);
       setSearchQuery('');
+    } else {
+      // Unrecognized barcode/card - play error sound feedback
+      playScanErrorSound();
+      setScanToast({
+        studentName: `Kode tidak terdaftar: "${cleanCode}"`,
+        time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        isError: true,
+      });
+      setTimeout(() => setScanToast(null), 3500);
     }
   }, [students, isReadOnly, onUpdateRecord]);
 
@@ -254,6 +240,7 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
   const handleMarkPuasaFromSuggest = (studentId: number) => {
     if (isReadOnly) return;
     onUpdateRecord(studentId, 'berpuasa');
+    playQuickChirpSound();
     setSearchQuery('');
     if (searchInputRef.current) {
       searchInputRef.current.focus();
@@ -265,12 +252,14 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
     if (isReadOnly) return;
     const newStatus: FastingStatus = currentStatus === 'berpuasa' ? 'belum_diisi' : 'berpuasa';
     onUpdateRecord(studentId, newStatus);
+    playQuickChirpSound();
   };
 
   // Remove / Cancel fasting status from active list
   const handleRemoveFasting = (studentId: number) => {
     if (isReadOnly) return;
     onUpdateRecord(studentId, 'belum_diisi');
+    playQuickChirpSound();
   };
 
   // Bulk reset all displayed fasting students with confirmation
@@ -501,25 +490,51 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
           </div>
         </div>
 
-        {/* Floating Success Toast on Top Center */}
+        {/* Floating Scan Toast on Top Center */}
         {scanToast && (
-          <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-sm w-[92%] sm:w-auto px-4 py-3 bg-gradient-to-r from-emerald-800 via-emerald-900 to-teal-950 text-white rounded-2xl shadow-2xl border-2 border-amber-400 flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-md">
+          <div
+            className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-sm w-[92%] sm:w-auto px-4 py-3 text-white rounded-2xl shadow-2xl border-2 flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-md ${
+              scanToast.isError
+                ? 'bg-gradient-to-r from-rose-900 via-rose-950 to-red-950 border-rose-400'
+                : 'bg-gradient-to-r from-emerald-800 via-emerald-900 to-teal-950 border-amber-400'
+            }`}
+          >
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-xl bg-amber-400/20 border border-amber-300/40 flex items-center justify-center shrink-0">
-                <Sparkles className="w-4 h-4 text-amber-300 animate-spin" style={{ animationDuration: '3s' }} />
+              <div
+                className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${
+                  scanToast.isError
+                    ? 'bg-rose-500/20 border-rose-400/50'
+                    : 'bg-amber-400/20 border-amber-300/40'
+                }`}
+              >
+                {scanToast.isError ? (
+                  <AlertTriangle className="w-4 h-4 text-rose-300" />
+                ) : (
+                  <Sparkles className="w-4 h-4 text-amber-300 animate-spin" style={{ animationDuration: '3s' }} />
+                )}
               </div>
               <div className="min-w-0">
-                <p className="text-[11px] font-bold text-amber-300 flex items-center gap-1">
-                  <span>✓ Berhasil Scan</span>
-                  <span className="text-emerald-300 font-mono text-[10px]">({scanToast.time})</span>
+                <p
+                  className={`text-[11px] font-bold flex items-center gap-1 ${
+                    scanToast.isError ? 'text-rose-300' : 'text-amber-300'
+                  }`}
+                >
+                  <span>{scanToast.isError ? '✕ Gagal Scan' : '✓ Berhasil Scan'}</span>
+                  <span className="font-mono text-[10px] opacity-80">({scanToast.time})</span>
                 </p>
                 <p className="text-xs sm:text-sm font-extrabold text-white truncate">
                   {scanToast.studentName}
                 </p>
               </div>
             </div>
-            <span className="px-2 py-0.5 rounded-lg text-[10px] font-black bg-emerald-600/90 text-white border border-emerald-400/40 shrink-0">
-              ✓ Berpuasa
+            <span
+              className={`px-2 py-0.5 rounded-lg text-[10px] font-black shrink-0 ${
+                scanToast.isError
+                  ? 'bg-rose-700 text-white border border-rose-400/50'
+                  : 'bg-emerald-600/90 text-white border border-emerald-400/40'
+              }`}
+            >
+              {scanToast.isError ? 'Tidak Terdaftar' : '✓ Berpuasa'}
             </span>
           </div>
         )}

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { Camera, X, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Camera, X, CheckCircle2, AlertCircle, RefreshCw, Volume2 } from 'lucide-react';
+import { playScanSuccessSound } from '../utils/audioNotification';
 
 interface BarcodeCameraScannerModalProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ export const BarcodeCameraScannerModal: React.FC<BarcodeCameraScannerModalProps>
           (decodedText) => {
             if (isMounted) {
               setLastScanned(decodedText);
+              playScanSuccessSound();
               onScanSuccess(decodedText);
             }
           },
@@ -196,7 +198,10 @@ export const BarcodeCameraScannerModal: React.FC<BarcodeCameraScannerModalProps>
           )}
 
           <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>💡 Otomatis menandai santri sebagai berpuasa.</span>
+            <span className="flex items-center gap-1 text-emerald-700 font-medium">
+              <Volume2 className="w-3.5 h-3.5" />
+              <span>Suara beep & getar aktif saat scan berhasil.</span>
+            </span>
             <button
               onClick={onClose}
               className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl text-xs font-bold transition-all cursor-pointer"

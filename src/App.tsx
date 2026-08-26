@@ -617,9 +617,9 @@ export default function App() {
           />
 
           {/* Main Container */}
-          <main className="max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-3.5 sm:py-5 flex-1 space-y-4 sm:space-y-6">
-            {/* Live Ramadan Prayer Times & Imsakiyah Banner Card (Hidden on Ceklist, Form Input, Raport, and Calendar for a clean focused single-screen view) */}
-            {activeAdminTab !== 'calendar' && activeAdminTab !== 'input' && activeAdminTab !== 'raport' && activeAdminTab !== 'checker' && (
+          <main className="max-w-7xl w-full mx-auto px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3.5 flex-1 space-y-3 sm:space-y-4">
+            {/* Live Ramadan Prayer Times & Imsakiyah Banner Card (Hidden on Admin, Ceklist, Form Input, Raport, and Calendar for a clean focused view) */}
+            {activeAdminTab !== 'admin' && activeAdminTab !== 'calendar' && activeAdminTab !== 'input' && activeAdminTab !== 'raport' && activeAdminTab !== 'checker' && (
               <PrayerTimeBannerCard
                 onOpenModal={() => setShowPrayerModal(true)}
                 onOpenSurahsModal={() => handleOpenSurahsModal('juz_amma')}
@@ -628,8 +628,8 @@ export default function App() {
               />
             )}
 
-            {/* Session Selector / Creator Block (Shown on regular session workflows) */}
-            {activeAdminTab !== 'raport' && activeAdminTab !== 'calendar' && (
+            {/* Session Selector / Creator Block (Shown on regular session workflows; hidden on admin since AdminPanel has complete session management) */}
+            {activeAdminTab !== 'admin' && activeAdminTab !== 'raport' && activeAdminTab !== 'calendar' && (
               <SessionSelector
                 sessions={sessions}
                 activeSessionId={activeSessionId}

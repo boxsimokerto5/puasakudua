@@ -18,6 +18,7 @@ import {
   Moon,
   LogOut,
 } from 'lucide-react';
+import { playQuickChirpSound } from '../utils/audioNotification';
 
 interface FastingCheckerViewProps {
   students: Student[];
@@ -160,6 +161,7 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
 
   // Toggle checklist item handlers
   const toggleSahurCheck = (id: number) => {
+    playQuickChirpSound();
     setCheckedSahurIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -169,6 +171,7 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
   };
 
   const toggleBerbukaCheck = (id: number) => {
+    playQuickChirpSound();
     setCheckedBerbukaIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -178,6 +181,7 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
   };
 
   const toggleMakanSiangCheck = (id: number) => {
+    playQuickChirpSound();
     setCheckedMakanSiangIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -187,6 +191,7 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
   };
 
   const toggleAllSahur = () => {
+    playQuickChirpSound();
     if (checkedSahurIds.size === sahurStudentsList.length) {
       setCheckedSahurIds(new Set());
     } else {
@@ -195,6 +200,7 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
   };
 
   const toggleAllBerbuka = () => {
+    playQuickChirpSound();
     if (checkedBerbukaIds.size === fastingStudentsList.length) {
       setCheckedBerbukaIds(new Set());
     } else {
@@ -203,6 +209,7 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
   };
 
   const toggleAllMakanSiang = () => {
+    playQuickChirpSound();
     if (checkedMakanSiangIds.size === makanSiangStudentsList.length) {
       setCheckedMakanSiangIds(new Set());
     } else {
