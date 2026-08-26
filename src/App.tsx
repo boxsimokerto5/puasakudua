@@ -293,8 +293,13 @@ export default function App() {
     }
   };
 
-  // Create new Fasting Session
+  // Create new Fasting Session (Restricted to Admin Only)
   const handleCreateSession = async (title: string, date: string) => {
+    if (user?.role !== 'admin') {
+      showToast('⚠️ Hak Akses Dibatasi: Hanya Administrator yang berhak menambahkan sesi baru.');
+      return;
+    }
+
     const id = `${date}_${title.trim().replace(/\s+/g, '_')}`;
     const newSession: FastingSession = {
       id,
@@ -303,7 +308,6 @@ export default function App() {
       records: {},
       isVerified: false,
       isLocked: false,
-      inputDeadline: adminSettings.defaultDeadlineTime || '15:00',
       createdById: user?.username,
       updatedAt: new Date().toISOString(),
     };
@@ -312,7 +316,7 @@ export default function App() {
     const updatedSessions = getStoredSessions();
     setSessions(updatedSessions);
     setActiveSessionId(id);
-    showToast(`Sesi baru "${title}" berhasil dibuat!`);
+    showToast(`✅ Sesi baru "${title}" berhasil dibuat oleh Admin!`);
 
     if (isSupabaseConfigured()) {
       await upsertSessionToSupabase(newSession);
@@ -343,30 +347,6 @@ export default function App() {
         ? `Sesi "${current.title}" berhasil DIKUNCI (Hanya Lihat)!`
         : `Sesi "${current.title}" berhasil DIBUKA untuk penginputan!`
     );
-
-    if (isSupabaseConfigured()) {
-      await upsertSessionToSupabase(updatedSession);
-    }
-  };
-
-  // Update input deadline
-  const handleUpdateDeadline = async (sessionId: string, deadline: string) => {
-    const current = sessions[sessionId];
-    if (!current) return;
-
-    const updatedSession: FastingSession = {
-      ...current,
-      inputDeadline: deadline,
-      updatedAt: new Date().toISOString(),
-    };
-
-    saveSession(updatedSession);
-    setSessions((prev) => ({
-      ...prev,
-      [sessionId]: updatedSession,
-    }));
-
-    showToast(`Batas jam penginputan diatur ke ${deadline} WIB`);
 
     if (isSupabaseConfigured()) {
       await upsertSessionToSupabase(updatedSession);
@@ -547,7 +527,6 @@ export default function App() {
       records: {},
       isVerified: true,
       isLocked: false,
-      inputDeadline: '15:00',
       updatedAt: new Date().toISOString(),
     };
 
@@ -676,7 +655,7 @@ export default function App() {
                 onCreateSession={handleCreateSession}
                 onDeleteSession={isAdmin ? handleDeleteSession : undefined}
                 isAdmin={isAdmin}
-                canCreateSession={isAdmin || (isPenginput && adminSettings.allowPenginputCreateSession)}
+                canCreateSession={isAdmin}
               />
             )}
 
@@ -691,8 +670,12 @@ export default function App() {
                   setActiveSessionId(id);
                 }}
                 onCreateSessionForDate={(dateStr, title) => {
-                  handleCreateSession(title, dateStr);
-                  setActiveAdminTab(isAdmin || isPenginput ? 'input' : 'checker');
+                  if (isAdmin) {
+                    handleCreateSession(title, dateStr);
+                    setActiveAdminTab('input');
+                  } else {
+                    showToast('⚠️ Hanya Administrator yang berhak membuat sesi baru.');
+                  }
                 }}
                 onNavigateToTab={(tab) => setActiveAdminTab(tab)}
               />
@@ -711,7 +694,6 @@ export default function App() {
                   students={students}
                   adminSettings={adminSettings}
                   onToggleLockSession={handleToggleLockSession}
-                  onUpdateDeadline={handleUpdateDeadline}
                   onUpdateAdminSettings={handleUpdateAdminSettings}
                   onDeleteSession={handleDeleteSession}
                   onSelectSession={(id) => setActiveSessionId(id)}

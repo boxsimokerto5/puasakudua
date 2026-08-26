@@ -28,7 +28,7 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
   onCreateSession,
   onDeleteSession,
   isAdmin = false,
-  canCreateSession = true,
+  canCreateSession = false,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -129,11 +129,6 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
               <span className="font-bold text-amber-300">
                 {activeSession ? formatDateIndo(activeSession.date) : '27 Agustus 2026'}
               </span>
-              {activeSession?.inputDeadline && (
-                <span className="text-amber-200/90 bg-emerald-900/60 px-1.5 py-0.2 rounded border border-emerald-700/50 text-[10px]">
-                  Batas: <strong className="text-amber-300">{activeSession.inputDeadline} WIB</strong>
-                </span>
-              )}
             </p>
           </div>
         </div>
@@ -239,12 +234,13 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
             </button>
           )}
 
-          {/* Create New Session Button (Based on canCreateSession or Admin) */}
+          {/* Create New Session Button (Admin Only) */}
           {(isAdmin || canCreateSession) && (
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
               className="px-3 py-1.5 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-emerald-950 font-bold text-xs rounded-lg shadow-md shadow-amber-400/20 transition-all duration-150 flex items-center gap-1 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+              title="Tambah Sesi Puasa Baru (Wewenang Khusus Admin)"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>Sesi Baru</span>

@@ -1558,47 +1558,47 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
           )}
 
           {/* ========================================================= */}
-          {/* TAB 5: DZIKIR & DOA SESUDAH SHOLAT FARDHU LENGKAP         */}
+          {/* TAB 5: DZIKIR & DOA SESUDAH SHOLAT FARDHU LENGKAP (TERANG LEMBUT) */}
           {/* ========================================================= */}
           {mainTab === 'dzikir_sholat' && (
             <div
               ref={versesContainerRef}
-              className="flex-1 overflow-y-auto p-3 sm:p-6 bg-slate-900/60 custom-scrollbar flex flex-col"
+              className="flex-1 overflow-y-auto p-3 sm:p-5 bg-gradient-to-b from-[#faf8f5] via-[#f5f2eb] to-[#efebe2] custom-scrollbar flex flex-col text-slate-800"
             >
               {/* Dzikir Sholat Header Banner */}
-              <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-[#170e2b] via-[#2d1b54] to-[#120a24] border border-purple-400/40 shadow-xl mb-4 text-center relative overflow-hidden">
-                <RamadanStarryBackdrop variant="purple" showCrescent={true} />
-                <div className="absolute top-0 right-0 opacity-10 font-arabic text-8xl select-none pointer-events-none p-2 text-purple-200">
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-900 border border-emerald-700/50 shadow-md mb-3 text-center relative overflow-hidden text-white">
+                <RamadanStarryBackdrop variant="emerald" showCrescent={true} />
+                <div className="absolute top-0 right-0 opacity-10 font-arabic text-8xl select-none pointer-events-none p-2 text-emerald-200">
                   أَذْكَارُ الصَّلَاةِ
                 </div>
                 
                 <div className="relative z-10">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-400/20 border border-purple-300/40 text-purple-300 text-xs font-bold mb-1 shadow-xs">
-                    <Layers className="w-3.5 h-3.5 text-purple-300" />
+                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-200 text-[11px] font-bold mb-1 shadow-2xs backdrop-blur-xs">
+                    <Layers className="w-3.5 h-3.5 text-amber-300" />
                     <span>Wirid & Doa Ba'da Sholat Fardhu</span>
                   </div>
 
-                  <h2 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-pink-100 to-amber-200 tracking-wider font-sans">
+                  <h2 className="text-xl sm:text-2xl font-black text-amber-300 tracking-wide font-sans drop-shadow-xs">
                     Dzikir & Doa Sesudah Sholat
                   </h2>
                   
-                  <p className="text-3xl sm:text-4xl font-arabic font-bold text-amber-300 mt-1 drop-shadow-md">
+                  <p className="text-2xl sm:text-3xl font-arabic font-bold text-emerald-100 mt-1 drop-shadow-xs">
                     أَذْكَارُ وَأَدْعِيَةُ بَعْدَ الصَّلَاةِ الْمَكْتُوبَةِ
                   </p>
 
-                  <p className="text-xs text-purple-200/90 mt-1 max-w-xl mx-auto leading-relaxed">
+                  <p className="text-xs text-emerald-100/90 mt-1 max-w-xl mx-auto leading-relaxed">
                     Susunan bacaan istighfar, ayat kursi, tasbih 33x, dan doa memohon keselamatan dunia-akhirat sesuai Sunnah Rasulullah SAW
                   </p>
 
                 {/* Section Filter Pills for Dzikir Sholat */}
-                <div className="flex items-center justify-center gap-1.5 mt-4 flex-wrap text-xs">
+                <div className="flex items-center justify-center gap-1.5 mt-3 flex-wrap text-xs">
                   <button
                     type="button"
                     onClick={() => setDzikirSectionFilter('all')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       dzikirSectionFilter === 'all'
-                        ? 'bg-purple-500 text-slate-950 font-black shadow-xs'
-                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                        ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                        : 'bg-white/15 text-emerald-100 hover:bg-white/25 border border-white/20'
                     }`}
                   >
                     Semua ({DZIKIR_SHOLAT_DATA.length})
@@ -1608,8 +1608,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                     onClick={() => setDzikirSectionFilter('istighfar_salam')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       dzikirSectionFilter === 'istighfar_salam'
-                        ? 'bg-purple-500 text-slate-950 font-black shadow-xs'
-                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                        ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                        : 'bg-white/15 text-emerald-100 hover:bg-white/25 border border-white/20'
                     }`}
                   >
                     1. Istighfar & Salam
@@ -1619,8 +1619,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                     onClick={() => setDzikirSectionFilter('ayat')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       dzikirSectionFilter === 'ayat'
-                        ? 'bg-purple-500 text-slate-950 font-black shadow-xs'
-                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                        ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                        : 'bg-white/15 text-emerald-100 hover:bg-white/25 border border-white/20'
                     }`}
                   >
                     2. Ayat Kursi & Surat
@@ -1630,8 +1630,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                     onClick={() => setDzikirSectionFilter('tasbih33')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       dzikirSectionFilter === 'tasbih33'
-                        ? 'bg-purple-500 text-slate-950 font-black shadow-xs'
-                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                        ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                        : 'bg-white/15 text-emerald-100 hover:bg-white/25 border border-white/20'
                     }`}
                   >
                     3. Tasbih 33x
@@ -1641,8 +1641,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                     onClick={() => setDzikirSectionFilter('doa_sholat')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       dzikirSectionFilter === 'doa_sholat'
-                        ? 'bg-purple-500 text-slate-950 font-black shadow-xs'
-                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                        ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                        : 'bg-white/15 text-emerald-100 hover:bg-white/25 border border-white/20'
                     }`}
                   >
                     4. Doa Ba'da Sholat
@@ -1650,11 +1650,11 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                 </div>
 
                 {/* Salin Seluruh Dzikir & Doa Sholat Button */}
-                <div className="flex items-center justify-center gap-2 mt-3.5">
+                <div className="flex items-center justify-center gap-2 mt-3">
                   <button
                     type="button"
                     onClick={handleCopyWholeDzikir}
-                    className="px-3.5 py-1.5 rounded-xl bg-purple-400/20 hover:bg-purple-400/30 text-purple-200 text-xs font-bold flex items-center gap-1.5 border border-purple-300/40 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
+                    className="px-3 py-1 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 text-xs font-bold flex items-center gap-1.5 border border-amber-300/40 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
                   >
                     {isDzikirWholeCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                     <span>{isDzikirWholeCopied ? 'Tersalin!' : 'Salin Seluruh Rangkaian Dzikir & Doa'}</span>
@@ -1663,8 +1663,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                 </div>
               </div>
 
-              {/* Dzikir Sholat Items List */}
-              <div className="space-y-4 my-2">
+              {/* Dzikir Sholat Items List (Nuansa Terang Lembut) */}
+              <div className="space-y-3.5 my-2">
                 {filteredDzikirSholat.map((item) => {
                   const currentCount = dzikirCounts[item.id] || 0;
                   const isTargetReached = item.targetCount ? currentCount >= item.targetCount : false;
@@ -1672,35 +1672,39 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                   return (
                     <div
                       key={item.id}
-                      className={`p-4 sm:p-5 rounded-2xl transition-all shadow-md ${
+                      className={`p-4 sm:p-5 rounded-2xl transition-all shadow-xs ${
                         isTargetReached
-                          ? 'bg-purple-950/60 border-2 border-emerald-400/80 shadow-emerald-950/30'
-                          : 'bg-slate-950/70 border border-slate-800 hover:border-purple-700/60'
+                          ? 'bg-emerald-50/90 border-2 border-emerald-500 shadow-sm'
+                          : 'bg-white border border-amber-200/70 hover:border-amber-400/80 hover:shadow-md'
                       }`}
                     >
                       {/* Dzikir Card Header */}
-                      <div className="flex items-center justify-between mb-3 border-b border-slate-800/80 pb-2.5">
+                      <div className="flex items-center justify-between mb-3 border-b border-amber-100 pb-2.5">
                         <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-lg bg-purple-950 border border-purple-600/40 text-purple-300 text-xs font-mono font-bold flex items-center justify-center">
+                          <span className="w-6 h-6 rounded-lg bg-amber-100 border border-amber-300 text-amber-900 text-xs font-mono font-bold flex items-center justify-center">
                             {item.id}
                           </span>
                           <div>
-                            <h4 className="text-xs sm:text-sm font-black text-purple-200">{item.title}</h4>
+                            <h4 className="text-xs sm:text-sm font-black text-slate-800">{item.title}</h4>
                             {item.countLabel && (
-                              <span className="text-[10px] text-amber-300/90 font-bold">{item.countLabel}</span>
+                              <span className="text-[10px] text-amber-800 font-bold bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
+                                {item.countLabel}
+                              </span>
                             )}
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
                           {/* Interactive Tasbih Counter Button */}
-                          <div className="flex items-center gap-1 bg-slate-900 px-2.5 py-1 rounded-xl border border-purple-800/40">
+                          <div className={`flex items-center gap-1 px-2.5 py-1 rounded-xl border transition-all ${
+                            isTargetReached 
+                              ? 'bg-emerald-100 border-emerald-300 text-emerald-900' 
+                              : 'bg-amber-50/80 border-amber-200 text-amber-950 hover:bg-amber-100'
+                          }`}>
                             <button
                               type="button"
                               onClick={() => handleIncrementDzikir(item.id)}
-                              className={`flex items-center gap-1 text-xs font-bold transition-all cursor-pointer ${
-                                isTargetReached ? 'text-emerald-300 font-black' : 'text-purple-300 hover:text-white'
-                              }`}
+                              className="flex items-center gap-1 text-xs font-bold cursor-pointer"
                               title="Klik untuk Menambah Hitungan Dzikir"
                             >
                               <Plus className="w-3 h-3" />
@@ -1709,13 +1713,13 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                                   ? `${currentCount}/${item.targetCount}`
                                   : `Hitung: ${currentCount}`}
                               </span>
-                              {isTargetReached && <Check className="w-3 h-3 text-emerald-400" />}
+                              {isTargetReached && <Check className="w-3 h-3 text-emerald-600 font-bold" />}
                             </button>
                             {currentCount > 0 && (
                               <button
                                 type="button"
                                 onClick={() => handleResetDzikir(item.id)}
-                                className="text-slate-500 hover:text-rose-400 ml-1.5 cursor-pointer"
+                                className="text-slate-400 hover:text-rose-600 ml-1 cursor-pointer"
                                 title="Reset Hitungan"
                               >
                                 <RotateCcw className="w-3 h-3" />
@@ -1727,11 +1731,11 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                           <button
                             type="button"
                             onClick={() => handleCopyDzikirItem(item)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-purple-300 hover:bg-slate-900 border border-slate-800 cursor-pointer"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-800 hover:bg-amber-50 border border-slate-200 cursor-pointer"
                             title="Salin Bacaan Ini"
                           >
                             {copiedDzikirId === item.id ? (
-                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                              <Check className="w-3.5 h-3.5 text-emerald-600" />
                             ) : (
                               <Copy className="w-3.5 h-3.5" />
                             )}
@@ -1739,9 +1743,9 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                         </div>
                       </div>
 
-                      {/* Arabic Text */}
+                      {/* Arabic Text (Deep Sharp Charcoal for Maximum Readability) */}
                       <p
-                        className={`text-right font-arabic font-bold text-white whitespace-pre-line ${getArabicSizeClass()}`}
+                        className={`text-right font-arabic font-bold text-slate-900 whitespace-pre-line ${getArabicSizeClass()}`}
                         dir="rtl"
                       >
                         {item.arabic}
@@ -1749,22 +1753,22 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
 
                       {/* Latin Transliteration */}
                       {showLatin && (
-                        <p className="text-xs sm:text-sm font-sans font-medium text-purple-200/95 mt-3 leading-relaxed">
+                        <p className="text-xs sm:text-sm font-sans font-semibold text-emerald-800 mt-2.5 leading-relaxed">
                           {item.latin}
                         </p>
                       )}
 
                       {/* Indonesian Translation */}
                       {showTranslation && (
-                        <p className="text-xs sm:text-sm font-sans text-slate-300 mt-2 leading-relaxed italic">
+                        <p className="text-xs sm:text-sm font-sans text-slate-600 mt-1.5 leading-relaxed italic">
                           "{item.translation}"
                         </p>
                       )}
 
-                      {/* Fadhilah / Keutamaan */}
+                      {/* Fadhilah / Keutamaan (Soft Amber Highlight) */}
                       {item.fadhilah && (
-                        <div className="mt-3 pt-2 border-t border-slate-900 flex items-start gap-1.5 text-[11px] text-amber-300/90 font-medium bg-amber-950/20 px-2.5 py-1.5 rounded-lg border border-amber-500/20">
-                          <Info className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                        <div className="mt-3 pt-2 border-t border-amber-100 flex items-start gap-1.5 text-[11px] text-amber-950 font-medium bg-amber-50/90 px-3 py-2 rounded-xl border border-amber-200/80">
+                          <Info className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
                           <span><strong>Keutamaan & Dalil:</strong> {item.fadhilah}</span>
                         </div>
                       )}
@@ -1776,47 +1780,47 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
           )}
 
           {/* ========================================= */}
-          {/* TAB 6: DOA-DOA HARIAN LENGKAP & ELEGAN    */}
+          {/* TAB 6: DOA-DOA HARIAN LENGKAP (TERANG LEMBUT) */}
           {/* ========================================= */}
           {mainTab === 'doa_harian' && (
             <div
               ref={versesContainerRef}
-              className="flex-1 overflow-y-auto p-3 sm:p-6 bg-slate-900/60 custom-scrollbar flex flex-col"
+              className="flex-1 overflow-y-auto p-3 sm:p-5 bg-gradient-to-b from-[#faf8f5] via-[#f5f2eb] to-[#efebe2] custom-scrollbar flex flex-col text-slate-800"
             >
               {/* Doa Harian Header Banner */}
-              <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-[#022e23] via-[#044c38] to-[#02241b] border border-teal-400/40 shadow-xl mb-4 text-center relative overflow-hidden">
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-teal-950 via-emerald-900 to-teal-900 border border-teal-700/50 shadow-md mb-3 text-center relative overflow-hidden text-white">
                 <RamadanStarryBackdrop variant="teal" showCrescent={true} />
                 <div className="absolute top-0 right-0 opacity-10 font-arabic text-8xl select-none pointer-events-none p-2 text-emerald-200">
                   الأَدْعِيَةُ
                 </div>
                 
                 <div className="relative z-10">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-400/20 border border-teal-300/40 text-teal-300 text-xs font-bold mb-1 shadow-xs">
-                    <HeartHandshake className="w-3.5 h-3.5 text-teal-300" />
+                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-200 text-[11px] font-bold mb-1 shadow-2xs backdrop-blur-xs">
+                    <HeartHandshake className="w-3.5 h-3.5 text-amber-300" />
                     <span>Kumpulan Doa Pilihan Santri & Umat Islam</span>
                   </div>
 
-                  <h2 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-200 via-teal-100 to-amber-200 tracking-wider font-sans">
+                  <h2 className="text-xl sm:text-2xl font-black text-amber-300 tracking-wide font-sans drop-shadow-xs">
                     Doa-Doa Harian Lengkap
                   </h2>
                   
-                  <p className="text-3xl sm:text-4xl font-arabic font-bold text-amber-300 mt-1 drop-shadow-md">
+                  <p className="text-2xl sm:text-3xl font-arabic font-bold text-teal-100 mt-1 drop-shadow-xs">
                     الأَدْعِيَةُ الْيَوْمِيَّةُ الْمَأْثُورَةُ
                   </p>
 
-                  <p className="text-xs text-emerald-200/90 mt-1 max-w-xl mx-auto leading-relaxed">
+                  <p className="text-xs text-teal-100/90 mt-1 max-w-xl mx-auto leading-relaxed">
                     Kumpulan doa sehari-hari bersumber dari Al-Qur'an dan Sunnah Rasulullah SAW lengkap dengan adab, teks Arab, Latin, dan Terjemahan
                   </p>
 
                 {/* Category Filter Pills for Doa Harian */}
-                <div className="flex items-center justify-center gap-1.5 mt-4 flex-wrap text-xs">
+                <div className="flex items-center justify-center gap-1.5 mt-3 flex-wrap text-xs">
                   <button
                     type="button"
                     onClick={() => setDoaCategoryFilter('all')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       doaCategoryFilter === 'all'
-                        ? 'bg-teal-500 text-slate-950 font-black shadow-xs'
-                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                        ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                        : 'bg-white/15 text-teal-100 hover:bg-white/25 border border-white/20'
                     }`}
                   >
                     Semua ({DAILY_PRAYERS_DATA.length})
@@ -1826,8 +1830,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                     onClick={() => setDoaCategoryFilter('harian')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       doaCategoryFilter === 'harian'
-                        ? 'bg-teal-500 text-slate-950 font-black shadow-xs'
-                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                        ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                        : 'bg-white/15 text-teal-100 hover:bg-white/25 border border-white/20'
                     }`}
                   >
                     🍽️ Makan & Tidur
@@ -1837,8 +1841,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                     onClick={() => setDoaCategoryFilter('rumah_safar')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       doaCategoryFilter === 'rumah_safar'
-                        ? 'bg-teal-500 text-slate-950 font-black shadow-xs'
-                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                        ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                        : 'bg-white/15 text-teal-100 hover:bg-white/25 border border-white/20'
                     }`}
                   >
                     🚗 Rumah & Safar
@@ -1848,8 +1852,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                     onClick={() => setDoaCategoryFilter('masjid_ibadah')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       doaCategoryFilter === 'masjid_ibadah'
-                        ? 'bg-teal-500 text-slate-950 font-black shadow-xs'
-                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                        ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                        : 'bg-white/15 text-teal-100 hover:bg-white/25 border border-white/20'
                     }`}
                   >
                     🕌 Wudhu & Ibadah
@@ -1859,8 +1863,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                     onClick={() => setDoaCategoryFilter('puasa')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       doaCategoryFilter === 'puasa'
-                        ? 'bg-teal-500 text-slate-950 font-black shadow-xs'
-                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                        ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                        : 'bg-white/15 text-teal-100 hover:bg-white/25 border border-white/20'
                     }`}
                   >
                     🌙 Puasa Ramadhan
@@ -1870,8 +1874,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                     onClick={() => setDoaCategoryFilter('belajar')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       doaCategoryFilter === 'belajar'
-                        ? 'bg-teal-500 text-slate-950 font-black shadow-xs'
-                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                        ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                        : 'bg-white/15 text-teal-100 hover:bg-white/25 border border-white/20'
                     }`}
                   >
                     📚 Belajar & Ujian
@@ -1881,8 +1885,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                     onClick={() => setDoaCategoryFilter('orangtua_selamat')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       doaCategoryFilter === 'orangtua_selamat'
-                        ? 'bg-teal-500 text-slate-950 font-black shadow-xs'
-                        : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800'
+                        ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                        : 'bg-white/15 text-teal-100 hover:bg-white/25 border border-white/20'
                     }`}
                   >
                     🤲 Orang Tua & Selamat
@@ -1891,8 +1895,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                 </div>
               </div>
 
-              {/* Search Bar for Doa */}
-              <div className="mb-4">
+              {/* Search Bar for Doa (Clean Light Input) */}
+              <div className="mb-3">
                 <div className="relative">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
@@ -1900,13 +1904,13 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                     placeholder="Cari doa (misal: sebelum makan, belajar, wudhu, orang tua, sapu jagad)..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 bg-slate-950/80 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-teal-500 shadow-inner"
+                    className="w-full pl-9 pr-4 py-2 bg-white border border-amber-200/80 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 shadow-xs"
                   />
                   {searchQuery && (
                     <button
                       type="button"
                       onClick={() => setSearchQuery('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -1914,44 +1918,46 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                 </div>
               </div>
 
-              {/* Daily Prayers List */}
-              <div className="space-y-4 my-2">
+              {/* Daily Prayers List (Nuansa Terang Lembut) */}
+              <div className="space-y-3.5 my-2">
                 {filteredDoaHarian.map((item) => {
                   const currentCount = doaCounts[item.id] || 0;
                   return (
                     <div
                       key={item.id}
-                      className="p-4 sm:p-5 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-teal-700/60 transition-all shadow-md"
+                      className="p-4 sm:p-5 rounded-2xl bg-white border border-teal-200/70 hover:border-teal-400/80 hover:shadow-md transition-all shadow-xs"
                     >
                       {/* Doa Card Header */}
-                      <div className="flex items-center justify-between mb-3 border-b border-slate-800/80 pb-2.5">
+                      <div className="flex items-center justify-between mb-3 border-b border-teal-100 pb-2.5">
                         <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-lg bg-teal-950 border border-teal-600/40 text-teal-300 text-xs font-mono font-bold flex items-center justify-center">
+                          <span className="w-6 h-6 rounded-lg bg-teal-100 border border-teal-300 text-teal-900 text-xs font-mono font-bold flex items-center justify-center">
                             {item.id}
                           </span>
                           <div>
-                            <h4 className="text-xs sm:text-sm font-black text-teal-200">{item.title}</h4>
-                            <span className="text-[10px] text-amber-300/90 font-semibold">{item.categoryName}</span>
+                            <h4 className="text-xs sm:text-sm font-black text-slate-800">{item.title}</h4>
+                            <span className="text-[10px] text-teal-800 font-bold bg-teal-50 px-1.5 py-0.2 rounded border border-teal-200">
+                              {item.categoryName}
+                            </span>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
                           {/* Counter Button */}
-                          <div className="flex items-center gap-1 bg-slate-900 px-2 py-1 rounded-xl border border-teal-800/40">
+                          <div className="flex items-center gap-1 bg-teal-50/80 px-2 py-1 rounded-xl border border-teal-200 hover:bg-teal-100 transition-all">
                             <button
                               type="button"
                               onClick={() => handleIncrementDoa(item.id)}
-                              className="flex items-center gap-1 text-xs font-bold text-teal-300 hover:text-white cursor-pointer"
+                              className="flex items-center gap-1 text-xs font-bold text-teal-950 cursor-pointer"
                               title="Hitung Bacaan Doa Ini"
                             >
-                              <Plus className="w-3 h-3" />
+                              <Plus className="w-3 h-3 text-teal-700" />
                               <span>Dibaca: {currentCount}x</span>
                             </button>
                             {currentCount > 0 && (
                               <button
                                 type="button"
                                 onClick={() => handleResetDoa(item.id)}
-                                className="text-slate-500 hover:text-rose-400 ml-1 cursor-pointer"
+                                className="text-slate-400 hover:text-rose-600 ml-1 cursor-pointer"
                                 title="Reset Hitungan"
                               >
                                 <RotateCcw className="w-3 h-3" />
@@ -1963,11 +1969,11 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                           <button
                             type="button"
                             onClick={() => handleCopyDoaItem(item)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-teal-300 hover:bg-slate-900 border border-slate-800 cursor-pointer"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-teal-800 hover:bg-teal-50 border border-slate-200 cursor-pointer"
                             title="Salin Doa Ini"
                           >
                             {copiedDoaId === item.id ? (
-                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                              <Check className="w-3.5 h-3.5 text-emerald-600" />
                             ) : (
                               <Copy className="w-3.5 h-3.5" />
                             )}
@@ -1975,9 +1981,9 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                         </div>
                       </div>
 
-                      {/* Arabic Text */}
+                      {/* Arabic Text (Deep Sharp Charcoal for Optimal Comfort) */}
                       <p
-                        className={`text-right font-arabic font-bold text-white whitespace-pre-line ${getArabicSizeClass()}`}
+                        className={`text-right font-arabic font-bold text-slate-900 whitespace-pre-line ${getArabicSizeClass()}`}
                         dir="rtl"
                       >
                         {item.arabic}
@@ -1985,22 +1991,22 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
 
                       {/* Latin Transliteration */}
                       {showLatin && (
-                        <p className="text-xs sm:text-sm font-sans font-medium text-teal-200/95 mt-3 leading-relaxed">
+                        <p className="text-xs sm:text-sm font-sans font-semibold text-teal-800 mt-2.5 leading-relaxed">
                           {item.latin}
                         </p>
                       )}
 
                       {/* Indonesian Translation */}
                       {showTranslation && (
-                        <p className="text-xs sm:text-sm font-sans text-slate-300 mt-2 leading-relaxed italic">
+                        <p className="text-xs sm:text-sm font-sans text-slate-600 mt-1.5 leading-relaxed italic">
                           "{item.translation}"
                         </p>
                       )}
 
-                      {/* Adab / Catatan Penting */}
+                      {/* Adab / Catatan Penting (Soft Teal/Amber Card) */}
                       {item.adab && (
-                        <div className="mt-3 pt-2 border-t border-slate-900 flex items-start gap-1.5 text-[11px] text-amber-300/90 font-medium bg-amber-950/20 px-2.5 py-1.5 rounded-lg border border-amber-500/20">
-                          <Info className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                        <div className="mt-3 pt-2 border-t border-teal-100 flex items-start gap-1.5 text-[11px] text-teal-950 font-medium bg-teal-50/90 px-3 py-2 rounded-xl border border-teal-200/80">
+                          <Info className="w-3.5 h-3.5 text-teal-700 shrink-0 mt-0.5" />
                           <span><strong>Adab & Petunjuk:</strong> {item.adab}</span>
                         </div>
                       )}

@@ -81,39 +81,39 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
   return (
     <div
       id={`student-card-${student.id}`}
-      className="w-[330px] sm:w-[350px] h-[218px] bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden flex flex-col justify-between select-none relative font-sans text-gray-800"
+      className="w-full max-w-[305px] h-[190px] bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden flex flex-col justify-between select-none relative font-sans text-gray-800 transition-all duration-150"
     >
       {/* Top Header Card */}
       <div
-        className={`bg-gradient-to-r ${themeConfig.headerBg} text-white px-3.5 py-2 flex items-center justify-between relative overflow-hidden`}
+        className={`bg-gradient-to-r ${themeConfig.headerBg} text-white px-2.5 py-1.5 flex items-center justify-between relative overflow-hidden shrink-0`}
       >
         {/* Background Islamic / decorative pattern */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:8px_8px]" />
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:6px_6px]" />
 
-        <div className="flex items-center gap-2.5 z-10">
-          <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-xs p-1 border border-white/20 flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-1.5 z-10">
+          <div className="w-6 h-6 rounded-md bg-white/15 backdrop-blur-xs p-0.5 border border-white/20 flex items-center justify-center shrink-0">
             <img src="/assets/logo.svg" alt="Logo" className="w-full h-full object-contain filter drop-shadow" />
           </div>
           <div>
-            <h3 className="text-xs font-black tracking-wider leading-none text-amber-300">
+            <h3 className="text-[10px] font-black tracking-wider leading-none text-amber-300">
               KARTU PUASA WALI ASUH
             </h3>
-            <p className="text-[8.5px] text-white/95 font-medium tracking-wide mt-0.5 whitespace-nowrap">
-              SEKOLAH RAKYAT TERINTEGRASI 1 KEDIRI
+            <p className="text-[7.5px] text-white/95 font-medium tracking-wide mt-0.5 whitespace-nowrap">
+              SRT 1 KEDIRI
             </p>
           </div>
         </div>
 
         <div className="z-10 text-right">
-          <span className="inline-block px-2 py-0.5 rounded text-[9px] font-black bg-amber-400 text-slate-950 uppercase shadow-xs">
+          <span className="inline-block px-1.5 py-0.5 rounded text-[8px] font-black bg-amber-400 text-slate-950 uppercase shadow-2xs leading-none">
             {themeConfig.levelTitle}
           </span>
-          <p className="text-[8px] text-white/80 font-mono mt-0.5">No. #{student.no}</p>
+          <p className="text-[7.5px] text-white/80 font-mono mt-0.5">#{student.no}</p>
         </div>
       </div>
 
       {/* Main Body with Student Avatar, Details & Prominent QR Code */}
-      <div className="px-3 py-1.5 flex items-center gap-2.5 relative flex-1">
+      <div className="px-2.5 py-1 flex items-center gap-2 relative flex-1 min-h-0">
         {/* Student Avatar / Photo Box */}
         <div
           onClick={(e) => {
@@ -122,7 +122,7 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
               onUploadClick(student, e);
             }
           }}
-          className={`w-14 h-19 rounded-xl bg-slate-100 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center shrink-0 relative overflow-hidden text-center group ${
+          className={`w-13 h-17 rounded-lg bg-slate-100 border border-dashed border-gray-300 flex flex-col items-center justify-center shrink-0 relative overflow-hidden text-center group ${
             onUploadClick ? 'cursor-pointer hover:border-emerald-500' : ''
           }`}
           title={onUploadClick ? 'Klik untuk mengganti / mengunggah foto santri' : undefined}
@@ -132,7 +132,7 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
               src={
                 isUsingDirectFallback
                   ? student.foto
-                  : getOptimizedPhotoUrl(student.foto, { width: 220, height: 280, quality: 88, format: 'webp' })
+                  : getOptimizedPhotoUrl(student.foto, { width: 200, height: 260, quality: 85, format: 'webp' })
               }
               alt={student.nama}
               referrerPolicy="no-referrer"
@@ -145,15 +145,15 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
                   setImgError(true);
                 }
               }}
-              className="w-full h-full object-cover rounded-lg"
+              className="w-full h-full object-cover rounded-md"
             />
           ) : (
             <div className="flex flex-col items-center justify-center p-0.5">
-              <span className="text-lg">
+              <span className="text-base">
                 {student.jenisKelamin === 'Perempuan' ? '🧕' : '👳'}
               </span>
-              <span className="text-[7px] font-bold text-gray-400 mt-0.5 uppercase leading-tight">
-                Foto Santri
+              <span className="text-[6.5px] font-bold text-gray-400 mt-0.5 uppercase leading-tight">
+                Foto
               </span>
             </div>
           )}
@@ -161,13 +161,13 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
           {/* Quick upload trigger button overlay */}
           {onUploadClick && (
             <div className="absolute inset-0 bg-emerald-950/70 text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-              <Camera className="w-4 h-4 text-amber-300 mb-0.5" />
-              <span className="text-[7.5px] font-bold text-white leading-none">Ubah</span>
+              <Camera className="w-3.5 h-3.5 text-amber-300 mb-0.5" />
+              <span className="text-[7px] font-bold text-white leading-none">Ubah</span>
             </div>
           )}
 
           <span
-            className={`absolute bottom-0 inset-x-0 text-[6.5px] font-extrabold text-white py-0.5 text-center shadow-xs ${
+            className={`absolute bottom-0 inset-x-0 text-[6px] font-extrabold text-white py-0.2 text-center shadow-2xs ${
               student.jenisKelamin === 'Perempuan' ? 'bg-pink-600' : 'bg-blue-600'
             }`}
           >
@@ -178,64 +178,64 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
         {/* Student Bio Details */}
         <div className="flex-1 min-w-0 space-y-0.5">
           <div>
-            <p className="text-[7.5px] font-semibold text-gray-400 uppercase tracking-wider">
+            <p className="text-[7px] font-semibold text-gray-400 uppercase tracking-wider leading-none">
               Nama Lengkap
             </p>
-            <h4 className="text-[11px] font-black text-gray-900 truncate leading-tight">
+            <h4 className="text-[10.5px] font-black text-gray-900 truncate leading-tight mt-0.5">
               {student.nama}
             </h4>
           </div>
 
-          <div className="grid grid-cols-2 gap-1 text-[9px]">
+          <div className="grid grid-cols-2 gap-1 text-[8px] pt-0.5">
             <div>
-              <p className="text-[7px] text-gray-400 font-semibold uppercase">Kelas</p>
-              <p className="font-extrabold text-emerald-800 leading-tight">{student.kelas}</p>
+              <p className="text-[6.5px] text-gray-400 font-semibold uppercase leading-none">Kelas</p>
+              <p className="font-extrabold text-emerald-800 leading-tight truncate">{student.kelas}</p>
             </div>
             <div>
-              <p className="text-[7px] text-gray-400 font-semibold uppercase">No. Urut</p>
+              <p className="text-[6.5px] text-gray-400 font-semibold uppercase leading-none">No. Urut</p>
               <p className="font-extrabold text-gray-800 leading-tight">#{student.no}</p>
             </div>
           </div>
 
-          <div>
-            <p className="text-[7px] text-gray-400 font-semibold uppercase">NIK / ID Siswa</p>
-            <p className="text-[9px] font-mono font-bold text-gray-900 tracking-wider truncate leading-tight">
+          <div className="pt-0.5">
+            <p className="text-[6.5px] text-gray-400 font-semibold uppercase leading-none">NIK / ID Siswa</p>
+            <p className="text-[8.5px] font-mono font-bold text-gray-900 tracking-wide truncate leading-tight mt-0.5">
               {student.nik || '-'}
             </p>
           </div>
         </div>
 
         {/* Prominent Large QR Code on the Right */}
-        <div className="shrink-0 flex flex-col items-center bg-white p-1 rounded-xl border border-gray-300 shadow-xs">
-          <div className="bg-slate-900 text-amber-300 text-[6.5px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider mb-0.5 leading-none">
-            Scan QR NIK
+        <div className="shrink-0 flex flex-col items-center bg-white p-0.5 rounded-lg border border-slate-200 shadow-2xs">
+          <div className="bg-slate-900 text-amber-300 text-[5.5px] font-black px-1 py-0.2 rounded uppercase tracking-wider mb-0.5 leading-none">
+            QR NIK
           </div>
-          <div className="w-16 h-16 bg-white flex items-center justify-center">
+          <div className="w-13 h-13 bg-white flex items-center justify-center">
             {qrDataUrl ? (
               <img src={qrDataUrl} alt="QR Code NIK" className="w-full h-full object-contain" />
             ) : (
               <div className="w-full h-full bg-gray-100 animate-pulse rounded" />
             )}
           </div>
-          <span className="text-[7.5px] font-mono font-bold text-gray-900 tracking-tight leading-none mt-0.5 max-w-[70px] truncate">
+          <span className="text-[7px] font-mono font-bold text-gray-900 tracking-tight leading-none mt-0.5 max-w-[58px] truncate">
             {qrValue}
           </span>
         </div>
       </div>
 
       {/* Footer Branding Bar */}
-      <div className="bg-slate-50 border-t border-gray-200 px-3 py-1 flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          <div className="w-4 h-4 rounded bg-emerald-600 p-0.5 flex items-center justify-center shrink-0 shadow-xs">
+      <div className="bg-slate-50 border-t border-slate-200 px-2.5 py-0.5 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-1">
+          <div className="w-3.5 h-3.5 rounded bg-emerald-600 p-0.5 flex items-center justify-center shrink-0">
             <img src="/assets/logo.svg" alt="Puasaku Logo" className="w-full h-full object-contain filter brightness-0 invert" />
           </div>
-          <span className="text-[8.5px] font-black text-emerald-800 tracking-tight">
-            puasaku.app <span className="font-normal text-gray-400 text-[7.5px]">• SRT 1 KEDIRI</span>
+          <span className="text-[7.5px] font-black text-emerald-800 tracking-tight">
+            puasaku.app <span className="font-normal text-gray-400 text-[6.5px]">• SRT 1 KEDIRI</span>
           </span>
         </div>
 
-        <span className="text-[7.5px] font-bold text-slate-500 uppercase tracking-wider">
-          Kartu Puasa Wali Asuh
+        <span className="text-[6.5px] font-bold text-slate-400 uppercase tracking-wider">
+          Kartu Puasa
         </span>
       </div>
     </div>

@@ -224,7 +224,6 @@ export function getStoredSessions(): Record<string, FastingSession> {
             records: records101,
             isVerified: true,
             isLocked: false,
-            inputDeadline: '15:00',
             updatedAt: new Date().toISOString(),
           };
           saveAllStoredSessions(parsed);
@@ -244,7 +243,6 @@ export function getStoredSessions(): Record<string, FastingSession> {
     records: records101,
     isVerified: true,
     isLocked: false,
-    inputDeadline: '15:00',
     updatedAt: new Date().toISOString(),
   };
 
@@ -282,13 +280,17 @@ export function getStoredAdminSettings(): AdminSettings {
   try {
     const raw = localStorage.getItem(ADMIN_SETTINGS_KEY);
     if (raw) {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      return {
+        ...parsed,
+        allowPenginputCreateSession: Boolean(parsed.allowPenginputCreateSession),
+      };
     }
   } catch (e) {
     console.error('Error reading admin settings:', e);
   }
   return {
-    allowPenginputCreateSession: true,
+    allowPenginputCreateSession: false,
     defaultDeadlineTime: '15:00',
   };
 }

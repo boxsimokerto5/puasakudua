@@ -548,11 +548,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   </button>
                 </div>
               ) : (
-                (user.role === 'admin' || user.role === 'penginput') && (
+                user.role === 'admin' && (
                   <button
                     type="button"
                     onClick={handleCreateSession}
                     className="px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-700 hover:bg-purple-800 text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    title="Buat Sesi Puasa Baru (Khusus Admin)"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>+ Buat Sesi Puasa Hari Ini</span>

@@ -31,7 +31,6 @@ interface AdminPanelProps {
   adminSettings: AdminSettings;
   onSelectSession: (id: string) => void;
   onToggleLockSession: (sessionId: string, locked: boolean) => void;
-  onUpdateDeadline: (sessionId: string, deadline: string) => void;
   onUpdateAdminSettings: (settings: AdminSettings) => void;
   onDeleteSession: (sessionId: string) => void;
   onCreateSession: (title: string, date: string) => void;
@@ -49,11 +48,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   activeSessionId,
   activeSession: propActiveSession,
   students,
-  adminSettings,
+  adminSettings: _adminSettings,
   onSelectSession,
   onToggleLockSession,
-  onUpdateDeadline,
-  onUpdateAdminSettings,
+  onUpdateAdminSettings: _onUpdateAdminSettings,
   onDeleteSession,
   onCreateSession,
   onOpenStudentModal,
@@ -71,7 +69,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       records: {},
       isVerified: false,
       isLocked: false,
-      inputDeadline: '15:00',
     };
 
   const [sessionToDelete, setSessionToDelete] = useState<FastingSession | null>(null);
@@ -80,13 +77,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [newTitle, setNewTitle] = useState('Puasa Sunnah Senin');
   const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0]);
   const [customTitle, setCustomTitle] = useState('');
-  const [deadlineInput, setDeadlineInput] = useState(activeSession.inputDeadline || '15:00');
-
-  useEffect(() => {
-    if (activeSession?.inputDeadline) {
-      setDeadlineInput(activeSession.inputDeadline);
-    }
-  }, [activeSession?.inputDeadline, activeSessionId]);
 
   const sessionList: FastingSession[] = (Object.values(sessions) as FastingSession[]).sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -120,10 +110,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     setCustomTitle('');
   };
 
-  const handleSaveDeadline = () => {
-    onUpdateDeadline(activeSessionId, deadlineInput);
-  };
-
   const confirmDelete = () => {
     if (sessionToDelete) {
       onDeleteSession(sessionToDelete.id);
@@ -142,10 +128,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               <span>Pusat Kendali Administrator</span>
             </div>
             <h1 className="text-base sm:text-lg font-black tracking-tight text-white">
-              Manajemen Akses & Izin Penginputan
+              Pusat Kendali & Pengelolaan Sesi Puasa
             </h1>
             <p className="text-[11px] sm:text-xs text-purple-200/90 max-w-xl leading-snug">
-              Kendalikan pembukaan sesi, batas waktu input, dan pengelolaan data puasa santri.
+              Kelola status penguncian sesi, pembuatan sesi baru, dan verifikasi data santri.
             </p>
           </div>
 
@@ -271,72 +257,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 <span>Kunci Sesi Ini</span>
               </button>
             )}
-          </div>
-        </div>
-
-        {/* Global & Session Rules Configuration - Compact Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
-          {/* Deadline Setting */}
-          <div className="p-3 rounded-xl bg-gray-50/80 border border-gray-200/70 space-y-1.5">
-            <div className="flex items-center gap-1.5 text-gray-900 font-bold text-xs">
-              <Clock className="w-3.5 h-3.5 text-purple-600" />
-              <span>Batas Waktu Penginputan (Deadline)</span>
-            </div>
-            <p className="text-[11px] text-gray-500 leading-snug">
-              Batas jam harian agar petugas mencatat tepat waktu.
-            </p>
-            <div className="flex items-center gap-2 pt-0.5">
-              <input
-                type="time"
-                value={deadlineInput}
-                onChange={(e) => setDeadlineInput(e.target.value)}
-                className="px-2.5 py-1 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-800 focus:ring-1 focus:ring-purple-600 focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={handleSaveDeadline}
-                className="px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold rounded-lg transition-all shadow-xs cursor-pointer"
-              >
-                Simpan Jam
-              </button>
-              {activeSession.inputDeadline && (
-                <span className="text-[11px] text-purple-800 font-medium ml-1">
-                  (Aktif: {activeSession.inputDeadline} WIB)
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Penginput New Session Creation Permission */}
-          <div className="p-3 rounded-xl bg-gray-50/80 border border-gray-200/70 space-y-1.5">
-            <div className="flex items-center gap-1.5 text-gray-900 font-bold text-xs">
-              <Settings className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Izin Buat Sesi oleh Penginput</span>
-            </div>
-            <p className="text-[11px] text-gray-500 leading-snug">
-              Atur wewenang pembuatan sesi baru untuk petugas penginput.
-            </p>
-            <div className="flex items-center justify-between pt-0.5">
-              <span className="text-xs font-semibold text-gray-700">
-                {adminSettings.allowPenginputCreateSession ? 'Diizinkan' : 'Dibatasi (Hanya Admin)'}
-              </span>
-              <button
-                type="button"
-                onClick={() =>
-                  onUpdateAdminSettings({
-                    ...adminSettings,
-                    allowPenginputCreateSession: !adminSettings.allowPenginputCreateSession,
-                  })
-                }
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  adminSettings.allowPenginputCreateSession
-                    ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                    : 'bg-rose-100 text-rose-900 border border-rose-300'
-                }`}
-              >
-                {adminSettings.allowPenginputCreateSession ? 'Aktif (Izinkan)' : 'Nonaktif (Kunci)'}
-              </button>
-            </div>
           </div>
         </div>
       </div>

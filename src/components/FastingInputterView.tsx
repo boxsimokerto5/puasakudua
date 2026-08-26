@@ -300,19 +300,13 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
             </div>
             <div>
               <h4 className="font-bold text-xs sm:text-sm text-rose-950 flex items-center gap-2">
-                <span>Penginputan Sesi Ini Telah DIKUNCI oleh Admin</span>
+                <span>Penginputan Sesi Ini Sedang DIKUNCI oleh Admin</span>
               </h4>
               <p className="text-[11px] text-rose-800 mt-0.5">
-                Batas waktu penginputan telah selesai atau dikunci oleh Administrator. Mode <strong>Hanya Lihat (Read-Only)</strong>.
+                Sesi presensi ini telah dikunci oleh Administrator. Mode <strong>Hanya Lihat (Read-Only)</strong>.
               </p>
             </div>
           </div>
-          {activeSession.inputDeadline && (
-            <div className="px-2.5 py-1 rounded-lg bg-rose-100 border border-rose-200 text-rose-900 text-[11px] font-bold shrink-0 flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5" />
-              <span>Batas: {activeSession.inputDeadline} WIB</span>
-            </div>
-          )}
         </div>
       )}
 

@@ -157,100 +157,100 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-200">
-      <div className="bg-slate-50 rounded-3xl max-w-6xl w-full max-h-[94vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden my-auto">
-        {/* Header Modal */}
-        <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 text-white px-6 py-4 flex items-center justify-between shrink-0 shadow-md">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-400 text-emerald-950 flex items-center justify-center font-bold shadow-inner">
-              <CreditCard className="w-5 h-5" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-3 bg-black/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-200">
+      <div className="bg-slate-50 rounded-2xl max-w-[97vw] 2xl:max-w-[1440px] w-full max-h-[96vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden my-auto">
+        {/* Header Modal - Compact & Clean */}
+        <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 text-white px-4 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between shrink-0 shadow-md">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-amber-400 text-emerald-950 flex items-center justify-center font-bold shadow-inner shrink-0">
+              <CreditCard className="w-4 h-4" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-bold tracking-tight">
+                <h2 className="text-sm sm:text-base font-black tracking-tight text-white">
                   Cetak & Buat Kartu Puasa Wali Asuh
                 </h2>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-emerald-950 uppercase tracking-wider">
-                  QR Code NIK
+                <span className="px-1.5 py-0.2 rounded-md text-[9px] font-extrabold bg-amber-400 text-emerald-950 uppercase tracking-wider">
+                  QR NIK
                 </span>
               </div>
-              <p className="text-xs text-emerald-200">
-                Desain kartu santri otomatis dengan QR Code NIK siap scan untuk input cepat amalan puasa wali asuh
+              <p className="text-[11px] text-emerald-200/90 leading-tight">
+                Format kartu santri otomatis siap cetak A4 (8 kartu/lembar) dengan barcode NIK untuk presensi cepat
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
+            className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
             title="Tutup Modal"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Level Theme Guide Legend */}
-        <div className="bg-white px-6 py-2.5 border-b border-gray-200 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-bold text-gray-700 flex items-center gap-1">
+        {/* Level Theme Guide Legend - Compact */}
+        <div className="bg-white px-4 sm:px-5 py-1.5 border-b border-gray-200 flex flex-wrap items-center justify-between gap-2 text-xs shrink-0">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="font-bold text-gray-700 text-[11px] flex items-center gap-1">
               <Layers className="w-3.5 h-3.5 text-emerald-700" />
-              Kode Warna Jenjang:
+              Jenjang:
             </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 text-red-700 border border-red-200 font-bold text-[11px]">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-600" />
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-50 text-red-700 border border-red-200 font-bold text-[10px]">
+              <span className="w-2 h-2 rounded-full bg-red-600" />
               SD (Merah)
             </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-bold text-[11px]">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 font-bold text-[10px]">
+              <span className="w-2 h-2 rounded-full bg-blue-600" />
               SMP (Biru)
             </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-300 font-bold text-[11px]">
-              <span className="w-2.5 h-2.5 rounded-full bg-slate-600" />
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-300 font-bold text-[10px]">
+              <span className="w-2 h-2 rounded-full bg-slate-600" />
               SMA (Abu-abu)
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-[11px] text-gray-500">
+          <div className="flex items-center gap-2.5">
+            <div className="hidden md:flex items-center gap-1.5 text-[10.5px] text-gray-500">
               <Info className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-              <span>Format cetak diatur presisi untuk kartu ID / cetak kertas A4 (8 kartu per lembar).</span>
+              <span>Format presisi kertas A4 (8 kartu ID Card / lembar).</span>
             </div>
 
             {onOpenPhotoModal && (
               <button
                 type="button"
                 onClick={() => onOpenPhotoModal()}
-                className="px-3 py-1.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-emerald-950 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all shadow-xs cursor-pointer ml-auto"
+                className="px-2.5 py-1 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-emerald-950 rounded-lg text-[11px] font-black flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer ml-auto"
                 title="Kelola & Upload Foto Santri Langsung / Batch"
               >
-                <Camera className="w-3.5 h-3.5" />
-                <span>Upload / Kelola Foto Santri</span>
+                <Camera className="w-3 h-3" />
+                <span>Upload Foto Santri</span>
               </button>
             )}
           </div>
         </div>
 
-        {/* Filter Controls Bar */}
-        <div className="bg-white p-4 border-b border-gray-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 shrink-0">
+        {/* Filter Controls Bar - Tight & Organized */}
+        <div className="bg-white px-4 sm:px-5 py-2 border-b border-gray-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 shrink-0">
           {/* Level Filter */}
           <div>
-            <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">
               Jenjang Sekolah
             </label>
-            <div className="grid grid-cols-4 gap-1 bg-gray-100 p-1 rounded-xl">
+            <div className="grid grid-cols-4 gap-0.5 bg-gray-100 p-0.5 rounded-lg">
               {(['SEMUA', 'SD', 'SMP', 'SMA'] as const).map((lvl) => (
                 <button
                   key={lvl}
                   onClick={() => setSelectedLevel(lvl)}
-                  className={`py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  className={`py-1 text-[11px] font-bold rounded-md transition-all cursor-pointer ${
                     selectedLevel === lvl
                       ? lvl === 'SD'
-                        ? 'bg-red-600 text-white shadow-xs'
+                        ? 'bg-red-600 text-white shadow-2xs'
                         : lvl === 'SMP'
-                        ? 'bg-blue-600 text-white shadow-xs'
+                        ? 'bg-blue-600 text-white shadow-2xs'
                         : lvl === 'SMA'
-                        ? 'bg-slate-700 text-white shadow-xs'
-                        : 'bg-emerald-700 text-white shadow-xs'
+                        ? 'bg-slate-700 text-white shadow-2xs'
+                        : 'bg-emerald-700 text-white shadow-2xs'
                       : 'text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -262,13 +262,13 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
 
           {/* Class Filter */}
           <div>
-            <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">
               Pilih Kelas
             </label>
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              className="w-full py-2 px-3 text-xs font-semibold bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 cursor-pointer"
+              className="w-full py-1.5 px-2.5 text-xs font-semibold bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600 cursor-pointer"
             >
               <option value="SEMUA">Semua Kelas ({students.length} Siswa)</option>
               {uniqueClasses.map((cls) => (
@@ -281,24 +281,24 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
 
           {/* Search Query */}
           <div>
-            <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">
               Cari Nama / NIK
             </label>
             <div className="relative">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Ketik nama atau NIK..."
-                className="w-full pl-9 pr-8 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                placeholder="Ketik nama / NIK..."
+                className="w-full pl-8 pr-7 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="w-3 h-3" />
                 </button>
               )}
             </div>
@@ -306,20 +306,20 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
 
           {/* Selection & Batch Action */}
           <div className="flex flex-col justify-end">
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center justify-between gap-1.5">
               <button
                 onClick={handleToggleSelectAll}
-                className="px-3 py-2 text-xs font-bold rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-1.5 transition-all cursor-pointer flex-1 justify-center"
+                className="px-2.5 py-1.5 text-xs font-bold rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-1.5 transition-all cursor-pointer flex-1 justify-center"
               >
                 {filteredStudents.length > 0 &&
                 filteredStudents.every((s) => selectedStudentIds.has(s.id)) ? (
                   <>
-                    <CheckSquare className="w-4 h-4 text-emerald-700" />
-                    <span>Batal Pilih Semua</span>
+                    <CheckSquare className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>Batal Semua</span>
                   </>
                 ) : (
                   <>
-                    <Square className="w-4 h-4 text-gray-500" />
+                    <Square className="w-3.5 h-3.5 text-gray-500" />
                     <span>Pilih Semua ({filteredStudents.length})</span>
                   </>
                 )}
@@ -328,42 +328,42 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
               <button
                 onClick={handleExportPdf}
                 disabled={isExportingPdf || studentsToPrint.length === 0}
-                className={`px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-md cursor-pointer ${
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-all shadow-xs cursor-pointer shrink-0 ${
                   studentsToPrint.length === 0 || isExportingPdf
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-emerald-700 hover:bg-emerald-800 text-white active:scale-95'
                 }`}
               >
-                <Download className="w-4 h-4" />
-                <span>{isExportingPdf ? 'Membuat PDF...' : `Unduh PDF (${studentsToPrint.length})`}</span>
+                <Download className="w-3.5 h-3.5" />
+                <span>{isExportingPdf ? 'PDF...' : `Unduh (${studentsToPrint.length})`}</span>
               </button>
             </div>
           </div>
         </div>
 
         {/* Selected Summary Info */}
-        <div className="px-6 py-2 bg-emerald-50/50 border-b border-emerald-100 flex items-center justify-between text-xs text-emerald-900 font-medium">
+        <div className="px-4 sm:px-5 py-1 bg-emerald-50/70 border-b border-emerald-100 flex items-center justify-between text-[11px] text-emerald-950 font-medium shrink-0">
           <span>
             Menampilkan <strong>{filteredStudents.length}</strong> siswa | Terpilih untuk dicetak:{' '}
-            <strong className="text-emerald-700">{studentsToPrint.length}</strong> kartu
+            <strong className="text-emerald-700 font-black">{studentsToPrint.length}</strong> kartu
           </span>
-          <span className="text-[11px] text-gray-500">
-            Klik pada kartu untuk memilih / membatalkan pilihan cetak
+          <span className="text-[10.5px] text-gray-500">
+            Klik pada kartu untuk memilih / membatalkan pilihan
           </span>
         </div>
 
-        {/* Cards Grid Area */}
-        <div className="flex-1 p-6 overflow-y-auto bg-slate-100/70">
+        {/* Cards Grid Area - High Density & Compact Spacing */}
+        <div className="flex-1 p-3 sm:p-4 overflow-y-auto bg-slate-100/90">
           {filteredStudents.length === 0 ? (
-            <div className="py-16 text-center text-gray-500 space-y-2">
-              <CreditCard className="w-12 h-12 text-gray-300 mx-auto" />
+            <div className="py-12 text-center text-gray-500 space-y-2">
+              <CreditCard className="w-10 h-10 text-gray-300 mx-auto" />
               <p className="text-sm font-bold text-gray-700">Tidak ada santri ditemukan</p>
               <p className="text-xs text-gray-400">
                 Coba ubah filter jenjang, kelas, atau kata kunci pencarian Anda.
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 justify-items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2.5 sm:gap-3 justify-items-center">
               {filteredStudents.map((student) => {
                 const isSelected = selectedStudentIds.has(student.id);
                 const level = getStudentLevel(student.kelas);
@@ -372,15 +372,15 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
                   <div
                     key={student.id}
                     onClick={() => handleToggleStudent(student.id)}
-                    className={`relative cursor-pointer transition-all duration-200 transform rounded-2xl ${
+                    className={`relative cursor-pointer transition-all duration-150 transform rounded-xl w-full flex justify-center ${
                       isSelected
-                        ? 'ring-3 ring-emerald-600 ring-offset-2 scale-[1.01] shadow-xl'
-                        : 'opacity-50 grayscale hover:grayscale-0 hover:opacity-90 shadow'
+                        ? 'ring-2 ring-emerald-600 ring-offset-1 scale-[1.01] shadow-md'
+                        : 'opacity-50 grayscale hover:grayscale-0 hover:opacity-90 shadow-2xs'
                     }`}
                   >
                     {/* Checkbox badge overlay */}
                     <div
-                      className={`absolute top-2 right-2 z-20 w-6 h-6 rounded-full flex items-center justify-center shadow-md border-2 border-white ${
+                      className={`absolute top-1.5 right-1.5 z-20 w-5 h-5 rounded-full flex items-center justify-center shadow-xs border border-white text-[10px] font-bold ${
                         isSelected ? 'bg-emerald-600 text-white' : 'bg-gray-400 text-white'
                       }`}
                     >
@@ -401,18 +401,18 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="bg-white px-6 py-3.5 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+        <div className="bg-white px-4 sm:px-5 py-2.5 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-2 shrink-0">
           <div className="text-xs text-gray-500">
-            Total Kartu Terpilih:{' '}
-            <strong className="text-emerald-800 text-sm font-bold">{studentsToPrint.length}</strong> Santri
+            Total Terpilih:{' '}
+            <strong className="text-emerald-800 font-black">{studentsToPrint.length}</strong> Santri
             (estimasi {Math.ceil(studentsToPrint.length / 8)} lembar A4)
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <button
               onClick={onClose}
               disabled={isExportingPdf}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 transition-all cursor-pointer disabled:opacity-50"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-100 transition-all cursor-pointer disabled:opacity-50"
             >
               Tutup
             </button>
@@ -420,18 +420,18 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
             <button
               onClick={handleExportPdf}
               disabled={isExportingPdf || studentsToPrint.length === 0}
-              className={`px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md cursor-pointer ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer ${
                 studentsToPrint.length === 0 || isExportingPdf
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-emerald-700 hover:bg-emerald-800 text-white active:scale-95'
               }`}
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-3.5 h-3.5" />
               <span>
                 {isExportingPdf
                   ? exportProgress
-                    ? `Merender Kartu ${exportProgress.current} / ${exportProgress.total}...`
-                    : 'Sedang Memproses Dokumen PDF...'
+                    ? `Merender ${exportProgress.current}/${exportProgress.total}...`
+                    : 'Memproses PDF...'
                   : `Export PDF Kartu Siap Cetak (${studentsToPrint.length})`}
               </span>
             </button>
