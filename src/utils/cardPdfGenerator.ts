@@ -2,6 +2,7 @@ import jsPDF from 'jspdf';
 import QRCode from 'qrcode';
 import { Student } from '../types';
 import { loadSafeImageElement } from './imageUtils';
+import { buildCardQrValue, getEffectiveCardVersion } from './cardSecurity';
 
 /**
  * Helper to determine student educational level from class string
@@ -108,10 +109,9 @@ export async function renderCardToCanvas(
   sharedLogo?: HTMLImageElement | null
 ): Promise<string> {
   const level = getStudentLevel(student.kelas);
-  const qrValue =
-    student.nik && student.nik.trim()
-      ? student.nik.trim()
-      : `SRT-${student.no.toString().padStart(4, '0')}`;
+  const cardVersion = getEffectiveCardVersion(student);
+  const isDuplicate = cardVersion > 1;
+  const qrValue = buildCardQrValue(student);
 
   const W = 860;
   const H = 540;
@@ -183,18 +183,35 @@ export async function renderCardToCanvas(
 
   // Header Titles
   ctx.fillStyle = '#fde047';
-  ctx.font = '900 26px system-ui, -apple-system, sans-serif';
-  ctx.fillText('KARTU PUASA WALI ASUH', logoBoxX + logoBoxSize + 20, 50);
+  ctx.font = '900 25px system-ui, -apple-system, sans-serif';
+  ctx.fillText('KARTU PUASA WALI ASUH', logoBoxX + logoBoxSize + 20, 46);
+
+  // If Duplicate, show duplicate badge right beside title in Header
+  if (isDuplicate) {
+    const dupBadgeX = logoBoxX + logoBoxSize + 340;
+    drawRoundedRect(ctx, dupBadgeX, 22, 130, 28, 6);
+    ctx.fillStyle = '#dc2626';
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 14px system-ui, -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('★ DUPLIKAT ★', dupBadgeX + 65, 41);
+    ctx.textAlign = 'left';
+  }
 
   ctx.fillStyle = '#ffffff';
-  ctx.font = '600 18px system-ui, -apple-system, sans-serif';
-  ctx.fillText('SEKOLAH RAKYAT TERINTEGRASI 1 KEDIRI', logoBoxX + logoBoxSize + 20, 80);
+  ctx.font = '600 17px system-ui, -apple-system, sans-serif';
+  ctx.fillText('SEKOLAH RAKYAT TERINTEGRASI 1 KEDIRI', logoBoxX + logoBoxSize + 20, 76);
 
   // Header Level Pill (Top Right)
   const pillW = 160;
   const pillH = 36;
   const pillX = W - pillW - 26;
-  const pillY = 20;
+  const pillY = 16;
   drawRoundedRect(ctx, pillX, pillY, pillW, pillH, 10);
   ctx.fillStyle = '#fbbf24';
   ctx.fill();
@@ -206,12 +223,44 @@ export async function renderCardToCanvas(
   ctx.fillText(levelLabel, pillX + pillW / 2, pillY + 25);
   ctx.textAlign = 'left';
 
-  // No Urut under Pill
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-  ctx.font = 'bold 17px monospace';
+  // Version + No Urut under Pill
+  ctx.fillStyle = isDuplicate ? '#fecdd3' : 'rgba(255, 255, 255, 0.9)';
+  ctx.font = 'bold 16px monospace';
   ctx.textAlign = 'right';
-  ctx.fillText(`No. #${student.no}`, W - 28, 86);
+  const verText = isDuplicate ? `DUPLIKAT V${cardVersion} • No. #${student.no}` : `V1 • No. #${student.no}`;
+  ctx.fillText(verText, W - 28, 82);
   ctx.textAlign = 'left';
+
+  // Prominent DUPLIKAT Watermark Stamp in center top if duplicate
+  if (isDuplicate) {
+    // 1. Large Top Warning Banner
+    const stampW = 370;
+    const stampH = 32;
+    const stampX = (W - stampW) / 2;
+    const stampY = 118;
+    drawRoundedRect(ctx, stampX, stampY, stampW, stampH, 8);
+    ctx.fillStyle = '#fee2e2';
+    ctx.fill();
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = '#b91c1c';
+    ctx.font = '900 14px system-ui, -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`⚠️ KARTU PENGGANTI (DUPLIKAT V${cardVersion})`, stampX + stampW / 2, stampY + 21);
+    ctx.textAlign = 'left';
+
+    // 2. Large Diagonal Watermark Across Body
+    ctx.save();
+    ctx.translate(380, 270);
+    ctx.rotate((-22 * Math.PI) / 180);
+    ctx.fillStyle = 'rgba(220, 38, 38, 0.08)';
+    ctx.font = '900 48px system-ui, -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`DUPLIKAT V${cardVersion}`, 0, 0);
+    ctx.restore();
+  }
 
   // 2. MAIN BODY
   const isPutri = student.jenisKelamin === 'Perempuan' || student.jenisKelamin?.toLowerCase().startsWith('p');
@@ -365,21 +414,39 @@ export async function renderCardToCanvas(
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  ctx.fillStyle = '#047857';
-  ctx.font = '900 14px system-ui, -apple-system, sans-serif';
-  ctx.fillText('✓ KARTU PUASA WALI ASUH RESMI', bioX + 16, noteBoxY + 32);
+  if (isDuplicate) {
+    ctx.fillStyle = '#b91c1c';
+    ctx.font = '900 14px system-ui, -apple-system, sans-serif';
+    ctx.fillText(`⚠️ KARTU DUPLIKAT RESMI (EDISI V${cardVersion})`, bioX + 16, noteBoxY + 32);
 
-  ctx.fillStyle = '#475569';
-  ctx.font = '600 13px system-ui, -apple-system, sans-serif';
-  ctx.fillText('Scan QR Code di samping untuk verifikasi', bioX + 16, noteBoxY + 62);
+    ctx.fillStyle = '#475569';
+    ctx.font = '600 13px system-ui, -apple-system, sans-serif';
+    ctx.fillText('Kartu pengganti sah untuk presensi & berbuka.', bioX + 16, noteBoxY + 62);
 
-  ctx.fillStyle = '#64748b';
-  ctx.font = '500 12px system-ui, -apple-system, sans-serif';
-  ctx.fillText('data identitas santri & pencatatan puasa.', bioX + 16, noteBoxY + 88);
+    ctx.fillStyle = '#64748b';
+    ctx.font = '500 12px system-ui, -apple-system, sans-serif';
+    ctx.fillText('Kartu edisi lama sebelumnya telah dinonaktifkan.', bioX + 16, noteBoxY + 88);
 
-  ctx.fillStyle = '#94a3b8';
-  ctx.font = '600 11px system-ui, -apple-system, sans-serif';
-  ctx.fillText('Sekolah Rakyat Terintegrasi 1 Kediri', bioX + 16, noteBoxY + 110);
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '600 11px system-ui, -apple-system, sans-serif';
+    ctx.fillText('Sekolah Rakyat Terintegrasi 1 Kediri', bioX + 16, noteBoxY + 110);
+  } else {
+    ctx.fillStyle = '#047857';
+    ctx.font = '900 14px system-ui, -apple-system, sans-serif';
+    ctx.fillText('✓ KARTU PUASA WALI ASUH RESMI', bioX + 16, noteBoxY + 32);
+
+    ctx.fillStyle = '#475569';
+    ctx.font = '600 13px system-ui, -apple-system, sans-serif';
+    ctx.fillText('Scan QR Code di samping untuk verifikasi', bioX + 16, noteBoxY + 62);
+
+    ctx.fillStyle = '#64748b';
+    ctx.font = '500 12px system-ui, -apple-system, sans-serif';
+    ctx.fillText('data identitas santri & pencatatan puasa.', bioX + 16, noteBoxY + 88);
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '600 11px system-ui, -apple-system, sans-serif';
+    ctx.fillText('Sekolah Rakyat Terintegrasi 1 Kediri', bioX + 16, noteBoxY + 110);
+  }
 
   // --- RIGHT COLUMN: GIANT QR CODE PANEL (Prominent & Fast Scan) ---
   const qrCardX = 574;
@@ -401,13 +468,13 @@ export async function renderCardToCanvas(
   const qrPillX = qrCardX + (qrCardW - qrPillW) / 2;
   const qrPillY = qrCardY + 12;
   drawRoundedRect(ctx, qrPillX, qrPillY, qrPillW, qrPillH, 8);
-  ctx.fillStyle = '#0f172a';
+  ctx.fillStyle = isDuplicate ? '#881337' : '#0f172a';
   ctx.fill();
 
   ctx.fillStyle = '#fde047';
   ctx.font = '900 13px system-ui, -apple-system, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('⚡ SCAN QR CODE NIK', qrPillX + qrPillW / 2, qrPillY + 20);
+  ctx.fillText(isDuplicate ? `⚡ SCAN QR NIK (V${cardVersion})` : '⚡ SCAN QR CODE NIK', qrPillX + qrPillW / 2, qrPillY + 20);
   ctx.textAlign = 'left';
 
   // Draw Giant QR Code (220 x 220 px)
@@ -437,14 +504,14 @@ export async function renderCardToCanvas(
   const qrFootX = qrCardX + (qrCardW - qrFootW) / 2;
   const qrFootY = qrCardY + qrCardH - qrFootH - 12;
   drawRoundedRect(ctx, qrFootX, qrFootY, qrFootW, qrFootH, 8);
-  ctx.fillStyle = '#f1f5f9';
+  ctx.fillStyle = isDuplicate ? '#fff1f2' : '#f1f5f9';
   ctx.fill();
-  ctx.strokeStyle = '#e2e8f0';
+  ctx.strokeStyle = isDuplicate ? '#fecdd3' : '#e2e8f0';
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  ctx.fillStyle = '#0f172a';
-  ctx.font = '900 16px monospace';
+  ctx.fillStyle = isDuplicate ? '#9f1239' : '#0f172a';
+  ctx.font = '900 15px monospace';
   ctx.textAlign = 'center';
   ctx.fillText(qrValue, qrFootX + qrFootW / 2, qrFootY + 25);
   ctx.textAlign = 'left';
@@ -463,9 +530,15 @@ export async function renderCardToCanvas(
   ctx.stroke();
 
   // Footer text
-  ctx.fillStyle = '#475569';
+  ctx.fillStyle = isDuplicate ? '#991b1b' : '#475569';
   ctx.font = 'bold 13px system-ui, -apple-system, sans-serif';
-  ctx.fillText('SEKOLAH RAKYAT TERINTEGRASI 1 KEDIRI — KARTU PUASA WALI ASUH', 28, footerY + 38);
+  ctx.fillText(
+    isDuplicate
+      ? `SEKOLAH RAKYAT TERINTEGRASI 1 KEDIRI — KARTU DUPLIKAT RESMI (EDISI V${cardVersion})`
+      : 'SEKOLAH RAKYAT TERINTEGRASI 1 KEDIRI — KARTU PUASA WALI ASUH',
+    28,
+    footerY + 38
+  );
 
   ctx.fillStyle = '#059669';
   ctx.font = '900 13px system-ui, -apple-system, sans-serif';

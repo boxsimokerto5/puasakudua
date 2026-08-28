@@ -3,6 +3,7 @@ import { Student } from '../types';
 import { getUniqueClasses } from '../data/students';
 import { StudentCardItem } from './StudentCardItem';
 import { exportStudentCardsToPdf } from '../utils/cardPdfGenerator';
+import { BlacklistCardModal } from './BlacklistCardModal';
 import {
   CreditCard,
   Printer,
@@ -17,7 +18,8 @@ import {
   Layers,
   ChevronDown,
   Camera,
-  Image as ImageIcon
+  Image as ImageIcon,
+  ShieldAlert,
 } from 'lucide-react';
 
 interface DormCardModalProps {
@@ -36,6 +38,7 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
   const [selectedLevel, setSelectedLevel] = useState<'SEMUA' | 'SD' | 'SMP' | 'SMA'>('SEMUA');
   const [selectedClass, setSelectedClass] = useState<string>('SEMUA');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isBlacklistModalOpen, setIsBlacklistModalOpen] = useState<boolean>(false);
   const [selectedStudentIds, setSelectedStudentIds] = useState<Set<number>>(
     () => new Set(students.map((s) => s.id))
   );
@@ -210,11 +213,16 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
             </span>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            <div className="hidden md:flex items-center gap-1.5 text-[10.5px] text-gray-500">
-              <Info className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-              <span>Format presisi kertas A4 (8 kartu ID Card / lembar).</span>
-            </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsBlacklistModalOpen(true)}
+              className="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[11px] font-black flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer border border-rose-400"
+              title="Kelola Kartu Hilang / Rusak & Riwayat Blacklist"
+            >
+              <ShieldAlert className="w-3.5 h-3.5 text-rose-200" />
+              <span>Blacklist & Cetak Ulang</span>
+            </button>
 
             {onOpenPhotoModal && (
               <button
@@ -492,6 +500,19 @@ export const DormCardModal: React.FC<DormCardModalProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Blacklist Card Modal */}
+      {isBlacklistModalOpen && (
+        <BlacklistCardModal
+          isOpen={isBlacklistModalOpen}
+          onClose={() => setIsBlacklistModalOpen(false)}
+          students={students}
+          onUpdateStudents={(upd) => {
+            if (onUpdateStudents) onUpdateStudents(upd);
+          }}
+          onOpenPhotoModal={onOpenPhotoModal}
+        />
       )}
     </div>
   );

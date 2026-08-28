@@ -1,5 +1,20 @@
 export type FastingStatus = 'berpuasa' | 'tidak_puasa' | 'halangan' | 'belum_diisi';
 
+export interface CardReissueRecord {
+  id: string;
+  studentId: number;
+  studentName: string;
+  studentClass: string;
+  studentNik: string;
+  oldVersion: number;
+  newVersion: number;
+  reissuedAt: string; // ISO string
+  reissuedBy: string;
+  reason: string; // e.g. "Kartu Hilang di Asrama", "Kartu Rusak / Patah"
+  notes?: string;
+  feePaid?: boolean;
+}
+
 export interface Student {
   id: number;
   no: number;
@@ -12,6 +27,9 @@ export interface Student {
   namaIbu: string;
   alamat: string;
   foto?: string; // Base64 data URL or external image link
+  cardVersion?: number; // 1 = Original/Perdana, 2 = Edisi 2 Duplikat, 3 = Edisi 3, etc.
+  lastReissuedAt?: string;
+  reissueCount?: number;
 }
 
 export interface FastingRecordItem {

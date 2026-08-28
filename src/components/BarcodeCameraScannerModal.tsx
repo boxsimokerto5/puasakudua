@@ -46,7 +46,6 @@ export const BarcodeCameraScannerModal: React.FC<BarcodeCameraScannerModalProps>
           (decodedText) => {
             if (isMounted) {
               setLastScanned(decodedText);
-              playScanSuccessSound();
               onScanSuccess(decodedText);
             }
           },

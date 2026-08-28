@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FastingSession, Student, AdminSettings } from '../types';
 import { DormCardModal } from './DormCardModal';
+import { BlacklistCardModal } from './BlacklistCardModal';
+import { getCardReissueHistory } from '../utils/cardSecurity';
 import {
   ShieldAlert,
+  ShieldX,
   Lock,
   Unlock,
   Clock,
@@ -74,9 +77,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [sessionToDelete, setSessionToDelete] = useState<FastingSession | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isDormCardModalOpen, setIsDormCardModalOpen] = useState(false);
+  const [isBlacklistModalOpen, setIsBlacklistModalOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('Puasa Sunnah Senin');
   const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0]);
   const [customTitle, setCustomTitle] = useState('');
+
+  const reissueHistory = getCardReissueHistory();
+  const blacklistCount = reissueHistory.length;
 
   const sessionList: FastingSession[] = (Object.values(sessions) as FastingSession[]).sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -143,6 +150,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             >
               <CreditCard className="w-3.5 h-3.5 text-emerald-950" />
               <span>Kartu Puasa</span>
+            </button>
+            <button
+              onClick={() => setIsBlacklistModalOpen(true)}
+              className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-black flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95 border border-rose-400"
+              title="Buka Menu Blacklist Card & Riwayat Cetak Ulang Kartu"
+            >
+              <ShieldAlert className="w-3.5 h-3.5 text-rose-200" />
+              <span>Blacklist Card</span>
+              {blacklistCount > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full bg-white text-rose-900 text-[10px] font-black">
+                  {blacklistCount}
+                </span>
+              )}
             </button>
             <button
               onClick={() => onSwitchView('input')}
@@ -589,6 +609,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           students={students}
           onClose={() => setIsDormCardModalOpen(false)}
           onUpdateStudents={onUpdateStudents}
+          onOpenPhotoModal={onOpenPhotoModal}
+        />
+      )}
+
+      {/* Blacklist Card Modal */}
+      {isBlacklistModalOpen && (
+        <BlacklistCardModal
+          isOpen={isBlacklistModalOpen}
+          onClose={() => setIsBlacklistModalOpen(false)}
+          students={students}
+          onUpdateStudents={(upd) => {
+            if (onUpdateStudents) onUpdateStudents(upd);
+          }}
           onOpenPhotoModal={onOpenPhotoModal}
         />
       )}

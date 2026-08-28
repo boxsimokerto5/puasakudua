@@ -718,6 +718,7 @@ export default function App() {
                   isAdmin={true}
                   onToggleLockSession={handleToggleLockSession}
                   onLogout={handleLogout}
+                  onUpdateStudents={handleUpdateStudents}
                 />
               ) : (
                 <FastingCheckerView
@@ -739,6 +740,7 @@ export default function App() {
                   onRestore101Records={handleRestore101Records}
                   isAdmin={false}
                   onLogout={handleLogout}
+                  onUpdateStudents={handleUpdateStudents}
                 />
               ) : (
                 <RaportImtaqView

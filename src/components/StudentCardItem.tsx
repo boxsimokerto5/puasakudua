@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { Student } from '../types';
-import { Camera, User } from 'lucide-react';
+import { Camera, User, ShieldAlert, AlertTriangle } from 'lucide-react';
 import { getOptimizedPhotoUrl } from '../utils/imageUtils';
+import { buildCardQrValue, getEffectiveCardVersion } from '../utils/cardSecurity';
 
 interface StudentCardItemProps {
   student: Student;
@@ -15,14 +16,18 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
   const [imgError, setImgError] = useState<boolean>(false);
   const [isUsingDirectFallback, setIsUsingDirectFallback] = useState<boolean>(false);
 
+  const cardVersion = getEffectiveCardVersion(student);
+  const isDuplicate = cardVersion > 1;
+
   // Reset imgError & fallback if student foto changes
   useEffect(() => {
     setImgError(false);
     setIsUsingDirectFallback(false);
   }, [student.foto]);
 
-  // Generate QR Code based on student NIK (or fallback to student ID / No)
-  const qrValue = student.nik && student.nik.trim() ? student.nik.trim() : `SRT-${student.no.toString().padStart(4, '0')}`;
+  // Generate QR Code with version payload: e.g. "3506010203040002#V2"
+  const qrValue = buildCardQrValue(student);
+  const baseCodeDisplay = student.nik && student.nik.trim() ? student.nik.trim() : `SRT-${student.no.toString().padStart(4, '0')}`;
 
   useEffect(() => {
     let isMounted = true;
@@ -81,7 +86,9 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
   return (
     <div
       id={`student-card-${student.id}`}
-      className="w-full max-w-[305px] h-[190px] bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden flex flex-col justify-between select-none relative font-sans text-gray-800 transition-all duration-150"
+      className={`w-full max-w-[305px] h-[190px] bg-white rounded-xl shadow-xs border overflow-hidden flex flex-col justify-between select-none relative font-sans text-gray-800 transition-all duration-150 ${
+        isDuplicate ? 'border-rose-400 ring-2 ring-rose-300/40 shadow-rose-100' : 'border-slate-200'
+      }`}
     >
       {/* Top Header Card */}
       <div
@@ -95,9 +102,16 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
             <img src="/assets/logo.svg" alt="Logo" className="w-full h-full object-contain filter drop-shadow" />
           </div>
           <div>
-            <h3 className="text-[10px] font-black tracking-wider leading-none text-amber-300">
-              KARTU PUASA WALI ASUH
-            </h3>
+            <div className="flex items-center gap-1">
+              <h3 className="text-[10px] font-black tracking-wider leading-none text-amber-300">
+                KARTU PUASA WALI ASUH
+              </h3>
+              {isDuplicate && (
+                <span className="px-1 py-0.2 rounded bg-rose-600 border border-white text-white text-[6.5px] font-black uppercase tracking-wider animate-pulse shadow-xs">
+                  DUPLIKAT
+                </span>
+              )}
+            </div>
             <p className="text-[7.5px] text-white/95 font-medium tracking-wide mt-0.5 whitespace-nowrap">
               SRT 1 KEDIRI
             </p>
@@ -105,12 +119,39 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
         </div>
 
         <div className="z-10 text-right">
-          <span className="inline-block px-1.5 py-0.5 rounded text-[8px] font-black bg-amber-400 text-slate-950 uppercase shadow-2xs leading-none">
-            {themeConfig.levelTitle}
-          </span>
-          <p className="text-[7.5px] text-white/80 font-mono mt-0.5">#{student.no}</p>
+          <div className="flex items-center gap-1 justify-end">
+            <span className="inline-block px-1.5 py-0.5 rounded text-[8px] font-black bg-amber-400 text-slate-950 uppercase shadow-2xs leading-none">
+              {themeConfig.levelTitle}
+            </span>
+          </div>
+          <div className="flex items-center gap-1 justify-end mt-0.5">
+            <span className={`text-[7px] font-bold font-mono px-1 py-0.2 rounded leading-none ${
+              isDuplicate ? 'bg-rose-950 text-rose-200 border border-rose-400/50' : 'text-white/90'
+            }`}>
+              {isDuplicate ? `V${cardVersion}` : 'V1'}
+            </span>
+            <p className="text-[7.5px] text-white/80 font-mono">#{student.no}</p>
+          </div>
         </div>
       </div>
+
+      {/* Prominent Duplicate Ribbon / Watermark Badge */}
+      {isDuplicate && (
+        <>
+          <div className="absolute top-8 right-1 z-20 pointer-events-none">
+            <div className="px-1.5 py-0.5 rounded-md bg-rose-600 border border-rose-300 text-white text-[7px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1 backdrop-blur-2xs">
+              <AlertTriangle className="w-2.5 h-2.5 text-amber-300" />
+              <span>DUPLIKAT (V{cardVersion})</span>
+            </div>
+          </div>
+          {/* Subtle diagonal DUPLIKAT text watermark in background */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
+            <span className="text-[28px] font-black text-rose-500/10 uppercase tracking-widest -rotate-15 select-none whitespace-nowrap">
+              DUPLIKAT V{cardVersion}
+            </span>
+          </div>
+        </>
+      )}
 
       {/* Main Body with Student Avatar, Details & Prominent QR Code */}
       <div className="px-2.5 py-1 flex items-center gap-2 relative flex-1 min-h-0">
@@ -206,9 +247,14 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
         </div>
 
         {/* Prominent Large QR Code on the Right */}
-        <div className="shrink-0 flex flex-col items-center bg-white p-0.5 rounded-lg border border-slate-200 shadow-2xs">
-          <div className="bg-slate-900 text-amber-300 text-[5.5px] font-black px-1 py-0.2 rounded uppercase tracking-wider mb-0.5 leading-none">
-            QR NIK
+        <div className={`shrink-0 flex flex-col items-center bg-white p-0.5 rounded-lg border shadow-2xs ${
+          isDuplicate ? 'border-rose-400 ring-1 ring-rose-200' : 'border-slate-200'
+        }`}>
+          <div className={`text-[5.5px] font-black px-1 py-0.2 rounded uppercase tracking-wider mb-0.5 leading-none flex items-center gap-0.5 ${
+            isDuplicate ? 'bg-rose-700 text-amber-200' : 'bg-slate-900 text-amber-300'
+          }`}>
+            <span>QR NIK</span>
+            <span className="bg-white/20 px-0.5 rounded text-[5px]">V{cardVersion}</span>
           </div>
           <div className="w-13 h-13 bg-white flex items-center justify-center">
             {qrDataUrl ? (
@@ -217,14 +263,16 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
               <div className="w-full h-full bg-gray-100 animate-pulse rounded" />
             )}
           </div>
-          <span className="text-[7px] font-mono font-bold text-gray-900 tracking-tight leading-none mt-0.5 max-w-[58px] truncate">
-            {qrValue}
+          <span className="text-[6.5px] font-mono font-bold text-gray-900 tracking-tight leading-none mt-0.5 max-w-[58px] truncate">
+            {baseCodeDisplay} <span className={isDuplicate ? 'text-rose-600 font-black' : 'text-slate-500'}>#V{cardVersion}</span>
           </span>
         </div>
       </div>
 
       {/* Footer Branding Bar */}
-      <div className="bg-slate-50 border-t border-slate-200 px-2.5 py-0.5 flex items-center justify-between shrink-0">
+      <div className={`border-t px-2.5 py-0.5 flex items-center justify-between shrink-0 ${
+        isDuplicate ? 'bg-rose-50/70 border-rose-200' : 'bg-slate-50 border-slate-200'
+      }`}>
         <div className="flex items-center gap-1">
           <div className="w-3.5 h-3.5 rounded bg-emerald-600 p-0.5 flex items-center justify-center shrink-0">
             <img src="/assets/logo.svg" alt="Puasaku Logo" className="w-full h-full object-contain filter brightness-0 invert" />
@@ -234,8 +282,10 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
           </span>
         </div>
 
-        <span className="text-[6.5px] font-bold text-slate-400 uppercase tracking-wider">
-          Kartu Puasa
+        <span className={`text-[6.5px] font-extrabold uppercase tracking-wider ${
+          isDuplicate ? 'text-rose-700' : 'text-slate-400'
+        }`}>
+          {isDuplicate ? `DUPLIKAT (EDISI KE-${cardVersion})` : 'Kartu Puasa'}
         </span>
       </div>
     </div>
