@@ -43,9 +43,7 @@ export const FastingWisdomModal: React.FC<FastingWisdomModalProps> = ({
       const now = new Date();
       setMinutesToNextHour(60 - now.getMinutes());
       const hourlyIdx = getHourlyWisdomIndex(now.getTime());
-      // If modal just opens, ensure default is current hourly index
       setCurrentIndex((prev) => {
-        // If user hasn't manually clicked next recently, keep hourly index
         return (prev === getHourlyWisdomIndex(now.getTime() - 60000)) ? hourlyIdx : prev;
       });
     };
@@ -66,12 +64,14 @@ export const FastingWisdomModal: React.FC<FastingWisdomModalProps> = ({
     return FASTING_WISDOM_LIST[currentIndex % FASTING_WISDOM_LIST.length] || FASTING_WISDOM_LIST[0];
   }, [currentIndex]);
 
-  const handleNextWisdom = () => {
+  const handleNextWisdom = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setCurrentIndex((prev) => (prev + 1) % FASTING_WISDOM_LIST.length);
     setIsCopied(false);
   };
 
-  const handleCopy = () => {
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
     const textToCopy = `✨ *${currentWisdom.title}* (${currentWisdom.categoryLabel})\n\n${
       currentWisdom.arabic ? currentWisdom.arabic + '\n\n' : ''
     }${currentWisdom.translation}\n\n📚 *Sumber*: ${currentWisdom.source}\n💡 *Hikmah*: ${
@@ -86,20 +86,12 @@ export const FastingWisdomModal: React.FC<FastingWisdomModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-pointer select-none"
+    >
       {/* Modal Keyframes for Ramadan Ambience */}
       <style>{`
-        @keyframes wisdomStarGlow {
-          0%, 100% {
-            opacity: 0.25;
-            transform: scale(0.85);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.2);
-            filter: drop-shadow(0 0 6px #fef08a);
-          }
-        }
         @keyframes wisdomLantern {
           0%, 100% {
             transform: rotate(-3deg);
@@ -110,69 +102,73 @@ export const FastingWisdomModal: React.FC<FastingWisdomModalProps> = ({
         }
       `}</style>
 
-      {/* Main Glassmorphic Ramadan Card */}
-      <div className="relative w-full max-w-xl bg-gradient-to-b from-[#022319] via-[#033425] to-[#011710] border-2 border-amber-400/50 rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.85)] text-white overflow-hidden my-auto">
+      {/* Main Glassmorphic Ramadan Card (Slim & Single Screen) */}
+      <div
+        onClick={onClose}
+        className="relative w-full max-w-md bg-gradient-to-b from-[#022319] via-[#033425] to-[#011710] border border-amber-400/50 rounded-2xl sm:rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.85)] text-white overflow-hidden my-auto cursor-pointer animate-in zoom-in-95 duration-200"
+      >
         {/* Subtle Background Geometric Pattern */}
-        <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:20px_20px] opacity-10 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
 
         {/* Ambient Top Glows */}
-        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-amber-400/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 -right-24 w-60 h-60 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-80 h-80 bg-amber-400/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 -right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-2xl pointer-events-none" />
 
         {/* Hanging Lantern Decoration on Top Left */}
-        <div className="absolute -top-1 left-6 flex flex-col items-center origin-top pointer-events-none [animation:wisdomLantern_5s_ease-in-out_infinite]">
-          <div className="w-0.5 h-12 bg-gradient-to-b from-amber-600/40 via-amber-400/60 to-amber-300" />
-          <div className="w-4 h-6 rounded-b-xl rounded-t-xs bg-gradient-to-b from-amber-400 to-amber-600 border border-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.6)] flex items-center justify-center">
-            <div className="w-1.5 h-2.5 bg-yellow-100 rounded-full animate-pulse shadow-[0_0_6px_#fef08a]" />
+        <div className="absolute -top-1 left-4 flex flex-col items-center origin-top pointer-events-none [animation:wisdomLantern_5s_ease-in-out_infinite]">
+          <div className="w-0.5 h-8 bg-gradient-to-b from-amber-600/40 via-amber-400/60 to-amber-300" />
+          <div className="w-3.5 h-5 rounded-b-lg rounded-t-xs bg-gradient-to-b from-amber-400 to-amber-600 border border-amber-300 shadow-[0_0_10px_rgba(251,191,36,0.6)] flex items-center justify-center">
+            <div className="w-1 h-2 bg-yellow-100 rounded-full animate-pulse shadow-[0_0_4px_#fef08a]" />
           </div>
         </div>
 
         {/* Close Button */}
         <button
           type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 z-20 p-2 rounded-full bg-emerald-950/70 hover:bg-emerald-800 text-emerald-200 hover:text-white border border-emerald-700/60 transition-colors cursor-pointer shadow-md"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-2.5 right-2.5 z-20 p-1.5 rounded-full bg-emerald-950/80 hover:bg-emerald-800 text-emerald-200 hover:text-white border border-emerald-700/60 transition-colors cursor-pointer shadow-md"
           title="Tutup & Lanjutkan"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
-        {/* Modal Header */}
-        <div className="relative z-10 pt-7 px-6 sm:px-8 text-center space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-widest bg-amber-400/15 text-amber-300 border border-amber-400/40 shadow-xs backdrop-blur-xs">
-            <Moon className="w-3.5 h-3.5 text-amber-300 fill-amber-300/30" />
+        {/* Modal Header - Slim & Compact */}
+        <div className="relative z-10 pt-4 px-4 sm:px-5 text-center space-y-1">
+          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-400/15 text-amber-300 border border-amber-400/40 shadow-xs backdrop-blur-xs">
+            <Moon className="w-3 h-3 text-amber-300 fill-amber-300/30" />
             <span>Mutiara Hikmah Puasa</span>
-            <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: '6s' }} />
+            <Sparkles className="w-3 h-3 text-amber-400 animate-spin" style={{ animationDuration: '6s' }} />
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300 font-sans tracking-wide">
+          <h2 className="text-base sm:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300 tracking-tight leading-snug">
             {currentWisdom.title}
           </h2>
 
-          <div className="flex items-center justify-center gap-2 pt-0.5">
+          <div className="flex items-center justify-center gap-1.5 pt-0.5">
             <span
-              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold text-white shadow-xs bg-gradient-to-r ${currentWisdom.badgeColor}`}
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold text-white shadow-2xs bg-gradient-to-r ${currentWisdom.badgeColor}`}
             >
-              <BookOpen className="w-3 h-3" />
+              <BookOpen className="w-2.5 h-2.5" />
               {currentWisdom.categoryLabel}
             </span>
+            {userName && (
+              <span className="text-[10px] text-emerald-300/80 truncate max-w-[200px]">
+                • untuk {userName}
+              </span>
+            )}
           </div>
-
-          {userName && (
-            <p className="text-xs text-emerald-300/90 font-medium">
-              Selamat datang, <strong className="text-amber-200">{userName}</strong>{' '}
-              {roleName ? `(${roleName})` : ''} • Semoga hari ini penuh berkah!
-            </p>
-          )}
         </div>
 
-        {/* Modal Body: Content & Hadith */}
-        <div className="relative z-10 p-6 sm:p-8 space-y-5">
+        {/* Modal Body: Slim & Compact Content */}
+        <div className="relative z-10 p-3.5 sm:p-4 space-y-2.5">
           {/* Arabic Verse / Hadith Container */}
           {currentWisdom.arabic && (
-            <div className="p-4 rounded-2xl bg-emerald-950/80 border border-emerald-700/60 text-center shadow-inner">
+            <div className="p-2.5 sm:p-3 rounded-xl bg-emerald-950/80 border border-emerald-700/60 text-center shadow-inner">
               <p
-                className="text-lg sm:text-xl font-serif text-amber-200 leading-relaxed font-bold tracking-wide"
+                className="text-sm sm:text-base font-serif text-amber-200 leading-relaxed font-bold tracking-wide"
                 dir="rtl"
               >
                 {currentWisdom.arabic}
@@ -181,88 +177,95 @@ export const FastingWisdomModal: React.FC<FastingWisdomModalProps> = ({
           )}
 
           {/* Translation Quote Box */}
-          <div className="relative p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-900/50 via-emerald-950/70 to-emerald-900/40 border border-amber-400/30 shadow-md">
-            <div className="absolute -top-3 left-4 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500 text-emerald-950 border border-amber-300">
-              Terjemahan & Makna
-            </div>
-
-            <p className="text-xs sm:text-sm text-emerald-50 leading-relaxed italic pt-1">
-              {currentWisdom.translation}
+          <div className="relative p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-emerald-900/50 via-emerald-950/70 to-emerald-900/40 border border-amber-400/30 shadow-xs">
+            <p className="text-[11px] sm:text-xs text-emerald-50 leading-relaxed italic">
+              "{currentWisdom.translation}"
             </p>
 
-            <div className="mt-3 pt-2.5 border-t border-emerald-800/80 flex items-center justify-between text-[11px] text-amber-300/90 font-semibold">
-              <span>{currentWisdom.source}</span>
-              <span className="flex items-center gap-1 text-[10px] text-emerald-400">
-                <HeartHandshake className="w-3 h-3 text-amber-400" />
+            <div className="mt-2 pt-1.5 border-t border-emerald-800/80 flex items-center justify-between text-[10px] text-amber-300/90 font-semibold">
+              <span className="truncate pr-2">📚 {currentWisdom.source}</span>
+              <span className="flex items-center gap-1 text-[9px] text-emerald-400 shrink-0">
+                <HeartHandshake className="w-2.5 h-2.5 text-amber-400" />
                 Shahih
               </span>
             </div>
           </div>
 
           {/* Explanation / Tafsir Singkat */}
-          <div className="p-3.5 rounded-xl bg-emerald-950/50 border border-emerald-800/50 text-xs text-emerald-200/95 leading-relaxed">
-            <strong className="text-amber-300 font-bold block mb-1">💡 Renungan Hikmah:</strong>
+          <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-950/60 border border-emerald-800/50 text-[10px] sm:text-[11px] text-emerald-200/95 leading-relaxed">
+            <strong className="text-amber-300 font-bold block mb-0.5">💡 Renungan Hikmah:</strong>
             {currentWisdom.explanation}
           </div>
 
           {/* Hourly Auto-Rotation Info */}
-          <div className="flex items-center justify-between text-[11px] text-emerald-400/90 bg-emerald-950/60 px-3 py-1.5 rounded-lg border border-emerald-800/60">
-            <span className="flex items-center gap-1.5 font-medium">
-              <Clock className="w-3.5 h-3.5 text-amber-400" />
-              Berganti otomatis setiap 1 jam
+          <div className="flex items-center justify-between text-[10px] text-emerald-400/90 bg-emerald-950/70 px-2.5 py-1 rounded-lg border border-emerald-800/60">
+            <span className="flex items-center gap-1 font-medium">
+              <Clock className="w-3 h-3 text-amber-400" />
+              Ganti otomatis tiap jam
             </span>
             <span className="text-amber-300 font-bold">
-              {minutesToNextHour} menit lagi ({currentIndex + 1}/{FASTING_WISDOM_LIST.length})
+              {minutesToNextHour}m lagi ({currentIndex + 1}/{FASTING_WISDOM_LIST.length})
             </span>
           </div>
         </div>
 
-        {/* Modal Footer: Action Buttons */}
-        <div className="relative z-10 px-6 sm:px-8 pb-7 pt-1 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-emerald-800/60 bg-emerald-950/40">
-          <div className="flex items-center gap-2 w-full sm:w-auto">
+        {/* Modal Footer: Action Buttons & Touch Hint */}
+        <div className="relative z-10 px-3.5 sm:px-4 py-2.5 border-t border-emerald-800/60 bg-emerald-950/60 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
             {/* Shuffle/Next Button */}
             <button
               type="button"
               onClick={handleNextWisdom}
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-900/70 hover:bg-emerald-800 text-emerald-100 border border-emerald-700 hover:border-amber-400/60 transition-all cursor-pointer shadow-xs"
+              className="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-900/80 hover:bg-emerald-800 text-emerald-100 border border-emerald-700 hover:border-amber-400/60 transition-all cursor-pointer shadow-2xs active:scale-95"
               title="Lihat kata mutiara hikmah lainnya"
             >
-              <Shuffle className="w-3.5 h-3.5 text-amber-300" />
-              <span>Hikmah Lainnya</span>
+              <Shuffle className="w-3 h-3 text-amber-300" />
+              <span>Ganti</span>
             </button>
 
             {/* Copy Button */}
             <button
               type="button"
               onClick={handleCopy}
-              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-emerald-900/70 hover:bg-emerald-800 text-emerald-100 border border-emerald-700 hover:border-amber-400/60 transition-all cursor-pointer shadow-xs"
+              className="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-900/80 hover:bg-emerald-800 text-emerald-100 border border-emerald-700 hover:border-amber-400/60 transition-all cursor-pointer shadow-2xs active:scale-95"
               title="Salin kata mutiara ini"
             >
               {isCopied ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-emerald-300">Tersalin!</span>
+                  <Check className="w-3 h-3 text-emerald-400" />
+                  <span className="text-emerald-300">Tersalin</span>
                 </>
               ) : (
                 <>
-                  <Copy className="w-3.5 h-3.5 text-amber-300" />
+                  <Copy className="w-3 h-3 text-amber-300" />
                   <span>Salin</span>
                 </>
               )}
             </button>
           </div>
 
-          {/* Close & Continue to App */}
+          {/* Dismiss button & touch hint */}
           <button
             type="button"
-            onClick={onClose}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-emerald-950 border border-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.4)] transition-all cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-black bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-emerald-950 border border-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.35)] transition-all cursor-pointer active:scale-95"
           >
-            <span>Buka & Lanjutkan Aplikasi</span>
-            <ArrowRight className="w-4 h-4 text-emerald-950" />
+            <span>Tutup</span>
+            <ArrowRight className="w-3.5 h-3.5 text-emerald-950" />
           </button>
+        </div>
+
+        {/* Bottom subtle dismiss hint */}
+        <div className="bg-emerald-950/90 py-1 text-center border-t border-emerald-900/60">
+          <p className="text-[9.5px] text-emerald-400/70 font-medium">
+            ✨ Sentuh di mana saja untuk menutup
+          </p>
         </div>
       </div>
     </div>
   );
 };
+

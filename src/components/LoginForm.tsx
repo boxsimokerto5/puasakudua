@@ -172,7 +172,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         name: 'Administrator Asrama',
       });
     } else {
-      setError('Username atau Password Petugas Haid salah! Gunakan user: inputhaid');
+      setError('Username atau Password salah! Pastikan kredensial yang dimasukkan benar.');
     }
   };
 
@@ -301,7 +301,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                   type="text"
                   value={haidUsername}
                   onChange={(e) => setHaidUsername(e.target.value)}
-                  placeholder="Masukkan username (inputhaid)"
+                  placeholder="Masukkan username"
                   className="w-full pl-10 pr-4 py-2.5 text-sm bg-pink-50/60 border border-pink-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all shadow-xs"
                   required
                   autoComplete="username"
@@ -374,17 +374,33 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         }
         @keyframes loginShootingStar {
           0% {
-            transform: translateX(0) translateY(0) rotate(-30deg);
+            transform: translateX(250px) translateY(-120px) rotate(-32deg);
             opacity: 0;
           }
-          20% {
+          15% {
             opacity: 1;
           }
-          60% {
+          55% {
             opacity: 1;
           }
           100% {
-            transform: translateX(-400px) translateY(240px) rotate(-30deg);
+            transform: translateX(-450px) translateY(300px) rotate(-32deg);
+            opacity: 0;
+          }
+        }
+        @keyframes loginShootingStar2 {
+          0% {
+            transform: translateX(180px) translateY(-80px) rotate(-38deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.9;
+          }
+          45% {
+            opacity: 0.9;
+          }
+          100% {
+            transform: translateX(-380px) translateY(260px) rotate(-38deg);
             opacity: 0;
           }
         }
@@ -396,12 +412,31 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             transform: rotate(3.5deg);
           }
         }
-        @keyframes loginMoonGlow {
-          0%, 100% {
-            filter: drop-shadow(0 0 16px rgba(253, 224, 71, 0.45));
+        @keyframes lunarBreathingGlow {
+          0% {
+            filter: drop-shadow(0 0 10px rgba(254, 240, 138, 0.35)) drop-shadow(0 0 25px rgba(251, 191, 36, 0.2));
+            opacity: 0.82;
+            transform: scale(0.97);
           }
           50% {
-            filter: drop-shadow(0 0 32px rgba(253, 224, 71, 0.8));
+            filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 50px rgba(251, 191, 36, 0.75)) drop-shadow(0 0 80px rgba(245, 158, 11, 0.45));
+            opacity: 1;
+            transform: scale(1.03);
+          }
+          100% {
+            filter: drop-shadow(0 0 10px rgba(254, 240, 138, 0.35)) drop-shadow(0 0 25px rgba(251, 191, 36, 0.2));
+            opacity: 0.82;
+            transform: scale(0.97);
+          }
+        }
+        @keyframes starPendantGlow {
+          0%, 100% {
+            filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.5));
+            transform: rotate(-2deg);
+          }
+          50% {
+            filter: drop-shadow(0 0 18px rgba(254, 240, 138, 0.95));
+            transform: rotate(2deg);
           }
         }
         @keyframes camelWalkTrack {
@@ -456,39 +491,137 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         }
       `}</style>
 
-      {/* Ramadan Starry Night Background Layer */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        {/* Subtle Geometric Texture */}
-        <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:28px_28px] opacity-10" />
+      {/* Deep Celestial Night Sky Background Layer */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 bg-gradient-to-b from-[#020b17] via-[#04172a] to-[#010e1b]">
+        {/* Celestial Cosmic Nebulae Dust */}
+        <div className="absolute inset-0 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:32px_32px] opacity-15" />
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-amber-400/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 -left-28 w-96 h-96 bg-teal-500/15 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-28 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl" />
 
-        {/* Ambient Top Glow Rings */}
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/4 -left-20 w-80 h-80 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
-
-        {/* Crescent Moon in Top Right */}
-        <div className="absolute top-8 right-8 sm:top-12 sm:right-16 text-amber-200 pointer-events-none [animation:loginMoonGlow_4s_ease-in-out_infinite]">
-          <Moon className="w-10 h-10 sm:w-14 sm:h-14 text-amber-200 fill-amber-300/25" />
-        </div>
-
-        {/* Hanging Ramadan Lanterns */}
-        <div className="absolute -top-2 left-6 sm:left-16 flex flex-col items-center origin-top pointer-events-none [animation:loginLanternSway_6s_ease-in-out_infinite]">
-          <div className="w-0.5 h-20 sm:h-32 bg-gradient-to-b from-amber-600/40 via-amber-400/60 to-amber-300" />
-          <div className="w-6 h-8 sm:w-7 sm:h-10 rounded-b-2xl rounded-t-xs bg-gradient-to-b from-amber-400 to-amber-600 border border-amber-300 shadow-[0_0_20px_rgba(251,191,36,0.65)] flex items-center justify-center">
-            <div className="w-2.5 h-4 bg-yellow-100 rounded-full animate-pulse shadow-[0_0_10px_#fef08a]" />
+        {/* Top-Left Hanging Celestial Star Pendant */}
+        <div className="absolute -top-1 left-4 sm:left-12 flex flex-col items-center origin-top pointer-events-none [animation:starPendantGlow_5s_ease-in-out_infinite]">
+          <div className="w-[1.5px] h-28 sm:h-40 bg-gradient-to-b from-amber-500/30 via-amber-300/60 to-amber-200 shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+          <div className="relative -mt-1 flex items-center justify-center">
+            {/* 8-Point Sparkling Golden Star */}
+            <svg viewBox="0 0 40 40" className="w-9 h-9 sm:w-11 sm:h-11 text-amber-200 fill-amber-300 drop-shadow-[0_0_12px_rgba(251,191,36,0.9)]">
+              <path d="M20 0 L23 14 L37 17 L23 20 L20 34 L17 20 L3 17 L17 14 Z" />
+              <circle cx="20" cy="17" r="3" className="fill-white" />
+            </svg>
           </div>
         </div>
 
-        <div className="absolute -top-2 right-24 sm:right-36 hidden md:flex flex-col items-center origin-top pointer-events-none [animation:loginLanternSway_5s_ease-in-out_infinite_1.5s]">
-          <div className="w-0.5 h-16 bg-gradient-to-b from-amber-600/40 via-amber-400/60 to-amber-300" />
-          <div className="w-5 h-7 rounded-b-xl rounded-t-xs bg-gradient-to-b from-amber-400 to-amber-600 border border-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.5)] flex items-center justify-center">
-            <div className="w-2 h-3 bg-yellow-100 rounded-full animate-pulse shadow-[0_0_8px_#fef08a]" />
+        {/* Top-Right Glowing Celestial Crescent Moon with Breathing Glow (Terang -> Agak Terang -> Terang) */}
+        <div className="absolute top-4 right-4 sm:top-8 sm:right-12 pointer-events-none [animation:lunarBreathingGlow_6s_ease-in-out_infinite]">
+          <div className="relative w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center">
+            {/* Textured Moon Sphere Glow Body */}
+            <div className="absolute inset-2 rounded-full bg-gradient-to-tr from-slate-900 via-slate-800 to-amber-100/30 border border-amber-200/20 overflow-hidden shadow-2xl opacity-90">
+              {/* Moon surface craters texture */}
+              <div className="absolute top-3 left-4 w-3.5 h-3.5 rounded-full bg-black/30 blur-xs" />
+              <div className="absolute top-7 left-7 w-5 h-5 rounded-full bg-black/25 blur-xs" />
+              <div className="absolute bottom-4 left-3 w-4 h-4 rounded-full bg-black/35 blur-xs" />
+              <div className="absolute top-5 right-5 w-3 h-3 rounded-full bg-black/20 blur-xs" />
+            </div>
+
+            {/* Glowing Golden Crescent overlay */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <svg viewBox="0 0 100 100" className="w-full h-full text-amber-200 fill-amber-200/90 drop-shadow-[0_0_18px_rgba(251,191,36,0.95)]">
+                <path d="M78 18 C52 18 32 38 32 64 C32 76 37 87 45 95 C25 90 10 72 10 50 C10 24 30 4 56 4 C64 4 72 7 78 12 Z" />
+              </svg>
+            </div>
+
+            {/* Small Luminous Star near Moon */}
+            <div className="absolute -top-1 -left-2">
+              <Sparkles className="w-5 h-5 text-amber-100 animate-spin" style={{ animationDuration: '8s' }} />
+            </div>
           </div>
         </div>
 
-        {/* Shooting Star */}
-        <div className="absolute top-12 right-20 w-32 h-0.5 bg-gradient-to-l from-amber-200 via-yellow-100 to-transparent pointer-events-none [animation:loginShootingStar_4s_ease-out_infinite_1.8s]" />
+        {/* Shooting Stars / Meteors */}
+        <div className="absolute top-10 right-28 w-40 h-0.5 bg-gradient-to-l from-amber-200 via-yellow-100 to-transparent pointer-events-none [animation:loginShootingStar_5s_ease-out_infinite_1s]" />
+        <div className="absolute top-28 right-8 w-32 h-0.5 bg-gradient-to-l from-cyan-200 via-teal-100 to-transparent pointer-events-none [animation:loginShootingStar2_7s_ease-out_infinite_3.8s]" />
 
-        {/* Twinkling Stars */}
+        {/* Golden Constellations (Rasi Bintang) spanning across the background sky */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-85" viewBox="0 0 800 1000" preserveAspectRatio="none" fill="none">
+          {/* Left Upper Constellation (Ursa Major / Bintang Biduk) */}
+          <g className="stroke-amber-300/50" strokeWidth="1.2" strokeDasharray="3 3">
+            <line x1="60" y1="120" x2="130" y2="170" />
+            <line x1="130" y1="170" x2="200" y2="140" />
+            <line x1="200" y1="140" x2="270" y2="210" />
+            <line x1="270" y1="210" x2="230" y2="290" />
+            <line x1="230" y1="290" x2="160" y2="270" />
+            <line x1="160" y1="270" x2="130" y2="170" />
+          </g>
+          {/* Left Upper Star Nodes */}
+          <circle cx="60" cy="120" r="3.5" className="fill-amber-200" />
+          <circle cx="130" cy="170" r="4" className="fill-amber-100 shadow-[0_0_10px_#fef08a]" />
+          <circle cx="200" cy="140" r="3" className="fill-amber-300" />
+          <circle cx="270" cy="210" r="4.5" className="fill-yellow-200 animate-pulse" />
+          <circle cx="230" cy="290" r="3.5" className="fill-amber-200" />
+          <circle cx="160" cy="270" r="3.5" className="fill-amber-100" />
+
+          {/* Left Lower Constellation (Scorpius / Gurita Bintang) */}
+          <g className="stroke-teal-300/45" strokeWidth="1.2" strokeDasharray="3 3">
+            <line x1="30" y1="420" x2="90" y2="480" />
+            <line x1="90" y1="480" x2="140" y2="460" />
+            <line x1="140" y1="460" x2="80" y2="570" />
+            <line x1="80" y1="570" x2="120" y2="650" />
+            <line x1="120" y1="650" x2="50" y2="730" />
+            <line x1="50" y1="730" x2="80" y2="800" />
+          </g>
+          <circle cx="30" cy="420" r="3.5" className="fill-teal-200" />
+          <circle cx="90" cy="480" r="4" className="fill-amber-200" />
+          <circle cx="140" cy="460" r="3" className="fill-yellow-100" />
+          <circle cx="80" cy="570" r="4" className="fill-teal-100 animate-pulse" />
+          <circle cx="120" cy="650" r="3.5" className="fill-amber-200" />
+          <circle cx="50" cy="730" r="4" className="fill-teal-200" />
+          <circle cx="80" cy="800" r="3.5" className="fill-amber-300" />
+
+          {/* Right Upper Constellation (Cassiopeia / W-Shape) */}
+          <g className="stroke-amber-300/50" strokeWidth="1.2" strokeDasharray="3 3">
+            <line x1="530" y1="130" x2="590" y2="180" />
+            <line x1="590" y1="180" x2="650" y2="140" />
+            <line x1="650" y1="140" x2="710" y2="200" />
+            <line x1="710" y1="200" x2="770" y2="150" />
+          </g>
+          <circle cx="530" cy="130" r="3.5" className="fill-amber-200" />
+          <circle cx="590" cy="180" r="4" className="fill-yellow-100" />
+          <circle cx="650" cy="140" r="3" className="fill-amber-300" />
+          <circle cx="710" cy="200" r="4.5" className="fill-yellow-200 animate-pulse" />
+          <circle cx="770" cy="150" r="3.5" className="fill-amber-100" />
+
+          {/* Right Middle Constellation (Orion Belt & Shield) */}
+          <g className="stroke-amber-300/50" strokeWidth="1.2" strokeDasharray="3 3">
+            <line x1="620" y1="460" x2="720" y2="490" />
+            <line x1="720" y1="490" x2="750" y2="590" />
+            <line x1="750" y1="590" x2="640" y2="570" />
+            <line x1="640" y1="570" x2="620" y2="460" />
+            {/* Belt */}
+            <line x1="660" y1="525" x2="685" y2="530" />
+            <line x1="685" y1="530" x2="710" y2="535" />
+          </g>
+          <circle cx="620" cy="460" r="4" className="fill-amber-200 animate-pulse" />
+          <circle cx="720" cy="490" r="3.5" className="fill-teal-100" />
+          <circle cx="750" cy="590" r="4" className="fill-amber-100" />
+          <circle cx="640" cy="570" r="3.5" className="fill-yellow-200" />
+          <circle cx="660" cy="525" r="2.5" className="fill-amber-300" />
+          <circle cx="685" cy="530" r="3" className="fill-yellow-100" />
+          <circle cx="710" cy="535" r="2.5" className="fill-amber-300" />
+
+          {/* Right Lower Constellation (Centaurus / Pegasus) */}
+          <g className="stroke-teal-300/45" strokeWidth="1.2" strokeDasharray="3 3">
+            <line x1="660" y1="710" x2="750" y2="760" />
+            <line x1="750" y1="760" x2="710" y2="850" />
+            <line x1="710" y1="850" x2="630" y2="820" />
+            <line x1="630" y1="820" x2="660" y2="710" />
+          </g>
+          <circle cx="660" cy="710" r="3.5" className="fill-teal-200" />
+          <circle cx="750" cy="760" r="4" className="fill-amber-200 animate-pulse" />
+          <circle cx="710" cy="850" r="3.5" className="fill-yellow-100" />
+          <circle cx="630" cy="820" r="3.5" className="fill-teal-100" />
+        </svg>
+
+        {/* Twinkling Stars Scattered Across Sky */}
         {stars.map((star) => (
           <div
             key={star.id}
@@ -506,13 +639,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             {star.isSparkle ? (
               <svg
                 viewBox="0 0 24 24"
-                className="w-full h-full fill-current drop-shadow-[0_0_5px_currentColor]"
+                className="w-full h-full fill-current drop-shadow-[0_0_6px_currentColor]"
               >
                 <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5L12 0Z" />
               </svg>
             ) : (
               <div
-                className="w-full h-full rounded-full shadow-[0_0_3px_currentColor]"
+                className="w-full h-full rounded-full shadow-[0_0_4px_currentColor]"
                 style={{ backgroundColor: star.color }}
               />
             )}
@@ -520,32 +653,59 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         ))}
       </div>
 
-      {/* Main Login Glassmorphic Card Container */}
-      <div className="relative z-10 max-w-md w-full space-y-6 bg-gradient-to-b from-emerald-950/85 via-emerald-900/80 to-[#022118]/90 p-8 sm:p-10 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.65)] border border-amber-400/35 backdrop-blur-md">
-        {/* Header Branding */}
-        <div className="text-center space-y-3">
+      {/* Main Login Frame Container (Seamless Cosmic Glassmorphism matching reference image) */}
+      <div
+        className="relative z-10 max-w-md w-full space-y-6 p-7 sm:p-9 rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.85)] border border-amber-400/30 backdrop-blur-md overflow-hidden"
+        style={{
+          background: 'linear-gradient(180deg, rgba(3, 20, 32, 0.45) 0%, rgba(2, 28, 38, 0.7) 35%, rgba(2, 22, 29, 0.88) 70%, rgba(1, 15, 20, 0.96) 100%)',
+        }}
+      >
+        {/* Header Branding (Circular Gold Medallion Logo & Gold Typography) */}
+        <div className="relative z-10 text-center space-y-3">
+          {/* Triple Gold-Rimmed Center Medallion Emblem */}
           <div className="relative inline-block">
-            {/* Ambient Logo Glow */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-amber-400/30 via-emerald-400/40 to-yellow-300/30 rounded-2xl blur-md animate-pulse" />
-            <div className="relative p-2.5 rounded-2xl bg-gradient-to-b from-emerald-800 to-emerald-950 border-2 border-amber-400/60 shadow-[0_0_20px_rgba(251,191,36,0.3)]">
-              <img src="/assets/logo.svg" alt="Logo Puasaku" className="w-14 h-14 object-contain drop-shadow-md" />
+            {/* Outer Radiant Glow */}
+            <div className="absolute -inset-3 bg-gradient-to-r from-amber-400/40 via-teal-300/30 to-yellow-300/40 rounded-full blur-lg animate-pulse" />
+            
+            {/* Outer Gold Bezel */}
+            <div className="relative p-1.5 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-200 to-amber-600 shadow-[0_0_25px_rgba(251,191,36,0.6)]">
+              {/* Inner Gold Bezel Ring */}
+              <div className="p-1 rounded-full bg-gradient-to-b from-amber-700 via-amber-400 to-amber-800">
+                {/* Deep Emerald-Teal Emblem Core */}
+                <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-gradient-to-b from-[#064e3b] via-[#022c22] to-[#011a14] border border-amber-300/60 shadow-inner flex items-center justify-center p-2">
+                  <img
+                    src="/assets/logo.svg"
+                    alt="Logo Puasaku"
+                    className="w-14 h-14 sm:w-16 sm:h-16 object-contain drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
           <div>
-            <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300 tracking-wider font-sans drop-shadow-[0_2px_8px_rgba(251,191,36,0.35)]">
+            {/* PUASAKU Golden Headline */}
+            <h2 className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-[#fff6d6] via-[#ffd966] to-[#df9b13] tracking-[0.18em] font-serif drop-shadow-[0_2px_12px_rgba(251,191,36,0.45)]">
               PUASAKU
             </h2>
-            <div className="flex items-center justify-center gap-2 mt-1">
-              <div className="h-[1.5px] w-5 bg-gradient-to-r from-transparent to-amber-400/80 rounded-full" />
-              <span className="px-3 py-0.5 rounded-full text-[11px] font-black bg-emerald-950/90 text-amber-300 border border-amber-400/50 shadow-xs tracking-widest">
+            
+            {/* SRT 1 KEDIRI Subtitle */}
+            <div className="flex items-center justify-center gap-2 mt-1.5">
+              <span className="text-xs sm:text-sm font-bold text-amber-300 tracking-[0.25em]">
                 SRT 1 KEDIRI
               </span>
-              <div className="h-[1.5px] w-5 bg-gradient-to-l from-transparent to-amber-400/80 rounded-full" />
             </div>
-            <p className="text-xs text-emerald-300/90 font-medium mt-2 max-w-xs mx-auto">
+
+            {/* Description Text */}
+            <p className="text-xs text-amber-100/85 font-normal mt-2 max-w-xs mx-auto leading-relaxed">
               Sistem Informasi Pencatatan & Verifikasi Amalan Puasa Siswa
             </p>
+
+            {/* Glowing Golden Horizon Line */}
+            <div className="relative mt-3.5 mb-1 flex items-center justify-center">
+              <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-amber-400/70 to-transparent" />
+              <div className="absolute w-1.5 h-1.5 rounded-full bg-amber-200 shadow-[0_0_6px_#fef08a]" />
+            </div>
           </div>
         </div>
 
@@ -560,10 +720,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
           {/* Mini Ramadan Desert Line with Walking Camel */}
           <div className="relative pt-1 pb-1 px-1 overflow-hidden" title="Unta Berjalan di Bawah Langit Ramadhan">
-            {/* The desert dune / walking track line */}
             <div className="relative w-full h-[1.5px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent rounded-full shadow-[0_0_6px_rgba(251,191,36,0.4)]" />
 
-            {/* Walking Animated Camel Silhouette */}
             <div
               className="absolute bottom-[2px] pointer-events-none origin-bottom [animation:camelWalkTrack_14s_easeInOutSine_infinite]"
             >
@@ -578,32 +736,34 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             </div>
           </div>
 
+          {/* USERNAME Field (Neon Cyan/Teal Stroke Pill Container) */}
           <div>
-            <label className="block text-xs font-extrabold text-amber-300/90 uppercase tracking-wider mb-1.5">
-              Username
+            <label className="block text-xs font-black text-amber-300/95 uppercase tracking-[0.15em] mb-1.5">
+              USERNAME
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400/70">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-teal-300">
                 <User className="w-4 h-4" />
               </div>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="admin / puasa / cekpuasa"
-                className="w-full pl-10 pr-4 py-2.5 text-sm bg-emerald-950/70 border border-emerald-700/80 rounded-xl text-white placeholder-emerald-400/50 focus:bg-emerald-950 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all shadow-inner"
+                placeholder="Masukkan username"
+                className="w-full pl-11 pr-4 py-3 text-sm bg-[#022228]/60 border-2 border-teal-400/80 rounded-2xl text-white placeholder-teal-300/40 focus:bg-[#021b20]/90 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-[0_0_16px_rgba(20,184,166,0.22)]"
                 required
                 autoComplete="username"
               />
             </div>
           </div>
 
+          {/* PASSWORD Field (Neon Cyan/Teal Stroke Pill Container) */}
           <div>
-            <label className="block text-xs font-extrabold text-amber-300/90 uppercase tracking-wider mb-1.5">
-              Password
+            <label className="block text-xs font-black text-amber-300/95 uppercase tracking-[0.15em] mb-1.5">
+              PASSWORD
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400/70">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-teal-300">
                 <Lock className="w-4 h-4" />
               </div>
               <input
@@ -611,33 +771,34 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Masukkan password"
-                className="w-full pl-10 pr-4 py-2.5 text-sm bg-emerald-950/70 border border-emerald-700/80 rounded-xl text-white placeholder-emerald-400/50 focus:bg-emerald-950 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all shadow-inner"
+                className="w-full pl-11 pr-4 py-3 text-sm bg-[#022228]/60 border-2 border-teal-400/80 rounded-2xl text-white placeholder-teal-300/40 focus:bg-[#021b20]/90 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-[0_0_16px_rgba(20,184,166,0.22)]"
                 required
                 autoComplete="current-password"
               />
             </div>
           </div>
 
+          {/* Button: Masuk ke Sistem (Gradient Teal-Emerald to Olive-Amber) */}
           <button
             type="submit"
-            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm shadow-[0_0_20px_rgba(16,185,129,0.35)] border border-emerald-400/40 hover:border-amber-300/70 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer mt-4"
+            className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#0d5959] via-[#0e6955] to-[#786118] hover:from-[#116e6e] hover:via-[#138068] hover:to-[#8c711c] text-white font-black text-sm shadow-[0_0_25px_rgba(20,184,166,0.3)] border border-teal-300/50 hover:border-amber-300 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer mt-4 active:scale-98"
           >
             <span>Masuk ke Sistem</span>
             <ArrowRight className="w-4 h-4 text-amber-200" />
           </button>
 
-          {/* Button: Pencatatan Haid (Opens Beautiful Pink Feminine Login View) */}
+          {/* Button: Pencatatan Haid (Gradient Wine-Crimson with Rose Glow) */}
           <button
             type="button"
             onClick={() => {
               setError(null);
               setLoginMode('haid');
             }}
-            className="w-full py-2.5 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-pink-950/90 via-rose-900/90 to-pink-950/90 hover:from-rose-900 hover:via-pink-800 hover:to-rose-900 text-pink-200 border-2 border-pink-400/60 shadow-[0_0_15px_rgba(244,114,182,0.25)] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+            className="w-full py-3 px-4 rounded-2xl text-xs font-black bg-gradient-to-r from-[#6b1435] via-[#881337] to-[#b91c5c] hover:from-[#801840] hover:via-[#9f1642] hover:to-[#cf2068] text-pink-100 border border-pink-400/60 shadow-[0_0_20px_rgba(244,114,182,0.3)] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
           >
-            <Droplets className="w-4 h-4 text-pink-300 shrink-0 animate-bounce" />
+            <Droplets className="w-4 h-4 text-pink-300 shrink-0" />
             <span>Pencatatan Haid</span>
-            <Heart className="w-3.5 h-3.5 text-pink-400 fill-pink-400/40 shrink-0" />
+            <Heart className="w-3.5 h-3.5 text-pink-300 fill-pink-300/40 shrink-0" />
           </button>
         </form>
 
@@ -647,7 +808,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <button
               type="button"
               onClick={onOpenPrayerModal}
-              className="w-full py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-900/90 via-[#033c2a] to-emerald-900/90 hover:from-emerald-800 hover:to-emerald-800 text-amber-300 border border-amber-400/50 shadow-[0_0_12px_rgba(251,191,36,0.15)] transition-all cursor-pointer backdrop-blur-xs"
+              className="w-full py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-950/90 via-[#033c2a] to-emerald-950/90 hover:from-emerald-900 hover:to-emerald-900 text-amber-300 border border-amber-400/50 shadow-[0_0_12px_rgba(251,191,36,0.15)] transition-all cursor-pointer backdrop-blur-xs"
             >
               <Clock className="w-3.5 h-3.5 text-amber-400" />
               <span>Jadwal Sholat & Imsakiyah Kediri</span>
@@ -659,7 +820,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <button
               type="button"
               onClick={onOpenWisdomModal}
-              className="w-full py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-emerald-950/80 hover:bg-emerald-900/90 text-emerald-200 border border-emerald-700/60 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
+              className="w-full py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-[#021f26]/80 hover:bg-[#032e38] text-teal-200 border border-teal-700/60 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
             >
               <Moon className="w-3.5 h-3.5 text-amber-300 fill-amber-300/30" />
               <span>Buka Mutiara Hikmah Puasa</span>
@@ -671,7 +832,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <button
               type="button"
               onClick={onOpenSurahsModal}
-              className="w-full py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 bg-emerald-950/80 hover:bg-emerald-900/90 text-amber-200 border border-emerald-500/50 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
+              className="w-full py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 bg-[#021f26]/80 hover:bg-[#032e38] text-amber-200 border border-teal-500/50 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
             >
               <BookOpen className="w-3.5 h-3.5 text-amber-300" />
               <span>Juz 'Amma, Yasin, Dzikir Sholat & Doa</span>
@@ -695,12 +856,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </div>
 
         {/* Clean Footer Info */}
-        <div className="pt-4 border-t border-emerald-800/60 text-center space-y-1.5">
-          <p className="text-[11px] text-emerald-400/90 flex items-center justify-center gap-1.5 font-medium">
+        <div className="pt-4 border-t border-teal-900/60 text-center space-y-1.5">
+          <p className="text-[11px] text-teal-300/90 flex items-center justify-center gap-1.5 font-medium">
             <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
             Portal Terproteksi • SMP / SMA SRT 1 Kediri
           </p>
-          <p className="text-[11px] text-emerald-300/80 flex items-center justify-center gap-1 font-medium">
+          <p className="text-[11px] text-teal-400/80 flex items-center justify-center gap-1 font-medium">
             <span>Dibuat oleh</span>
             <span className="font-bold text-amber-300 tracking-wide hover:text-amber-200 transition-colors">
               eccko developer
