@@ -73,6 +73,7 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
   const isAdmin = user.role === 'admin';
   const isPenginput = user.role === 'penginput';
   const isPengecek = user.role === 'pengecek';
+  const isHaidRole = user.role === 'haid';
 
   // Navigation slider scroll management
   const navSliderRef = useRef<HTMLDivElement>(null);
@@ -246,7 +247,7 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                   </span>
                 </div>
                 <p className="hidden sm:block text-[10.5px] text-emerald-300 font-medium -mt-0.5 truncate">
-                  Pencatatan & Verifikasi Amalan Puasa
+                  {isHaidRole ? 'Portal Pencatatan Haid & Suci Santriwati' : 'Pencatatan & Verifikasi Amalan Puasa'}
                 </p>
               </div>
             </div>
@@ -276,6 +277,8 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                 className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-xl border text-[11px] sm:text-xs font-bold shadow-xs ${
                   isAdmin
                     ? 'bg-purple-950/90 border-purple-500/70 text-purple-200'
+                    : isHaidRole
+                    ? 'bg-rose-950/90 border-rose-500/70 text-rose-200'
                     : isPenginput
                     ? 'bg-amber-950/90 border-amber-500/70 text-amber-200'
                     : 'bg-emerald-950/90 border-emerald-600/70 text-emerald-200'
@@ -283,6 +286,8 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
               >
                 {isAdmin ? (
                   <KeyRound className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-purple-300 shrink-0" />
+                ) : isHaidRole ? (
+                  <Droplets className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-rose-400 shrink-0" />
                 ) : isPenginput ? (
                   <UserCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-300 shrink-0" />
                 ) : (
@@ -326,128 +331,186 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                   onScroll={checkScrollability}
                   className="flex items-center gap-1 overflow-x-auto no-scrollbar scroll-smooth py-0.5 px-0.5"
                 >
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      data-active={activeAdminTab === 'admin'}
-                      onClick={() => onSelectAdminTab('admin')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
-                        activeAdminTab === 'admin'
-                          ? 'bg-purple-600 text-white shadow-md ring-1 ring-purple-400'
-                          : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
-                      }`}
-                    >
-                      <Sliders className="w-3.5 h-3.5 shrink-0" />
-                      <span>Admin</span>
-                    </button>
+                  {/* Dedicated Petugas Haid View (Only the 3 Haid & Suci tabs) */}
+                  {isHaidRole ? (
+                    <>
+                      {/* Catat Haid Tab */}
+                      <button
+                        type="button"
+                        data-active={activeAdminTab === 'catat_haid'}
+                        onClick={() => onSelectAdminTab('catat_haid')}
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 active:scale-95 ${
+                          activeAdminTab === 'catat_haid'
+                            ? 'bg-gradient-to-r from-pink-500 via-rose-400 to-pink-600 text-white shadow-[0_2px_12px_rgba(244,114,182,0.45)] ring-1 ring-pink-200 font-black'
+                            : 'text-pink-300 hover:text-white hover:bg-pink-900/40'
+                        }`}
+                      >
+                        <Droplets className="w-3.5 h-3.5 text-pink-200 shrink-0" />
+                        <span>Catat Haid</span>
+                      </button>
+
+                      {/* Daftar Haid Tab */}
+                      <button
+                        type="button"
+                        data-active={activeAdminTab === 'daftar_haid'}
+                        onClick={() => onSelectAdminTab('daftar_haid')}
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 active:scale-95 ${
+                          activeAdminTab === 'daftar_haid'
+                            ? 'bg-gradient-to-r from-pink-600 via-rose-500 to-pink-500 text-white shadow-[0_2px_12px_rgba(244,114,182,0.45)] ring-1 ring-pink-200 font-black'
+                            : 'text-pink-300 hover:text-white hover:bg-pink-900/40'
+                        }`}
+                      >
+                        <HeartPulse className="w-3.5 h-3.5 text-pink-200 shrink-0" />
+                        <span>Daftar Haid</span>
+                      </button>
+
+                      {/* Daftar Suci Tab */}
+                      <button
+                        type="button"
+                        data-active={activeAdminTab === 'daftar_suci'}
+                        onClick={() => onSelectAdminTab('daftar_suci')}
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 active:scale-95 ${
+                          activeAdminTab === 'daftar_suci'
+                            ? 'bg-gradient-to-r from-teal-500 via-emerald-500 to-pink-500 text-white shadow-[0_2px_12px_rgba(20,184,166,0.35)] ring-1 ring-pink-200 font-black'
+                            : 'text-pink-200 hover:text-white hover:bg-emerald-800/70'
+                        }`}
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-amber-200 shrink-0" />
+                        <span>Daftar Suci</span>
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          data-active={activeAdminTab === 'admin'}
+                          onClick={() => onSelectAdminTab('admin')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                            activeAdminTab === 'admin'
+                              ? 'bg-purple-600 text-white shadow-md ring-1 ring-purple-400'
+                              : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
+                          }`}
+                        >
+                          <Sliders className="w-3.5 h-3.5 shrink-0" />
+                          <span>Admin</span>
+                        </button>
+                      )}
+
+                      {(isAdmin || isPenginput) && (
+                        <button
+                          type="button"
+                          data-active={activeAdminTab === 'input'}
+                          onClick={() => onSelectAdminTab('input')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                            activeAdminTab === 'input'
+                              ? 'bg-emerald-600 text-white shadow-md ring-1 ring-emerald-400'
+                              : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
+                          }`}
+                        >
+                          <Edit3 className="w-3.5 h-3.5 shrink-0" />
+                          <span>Form Input</span>
+                        </button>
+                      )}
+
+                      {(isAdmin || isPengecek) && (
+                        <button
+                          type="button"
+                          data-active={activeAdminTab === 'checker'}
+                          onClick={() => onSelectAdminTab('checker')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                            activeAdminTab === 'checker'
+                              ? 'bg-amber-500 text-emerald-950 shadow-md font-black ring-1 ring-amber-300'
+                              : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
+                          }`}
+                        >
+                          <CheckSquare className="w-3.5 h-3.5 shrink-0" />
+                          <span>Ceklist</span>
+                        </button>
+                      )}
+
+                      {/* Raport & Sertifikat Imtaq Tab */}
+                      <button
+                        type="button"
+                        data-active={activeAdminTab === 'raport'}
+                        onClick={() => onSelectAdminTab('raport')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                          activeAdminTab === 'raport'
+                            ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-emerald-950 shadow-md ring-1 ring-amber-300 font-black'
+                            : 'text-amber-300 hover:text-amber-200 hover:bg-emerald-800/70'
+                        }`}
+                      >
+                        <Trophy className="w-3.5 h-3.5 text-amber-400 fill-amber-400/30 shrink-0" />
+                        <span>Raport</span>
+                      </button>
+
+                      {/* Kalender Puasa & Hijriah Tab */}
+                      <button
+                        type="button"
+                        data-active={activeAdminTab === 'calendar'}
+                        onClick={() => onSelectAdminTab('calendar')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                          activeAdminTab === 'calendar'
+                            ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-md ring-1 ring-teal-300 font-black'
+                            : 'text-teal-300 hover:text-white hover:bg-emerald-800/70'
+                        }`}
+                      >
+                        <CalendarCheck className="w-3.5 h-3.5 text-teal-300 shrink-0" />
+                        <span>Kalender</span>
+                      </button>
+
+                      {/* Catat Haid Tab for Admin */}
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          data-active={activeAdminTab === 'catat_haid'}
+                          onClick={() => onSelectAdminTab('catat_haid')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 active:scale-95 ${
+                            activeAdminTab === 'catat_haid'
+                              ? 'bg-gradient-to-r from-pink-500 via-rose-400 to-pink-600 text-white shadow-[0_2px_12px_rgba(244,114,182,0.45)] ring-1 ring-pink-200 font-black'
+                              : 'text-pink-300 hover:text-white hover:bg-pink-900/40'
+                          }`}
+                        >
+                          <Droplets className="w-3.5 h-3.5 text-pink-200 shrink-0" />
+                          <span>Catat Haid</span>
+                        </button>
+                      )}
+
+                      {/* Daftar Haid Tab for Admin */}
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          data-active={activeAdminTab === 'daftar_haid'}
+                          onClick={() => onSelectAdminTab('daftar_haid')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 active:scale-95 ${
+                            activeAdminTab === 'daftar_haid'
+                              ? 'bg-gradient-to-r from-pink-600 via-rose-500 to-pink-500 text-white shadow-[0_2px_12px_rgba(244,114,182,0.45)] ring-1 ring-pink-200 font-black'
+                              : 'text-pink-300 hover:text-white hover:bg-pink-900/40'
+                          }`}
+                        >
+                          <HeartPulse className="w-3.5 h-3.5 text-pink-200 shrink-0" />
+                          <span>Daftar Haid</span>
+                        </button>
+                      )}
+
+                      {/* Daftar Suci Tab for Admin */}
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          data-active={activeAdminTab === 'daftar_suci'}
+                          onClick={() => onSelectAdminTab('daftar_suci')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 active:scale-95 ${
+                            activeAdminTab === 'daftar_suci'
+                              ? 'bg-gradient-to-r from-teal-500 via-emerald-500 to-pink-500 text-white shadow-[0_2px_12px_rgba(20,184,166,0.35)] ring-1 ring-pink-200 font-black'
+                              : 'text-pink-200 hover:text-white hover:bg-emerald-800/70'
+                          }`}
+                        >
+                          <Sparkles className="w-3.5 h-3.5 text-amber-200 shrink-0" />
+                          <span>Daftar Suci</span>
+                        </button>
+                      )}
+                    </>
                   )}
-
-                  {(isAdmin || isPenginput) && (
-                    <button
-                      type="button"
-                      data-active={activeAdminTab === 'input'}
-                      onClick={() => onSelectAdminTab('input')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
-                        activeAdminTab === 'input'
-                          ? 'bg-emerald-600 text-white shadow-md ring-1 ring-emerald-400'
-                          : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
-                      }`}
-                    >
-                      <Edit3 className="w-3.5 h-3.5 shrink-0" />
-                      <span>Form Input</span>
-                    </button>
-                  )}
-
-                  {(isAdmin || isPengecek) && (
-                    <button
-                      type="button"
-                      data-active={activeAdminTab === 'checker'}
-                      onClick={() => onSelectAdminTab('checker')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
-                        activeAdminTab === 'checker'
-                          ? 'bg-amber-500 text-emerald-950 shadow-md font-black ring-1 ring-amber-300'
-                          : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
-                      }`}
-                    >
-                      <CheckSquare className="w-3.5 h-3.5 shrink-0" />
-                      <span>Ceklist</span>
-                    </button>
-                  )}
-
-                  {/* Raport & Sertifikat Imtaq Tab */}
-                  <button
-                    type="button"
-                    data-active={activeAdminTab === 'raport'}
-                    onClick={() => onSelectAdminTab('raport')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
-                      activeAdminTab === 'raport'
-                        ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-emerald-950 shadow-md ring-1 ring-amber-300 font-black'
-                        : 'text-amber-300 hover:text-amber-200 hover:bg-emerald-800/70'
-                    }`}
-                  >
-                    <Trophy className="w-3.5 h-3.5 text-amber-400 fill-amber-400/30 shrink-0" />
-                    <span>Raport</span>
-                  </button>
-
-                  {/* Kalender Puasa & Hijriah Tab */}
-                  <button
-                    type="button"
-                    data-active={activeAdminTab === 'calendar'}
-                    onClick={() => onSelectAdminTab('calendar')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
-                      activeAdminTab === 'calendar'
-                        ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-md ring-1 ring-teal-300 font-black'
-                        : 'text-teal-300 hover:text-white hover:bg-emerald-800/70'
-                    }`}
-                  >
-                    <CalendarCheck className="w-3.5 h-3.5 text-teal-300 shrink-0" />
-                    <span>Kalender</span>
-                  </button>
-
-                  {/* Catat Haid Tab */}
-                  <button
-                    type="button"
-                    data-active={activeAdminTab === 'catat_haid'}
-                    onClick={() => onSelectAdminTab('catat_haid')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
-                      activeAdminTab === 'catat_haid'
-                        ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md ring-1 ring-rose-300 font-black'
-                        : 'text-rose-300 hover:text-white hover:bg-emerald-800/70'
-                    }`}
-                  >
-                    <Droplets className="w-3.5 h-3.5 text-rose-300 shrink-0" />
-                    <span>Catat Haid</span>
-                  </button>
-
-                  {/* Daftar Haid Tab */}
-                  <button
-                    type="button"
-                    data-active={activeAdminTab === 'daftar_haid'}
-                    onClick={() => onSelectAdminTab('daftar_haid')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
-                      activeAdminTab === 'daftar_haid'
-                        ? 'bg-gradient-to-r from-rose-600 to-pink-700 text-white shadow-md ring-1 ring-rose-300 font-black'
-                        : 'text-rose-300 hover:text-white hover:bg-emerald-800/70'
-                    }`}
-                  >
-                    <HeartPulse className="w-3.5 h-3.5 text-rose-300 shrink-0" />
-                    <span>Daftar Haid</span>
-                  </button>
-
-                  {/* Daftar Suci Tab */}
-                  <button
-                    type="button"
-                    data-active={activeAdminTab === 'daftar_suci'}
-                    onClick={() => onSelectAdminTab('daftar_suci')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
-                      activeAdminTab === 'daftar_suci'
-                        ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-md ring-1 ring-emerald-300 font-black'
-                        : 'text-emerald-300 hover:text-white hover:bg-emerald-800/70'
-                    }`}
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-                    <span>Daftar Suci</span>
-                  </button>
                 </div>
               </nav>
 

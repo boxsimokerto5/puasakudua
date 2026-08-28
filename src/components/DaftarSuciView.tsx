@@ -31,6 +31,7 @@ import {
   CalendarDays,
   ArrowRight,
 } from 'lucide-react';
+import { CrystalSnowEffect } from './CrystalSnowEffect';
 
 interface DaftarSuciViewProps {
   students?: Student[];
@@ -78,9 +79,7 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
     return set;
   }, [haidRecords]);
 
-  // Monitored Suci Students:
-  // ONLY students who have a completed haid record (status === 'selesai_mandi')
-  // and are not currently active in another haid.
+  // Monitored Suci Students
   const monitoredSuciStudents = useMemo<MonitoredSuciStudent[]>(() => {
     const list: MonitoredSuciStudent[] = [];
     const processedStudentIds = new Set<number>();
@@ -170,34 +169,41 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
   }, [selectedStudentForHistory, haidRecords]);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-3.5 sm:space-y-4 animate-in fade-in duration-200">
+    <div className="relative max-w-6xl mx-auto space-y-4 sm:space-y-5 animate-pink-fade-in animate-pink-aura p-2 sm:p-4 rounded-3xl bg-gradient-to-b from-[#fff5f8]/70 via-[#fef2f6]/50 to-[#fce7f3]/40">
+      {/* Floating Soft Crystal Snow Effect */}
+      <CrystalSnowEffect count={18} />
+
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 text-white rounded-xl sm:rounded-2xl p-3.5 sm:p-4 shadow-sm border border-emerald-600/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-xs flex items-center justify-center border border-white/25 shrink-0 shadow-inner">
-            <Sparkles className="w-5 h-5 text-amber-300" />
+      <div className="relative z-10 bg-gradient-to-r from-emerald-600 via-teal-500 to-pink-500 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-[0_8px_25px_rgba(16,185,129,0.2)] border border-white/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 overflow-hidden">
+        {/* Soft decorative background circles */}
+        <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 blur-xl pointer-events-none" />
+        <div className="absolute -left-6 -bottom-6 w-28 h-28 rounded-full bg-emerald-300/20 blur-lg pointer-events-none" />
+
+        <div className="relative z-10 flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-xs flex items-center justify-center border border-white/30 shrink-0 shadow-inner">
+            <Sparkles className="w-6 h-6 text-amber-200" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-base sm:text-lg font-black tracking-tight leading-tight">
                 Daftar Santriwati Suci & Siap Ibadah
               </h2>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-emerald-500/40 text-emerald-100 border border-emerald-400/40">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/25 text-white border border-white/30 backdrop-blur-xs shadow-2xs">
                 {monitoredSuciStudents.length} Santriwati Terpantau
               </span>
             </div>
-            <p className="text-[11px] sm:text-xs text-emerald-200 leading-tight mt-0.5">
+            <p className="text-[11px] sm:text-xs text-emerald-50/90 leading-tight mt-0.5">
               Pemantauan masa suci syar'i pasca haid (Hari ke-1 s.d. 15+) untuk memastikan kejujuran & keabsahan ibadah.
             </p>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-1.5 self-end sm:self-auto print:hidden">
+        <div className="relative z-10 flex items-center gap-2 self-end sm:self-auto print:hidden">
           <button
             type="button"
             onClick={() => onNavigateToCatatHaid()}
-            className="px-3 py-1.5 rounded-lg text-xs font-black bg-rose-600 hover:bg-rose-500 text-white transition-all flex items-center gap-1 shadow-sm cursor-pointer"
+            className="px-3.5 py-2 rounded-xl text-xs font-black bg-pink-500 hover:bg-pink-600 text-white transition-all flex items-center gap-1.5 shadow-[0_2px_8px_rgba(244,114,182,0.3)] active:scale-95 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>+ Catat Haid</span>
@@ -206,16 +212,16 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
           <button
             type="button"
             onClick={onNavigateToDaftarHaid}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-700 hover:bg-emerald-600 text-white border border-emerald-500/40 transition-all flex items-center gap-1 shadow-2xs cursor-pointer"
+            className="px-3 py-2 rounded-xl text-xs font-bold bg-white/20 hover:bg-white/30 text-white border border-white/30 transition-all flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer"
           >
-            <HeartPulse className="w-3.5 h-3.5 text-rose-300" />
+            <HeartPulse className="w-3.5 h-3.5 text-pink-200" />
             <span>Daftar Haid ({activeHaidStudentIds.size})</span>
           </button>
 
           <button
             type="button"
             onClick={() => window.print()}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-teal-700 hover:bg-teal-600 text-white border border-teal-500/40 transition-all flex items-center gap-1 shadow-2xs cursor-pointer"
+            className="px-3 py-2 rounded-xl text-xs font-bold bg-white/20 hover:bg-white/30 text-white border border-white/30 transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer"
             title="Cetak Daftar Suci"
           >
             <Printer className="w-3.5 h-3.5" />
@@ -225,8 +231,8 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
       </div>
 
       {/* KPI Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
-        <div className="bg-white border border-emerald-200 rounded-xl p-2.5 sm:p-3 shadow-2xs">
+      <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+        <div className="bg-white/95 backdrop-blur-xs border border-emerald-100 rounded-2xl p-3 sm:p-3.5 shadow-[0_4px_16px_rgba(16,185,129,0.06)]">
           <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">
             Terpantau Dalam Masa Suci
           </span>
@@ -238,7 +244,7 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
           </div>
         </div>
 
-        <div className="bg-white border border-amber-200 rounded-xl p-2.5 sm:p-3 shadow-2xs">
+        <div className="bg-white/95 backdrop-blur-xs border border-amber-100 rounded-2xl p-3 sm:p-3.5 shadow-[0_4px_16px_rgba(245,158,11,0.06)]">
           <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">
             Masa Suci 1 - 14 Hari
           </span>
@@ -246,11 +252,11 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
             <span className="text-xl sm:text-2xl font-black text-amber-950">
               {stats.under15Days}
             </span>
-            <span className="text-[10px] text-amber-700 font-semibold">(Belum Sah Haid Baru)</span>
+            <span className="text-[10px] text-amber-700 font-semibold">(Belum Sah Haid)</span>
           </div>
         </div>
 
-        <div className="bg-white border border-teal-200 rounded-xl p-2.5 sm:p-3 shadow-2xs">
+        <div className="bg-white/95 backdrop-blur-xs border border-teal-100 rounded-2xl p-3 sm:p-3.5 shadow-[0_4px_16px_rgba(20,184,166,0.06)]">
           <span className="text-[10px] font-bold text-teal-700 uppercase tracking-wider block">
             Masa Suci &ge;15 Hari
           </span>
@@ -262,12 +268,12 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
           </div>
         </div>
 
-        <div className="bg-white border border-rose-200 rounded-xl p-2.5 sm:p-3 shadow-2xs">
-          <span className="text-[10px] font-bold text-rose-700 uppercase tracking-wider block">
+        <div className="bg-white/95 backdrop-blur-xs border border-pink-100 rounded-2xl p-3 sm:p-3.5 shadow-[0_4px_16px_rgba(244,114,182,0.06)]">
+          <span className="text-[10px] font-bold text-pink-700 uppercase tracking-wider block">
             Sedang Udzur Haid
           </span>
           <div className="flex items-baseline gap-1 mt-0.5">
-            <span className="text-xl sm:text-2xl font-black text-rose-950">
+            <span className="text-xl sm:text-2xl font-black text-pink-950">
               {stats.totalActiveHaid}
             </span>
             <span className="text-[10px] text-slate-500">santriwati</span>
@@ -276,13 +282,13 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
       </div>
 
       {/* Fiqh Rule Explanatory Banner */}
-      <div className="bg-emerald-50/80 border border-emerald-200/80 rounded-xl p-3 text-xs text-emerald-950 flex items-start gap-2.5 shadow-2xs">
-        <BookOpen className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+      <div className="relative z-10 bg-pink-50/70 border border-pink-200/80 rounded-2xl p-3.5 text-xs text-slate-800 flex items-start gap-3 shadow-2xs">
+        <BookOpen className="w-4 h-4 text-pink-600 shrink-0 mt-0.5" />
         <div className="space-y-0.5">
-          <strong className="font-bold text-emerald-900">
+          <strong className="font-bold text-pink-900">
             Kaidah Fiqih Syafi'i (Aqallu ath-Thuhr & Pencegahan Alasan Palsu):
           </strong>
-          <p className="text-[11px] text-emerald-800 leading-snug">
+          <p className="text-[11px] text-slate-600 leading-snug">
             Masa minimal suci antara dua haid adalah <strong>15 hari 15 malam</strong>. Jika santriwati baru berada di masa suci 1–14 hari lalu melapor haid lagi, darah tersebut dihukumi <strong>Darah Istihadhah (Penyakit) atau Terindikasi Alasan Palsu</strong>. Siswi wajib tetap sholat & berpuasa.
           </p>
         </div>
@@ -290,13 +296,13 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
 
       {/* Filter & View Mode Bar */}
       {monitoredSuciStudents.length > 0 && (
-        <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+        <div className="relative z-10 bg-white/95 backdrop-blur-xs border border-pink-100 rounded-2xl p-3 shadow-[0_4px_16px_rgba(244,114,182,0.06)] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
           <div className="flex items-center gap-2 flex-1">
             {/* Class Filter */}
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              className="px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-none shrink-0"
+              className="px-3 py-2 text-xs bg-pink-50/40 border border-pink-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-pink-400 focus:outline-none shrink-0"
             >
               <option value="SEMUA">Semua Kelas ({monitoredSuciStudents.length})</option>
               {classes.map((cls) => (
@@ -313,9 +319,9 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
                 placeholder="Cari santriwati suci..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-7 pr-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                className="w-full pl-8 pr-3 py-2 text-xs bg-pink-50/40 border border-pink-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-pink-400 focus:outline-none"
               />
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2" />
+              <Search className="w-3.5 h-3.5 text-pink-400 absolute left-2.5 top-2.5" />
             </div>
           </div>
 
@@ -324,26 +330,26 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
             <button
               type="button"
               onClick={() => setViewMode('card')}
-              className={`p-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'card'
-                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                  : 'text-slate-500 hover:bg-slate-100'
+                  ? 'bg-pink-100 text-pink-800 border border-pink-300'
+                  : 'text-slate-500 hover:bg-pink-50'
               }`}
               title="Tampilan Kartu"
             >
-              <LayoutGrid className="w-3.5 h-3.5" />
+              <LayoutGrid className="w-4 h-4" />
             </button>
             <button
               type="button"
               onClick={() => setViewMode('table')}
-              className={`p-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'table'
-                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                  : 'text-slate-500 hover:bg-slate-100'
+                  ? 'bg-pink-100 text-pink-800 border border-pink-300'
+                  : 'text-slate-500 hover:bg-pink-50'
               }`}
               title="Tampilan Tabel"
             >
-              <List className="w-3.5 h-3.5" />
+              <List className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -351,8 +357,8 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
 
       {/* Main Content */}
       {monitoredSuciStudents.length === 0 ? (
-        /* DEDICATED EMPTY STATE ACCORDING TO USER SPECIFICATION */
-        <div className="bg-white border border-slate-200 rounded-2xl p-8 sm:p-12 text-center space-y-4 shadow-2xs max-w-2xl mx-auto">
+        /* DEDICATED EMPTY STATE */
+        <div className="relative z-10 bg-white/95 backdrop-blur-xs border border-pink-100 rounded-3xl p-8 sm:p-12 text-center space-y-4 shadow-[0_4px_16px_rgba(244,114,182,0.06)] max-w-2xl mx-auto">
           <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
             <ShieldCheck className="w-8 h-8 text-emerald-600" />
           </div>
@@ -366,8 +372,8 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
             </p>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left text-xs text-slate-700 space-y-2 max-w-lg mx-auto">
-            <div className="flex items-center gap-2 font-bold text-slate-900">
+          <div className="p-4 rounded-2xl bg-pink-50/40 border border-pink-100 text-left text-xs text-slate-700 space-y-2 max-w-lg mx-auto">
+            <div className="flex items-center gap-2 font-bold text-pink-900">
               <Sparkles className="w-4 h-4 text-amber-500" />
               <span>Sistem Proteksi Anti-Kebohongan Fiqih:</span>
             </div>
@@ -384,11 +390,11 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
             </ul>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2">
             <button
               type="button"
               onClick={() => onNavigateToCatatHaid()}
-              className="px-4 py-2 rounded-xl text-xs font-black bg-rose-600 hover:bg-rose-700 active:scale-98 text-white transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
+              className="px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 active:scale-98 text-white transition-all shadow-[0_4px_15px_rgba(244,114,182,0.3)] flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Catat Haid Santriwati</span>
@@ -397,16 +403,16 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
             <button
               type="button"
               onClick={onNavigateToDaftarHaid}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2.5 rounded-xl text-xs font-bold bg-white hover:bg-pink-50 text-slate-800 border border-pink-200 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
             >
-              <HeartPulse className="w-4 h-4 text-rose-600" />
+              <HeartPulse className="w-4 h-4 text-pink-600" />
               <span>Lihat Daftar Haid Aktif ({activeHaidStudentIds.size})</span>
             </button>
           </div>
         </div>
       ) : filteredMonitoredStudents.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-xl p-8 text-center space-y-2">
-          <Info className="w-8 h-8 text-slate-400 mx-auto" />
+        <div className="relative z-10 bg-white/95 backdrop-blur-xs border border-pink-100 rounded-2xl p-8 text-center space-y-2 shadow-[0_4px_16px_rgba(244,114,182,0.06)]">
+          <Info className="w-8 h-8 text-pink-400 mx-auto" />
           <h3 className="text-sm font-black text-slate-800">
             Santriwati Tidak Ditemukan
           </h3>
@@ -416,31 +422,31 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
         </div>
       ) : viewMode === 'card' ? (
         /* CARD VIEW */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5">
           {filteredMonitoredStudents.map(({ student, latestRecord, suciInfo }) => {
             const isUnder15 = suciInfo.isUnder15Days;
 
             return (
               <div
                 key={student.id}
-                className={`bg-white border rounded-xl p-3.5 shadow-2xs flex flex-col justify-between gap-3 transition-all ${
+                className={`bg-white/95 backdrop-blur-xs border rounded-2xl p-4 shadow-[0_4px_16px_rgba(244,114,182,0.06)] flex flex-col justify-between gap-3 transition-all hover:shadow-md ${
                   isUnder15
-                    ? 'border-amber-200 hover:border-amber-400'
-                    : 'border-emerald-200 hover:border-emerald-400'
+                    ? 'border-amber-200 hover:border-amber-300'
+                    : 'border-emerald-200 hover:border-emerald-300'
                 }`}
               >
                 <div className="space-y-2.5">
                   {/* Header Student Info */}
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
+                    <div className="flex items-center gap-2.5 min-w-0">
                       {student.foto ? (
                         <img
                           src={student.foto}
                           alt={student.nama}
-                          className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0"
+                          className="w-10 h-10 rounded-full object-cover border border-pink-200 shrink-0 shadow-2xs"
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0 border border-emerald-200">
                           {student.nama.charAt(0)}
                         </div>
                       )}
@@ -455,7 +461,7 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
                     </div>
 
                     <span
-                      className={`px-2 py-0.5 rounded-md text-[10px] font-black shrink-0 border uppercase tracking-wider flex items-center gap-1 ${
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-black shrink-0 border uppercase tracking-wider flex items-center gap-1 ${
                         isUnder15
                           ? 'bg-amber-50 text-amber-900 border-amber-300'
                           : 'bg-emerald-50 text-emerald-900 border-emerald-300'
@@ -468,10 +474,10 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
 
                   {/* Realtime Purity Day Counter Box */}
                   <div
-                    className={`p-2.5 rounded-xl border space-y-2 ${
+                    className={`p-3 rounded-2xl border space-y-2 ${
                       isUnder15
-                        ? 'bg-amber-50/70 border-amber-200'
-                        : 'bg-emerald-50/70 border-emerald-200'
+                        ? 'bg-amber-50/60 border-amber-200'
+                        : 'bg-emerald-50/60 border-emerald-200'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -479,9 +485,9 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
                         Penghitung Masa Suci:
                       </span>
                       <span
-                        className={`px-2 py-0.5 rounded-md text-xs font-black shadow-2xs ${
+                        className={`px-2.5 py-0.5 rounded-full text-xs font-black shadow-2xs ${
                           isUnder15
-                            ? 'bg-amber-500 text-amber-950 ring-1 ring-amber-400'
+                            ? 'bg-amber-500 text-white ring-1 ring-amber-400'
                             : 'bg-emerald-600 text-white ring-1 ring-emerald-400'
                         }`}
                       >
@@ -497,7 +503,7 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
                           {Math.min(15, suciInfo.days)} / 15 Hari
                         </strong>
                       </div>
-                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all ${
                             isUnder15 ? 'bg-amber-500' : 'bg-emerald-500'
@@ -508,7 +514,7 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
                     </div>
 
                     {/* Completion Details */}
-                    <div className="text-[10px] text-slate-600 space-y-0.5 pt-1 border-t border-slate-200/70">
+                    <div className="text-[10px] text-slate-600 space-y-0.5 pt-1.5 border-t border-slate-200/70">
                       <div className="flex justify-between">
                         <span>Tanggal Selesai Mandi:</span>
                         <span className="font-semibold text-slate-800">{latestRecord.endDate || '-'} {latestRecord.endTime || ''}</span>
@@ -522,14 +528,14 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
                     {/* Fiqh Ruling & Anti-Lie Protection Status */}
                     <div className="pt-1 text-[10px] leading-snug">
                       {isUnder15 ? (
-                        <div className="p-1.5 rounded-lg bg-amber-100/70 border border-amber-300/80 text-amber-900 flex items-start gap-1.5">
+                        <div className="p-2 rounded-xl bg-amber-100/70 border border-amber-300/80 text-amber-900 flex items-start gap-1.5">
                           <AlertTriangle className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
                           <div>
                             <strong className="font-bold">Masa Suci Berjalan ({suciInfo.days} Hari):</strong> Kurang <strong>{suciInfo.remainingSuciDays} hari lagi</strong> untuk sah haid baru. Jika melapor haid sekarang, terindikasi alasan palsu / istihadhah.
                           </div>
                         </div>
                       ) : (
-                        <div className="p-1.5 rounded-lg bg-emerald-100/70 border border-emerald-300/80 text-emerald-900 flex items-start gap-1.5">
+                        <div className="p-2 rounded-xl bg-emerald-100/70 border border-emerald-300/80 text-emerald-900 flex items-start gap-1.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
                           <div>
                             <strong className="font-bold">Masa Suci Sempurna ({suciInfo.days} Hari):</strong> Telah melampaui batas minimal 15 hari suci syar'i. Sah dinyatakan haid baru jika nanti keluar darah.
@@ -541,23 +547,23 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
                 </div>
 
                 {/* Bottom Actions */}
-                <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1.5">
+                <div className="pt-2.5 border-t border-pink-100 flex items-center justify-between gap-1.5">
                   <button
                     type="button"
                     onClick={() => setSelectedStudentForHistory(student)}
-                    className="px-2.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
+                    className="px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-pink-50 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
                   >
-                    <History className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Riwayat Siklus</span>
+                    <History className="w-3.5 h-3.5 text-pink-500" />
+                    <span>Riwayat</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => onNavigateToCatatHaid(student)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1 shadow-2xs cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1 shadow-2xs cursor-pointer active:scale-95 ${
                       isUnder15
                         ? 'bg-amber-600 hover:bg-amber-700 text-white'
-                        : 'bg-rose-600 hover:bg-rose-700 text-white'
+                        : 'bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white'
                     }`}
                   >
                     <Droplets className="w-3.5 h-3.5" />
@@ -570,35 +576,35 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
         </div>
       ) : (
         /* TABLE VIEW */
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+        <div className="relative z-10 bg-white/95 backdrop-blur-xs border border-pink-100 rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(244,114,182,0.06)]">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-700">
-              <thead className="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-600 border-b border-slate-200">
+              <thead className="bg-pink-50/60 text-[11px] uppercase tracking-wider text-slate-600 border-b border-pink-100">
                 <tr>
-                  <th className="py-2.5 px-3">Santriwati</th>
-                  <th className="py-2.5 px-3">Kelas</th>
-                  <th className="py-2.5 px-3">Penghitung Suci</th>
-                  <th className="py-2.5 px-3">Tanggal Selesai Mandi</th>
-                  <th className="py-2.5 px-3">Status Fiqih Syar'i</th>
-                  <th className="py-2.5 px-3 text-right">Aksi</th>
+                  <th className="py-3 px-3.5">Santriwati</th>
+                  <th className="py-3 px-3.5">Kelas</th>
+                  <th className="py-3 px-3.5">Penghitung Suci</th>
+                  <th className="py-3 px-3.5">Tanggal Selesai Mandi</th>
+                  <th className="py-3 px-3.5">Status Fiqih Syar'i</th>
+                  <th className="py-3 px-3.5 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-pink-50">
                 {filteredMonitoredStudents.map(({ student, latestRecord, suciInfo }) => {
                   const isUnder15 = suciInfo.isUnder15Days;
 
                   return (
-                    <tr key={student.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-2 px-3">
+                    <tr key={student.id} className="hover:bg-pink-50/40 transition-colors">
+                      <td className="py-2.5 px-3.5">
                         <div className="flex items-center gap-2">
                           {student.foto ? (
                             <img
                               src={student.foto}
                               alt={student.nama}
-                              className="w-7 h-7 rounded-full object-cover border shrink-0"
+                              className="w-7 h-7 rounded-full object-cover border border-pink-200 shrink-0"
                             />
                           ) : (
-                            <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] flex items-center justify-center shrink-0">
+                            <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] flex items-center justify-center shrink-0 border border-emerald-200">
                               {student.nama.charAt(0)}
                             </div>
                           )}
@@ -608,10 +614,10 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
                           </div>
                         </div>
                       </td>
-                      <td className="py-2 px-3 font-medium text-slate-600">{student.kelas}</td>
-                      <td className="py-2 px-3">
+                      <td className="py-2.5 px-3.5 font-medium text-slate-600">{student.kelas}</td>
+                      <td className="py-2.5 px-3.5">
                         <span
-                          className={`px-2 py-0.5 rounded-md text-xs font-black inline-block ${
+                          className={`px-2.5 py-0.5 rounded-full text-xs font-black inline-block ${
                             isUnder15
                               ? 'bg-amber-100 text-amber-900 border border-amber-300'
                               : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
@@ -620,11 +626,11 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
                           Hari ke-{suciInfo.days} Suci
                         </span>
                       </td>
-                      <td className="py-2 px-3 text-[11px] text-slate-700">
+                      <td className="py-2.5 px-3.5 text-[11px] text-slate-700">
                         <div className="font-semibold">{latestRecord.endDate || '-'}</div>
                         <div className="text-[10px] text-slate-500">Oleh: {latestRecord.recordedBy || 'Ustadzah'}</div>
                       </td>
-                      <td className="py-2 px-3 text-[11px]">
+                      <td className="py-2.5 px-3.5 text-[11px]">
                         {isUnder15 ? (
                           <div className="text-amber-800 font-medium flex items-center gap-1">
                             <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
@@ -637,19 +643,19 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
                           </div>
                         )}
                       </td>
-                      <td className="py-2 px-3 text-right">
+                      <td className="py-2.5 px-3.5 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             type="button"
                             onClick={() => setSelectedStudentForHistory(student)}
-                            className="px-2 py-1 rounded text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-[11px] font-bold"
+                            className="px-2.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-pink-50 text-[11px] font-bold"
                           >
                             Riwayat
                           </button>
                           <button
                             type="button"
                             onClick={() => onNavigateToCatatHaid(student)}
-                            className="px-2 py-1 rounded text-xs font-black bg-rose-600 hover:bg-rose-700 text-white"
+                            className="px-2.5 py-1.5 rounded-lg text-xs font-black bg-pink-500 hover:bg-pink-600 text-white shadow-2xs active:scale-95"
                           >
                             Catat Haid
                           </button>
@@ -667,11 +673,11 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
       {/* Modal: Riwayat Siklus Haid & Suci Santriwati */}
       {selectedStudentForHistory && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 animate-in fade-in duration-150">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-4 sm:p-5 shadow-2xl border border-slate-200 space-y-3.5 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
-                  <History className="w-4 h-4" />
+          <div className="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-pink-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-pink-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                  <History className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="text-sm font-black text-slate-900">
@@ -685,7 +691,7 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
               <button
                 type="button"
                 onClick={() => setSelectedStudentForHistory(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-pink-50"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -696,24 +702,24 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
                 Belum ada rekam catatan haid terdahulu untuk santriwati ini.
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {studentHistoryRecords.map((r) => {
                   const fiqh = analyzeFiqhHaid(r.startDate, r.endDate, r.status);
                   return (
                     <div
                       key={r.id}
-                      className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs"
+                      className="p-3.5 rounded-2xl bg-pink-50/40 border border-pink-100 space-y-2 text-xs"
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-slate-900 flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-rose-600" />
+                          <Calendar className="w-3.5 h-3.5 text-pink-600" />
                           {r.startDate} s.d. {r.endDate || 'Sekarang'}
                         </span>
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-black ${
+                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${
                             r.status === 'selesai_mandi'
                               ? 'bg-emerald-100 text-emerald-800'
-                              : 'bg-rose-100 text-rose-800'
+                              : 'bg-pink-100 text-pink-800'
                           }`}
                         >
                           {r.status === 'selesai_mandi' ? 'Selesai & Mandi' : 'Sedang Haid'}
@@ -732,12 +738,12 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
                       </div>
 
                       {r.notes && (
-                        <p className="text-[11px] text-slate-600 italic bg-white p-1.5 rounded border border-slate-200">
+                        <p className="text-[11px] text-slate-600 italic bg-white p-2 rounded-xl border border-pink-100">
                           Catatan: {r.notes}
                         </p>
                       )}
 
-                      <div className="text-[10px] text-slate-500 pt-1 flex justify-between border-t border-slate-200">
+                      <div className="text-[10px] text-slate-500 pt-1.5 flex justify-between border-t border-pink-100">
                         <span>Pencatat: {r.recordedBy}</span>
                         <span>Update: {r.updatedAt ? new Date(r.updatedAt).toLocaleDateString('id-ID') : '-'}</span>
                       </div>
@@ -747,11 +753,11 @@ export const DaftarSuciView: React.FC<DaftarSuciViewProps> = ({
               </div>
             )}
 
-            <div className="pt-2 border-t border-slate-100 flex justify-end">
+            <div className="pt-2 border-t border-pink-100 flex justify-end">
               <button
                 type="button"
                 onClick={() => setSelectedStudentForHistory(null)}
-                className="px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-800"
+                className="px-4 py-2 rounded-xl bg-pink-50 hover:bg-pink-100 text-xs font-bold text-pink-900 transition-colors"
               >
                 Tutup
               </button>

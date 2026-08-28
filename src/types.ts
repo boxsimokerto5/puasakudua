@@ -56,7 +56,7 @@ export interface FastingSession {
   updatedAt?: string;
 }
 
-export type UserRole = 'admin' | 'penginput' | 'pengecek';
+export type UserRole = 'admin' | 'penginput' | 'pengecek' | 'haid';
 
 export interface UserSession {
   username: string;

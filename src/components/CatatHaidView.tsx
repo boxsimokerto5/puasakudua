@@ -9,6 +9,7 @@ import {
 } from '../utils/fiqhHaid';
 import { BarcodeCameraScannerModal } from './BarcodeCameraScannerModal';
 import { validateScannedCard } from '../utils/cardSecurity';
+import { CrystalSnowEffect } from './CrystalSnowEffect';
 import {
   QrCode,
   Search,
@@ -31,6 +32,7 @@ import {
   ShieldAlert,
   RotateCcw,
   AlertTriangle,
+  Snowflake,
 } from 'lucide-react';
 import {
   playScanSuccessSound,
@@ -239,61 +241,70 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
   }, [startDate]);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-3.5 sm:space-y-4 animate-in fade-in duration-200">
-      {/* Header Banner - Slim & Proportional */}
-      <div className="bg-gradient-to-r from-rose-700 via-rose-800 to-pink-900 text-white rounded-xl sm:rounded-2xl p-3.5 sm:p-4 shadow-sm border border-rose-600/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-xs flex items-center justify-center border border-white/25 shrink-0 shadow-inner">
-            <Droplets className="w-5 h-5 text-rose-200" />
+    <div className="relative max-w-6xl mx-auto space-y-3.5 sm:space-y-4 animate-pink-fade-in animate-pink-aura p-2 sm:p-3 rounded-3xl bg-gradient-to-b from-[#fff5f8]/90 via-[#fef2f6]/80 to-[#fce7f3]/50 border border-pink-100/80 shadow-[0_10px_35px_rgba(244,114,182,0.12)]">
+      {/* Salju Kristal Bertebaran */}
+      <CrystalSnowEffect density={30} />
+
+      {/* Header Banner - Soft Rose Pink with Crystal Shimmer */}
+      <div className="relative z-10 bg-gradient-to-r from-pink-500 via-rose-400 to-pink-600 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-[0_6px_25px_rgba(244,114,182,0.35)] border border-pink-200/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 overflow-hidden">
+        {/* Subtle background decorative crystal glow */}
+        <div className="absolute -right-8 -top-8 w-36 h-36 bg-white/20 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/40 shrink-0 shadow-inner">
+            <Droplets className="w-6 h-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base sm:text-lg font-black tracking-tight leading-tight">
+              <h2 className="text-base sm:text-xl font-black tracking-tight leading-tight text-white drop-shadow-xs">
                 Catat Haid Santriwati
               </h2>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-rose-500/40 text-rose-100 border border-rose-400/40">
-                Fiqih An-Nisa
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/25 text-white border border-white/30 backdrop-blur-xs flex items-center gap-1">
+                <Snowflake className="w-3 h-3 text-pink-100" />
+                <span>Fiqih An-Nisa</span>
               </span>
             </div>
-            <p className="text-[11px] sm:text-xs text-rose-200 leading-tight mt-0.5">
+            <p className="text-[11px] sm:text-xs text-pink-100 leading-tight mt-1 font-medium">
               Pencatatan masa haid, deteksi hari berjalan, dan integrasi otomatis ke status presensi puasa.
             </p>
           </div>
         </div>
 
         {/* Quick Nav Buttons to Other Haid/Suci Tabs */}
-        <div className="flex items-center gap-1.5 self-end sm:self-auto">
+        <div className="flex items-center gap-2 self-end sm:self-auto relative z-10">
           <button
             type="button"
             onClick={onNavigateToDaftarHaid}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white border border-rose-400/40 transition-all flex items-center gap-1 shadow-2xs cursor-pointer"
+            className="px-3 py-1.5 rounded-xl text-xs font-black bg-white/95 hover:bg-white text-pink-700 border border-pink-100 transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
           >
-            <HeartPulse className="w-3.5 h-3.5" />
+            <HeartPulse className="w-3.5 h-3.5 text-rose-500" />
             <span>Daftar Haid ({haidRecords.filter((r) => r.status === 'haid_aktif').length})</span>
           </button>
           <button
             type="button"
             onClick={onNavigateToDaftarSuci}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/40 transition-all flex items-center gap-1 shadow-2xs cursor-pointer"
+            className="px-3 py-1.5 rounded-xl text-xs font-bold bg-pink-700/80 hover:bg-pink-800 text-white border border-pink-300/40 transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-200" />
             <span>Daftar Suci</span>
           </button>
         </div>
       </div>
 
       {/* Main Grid: Left (Scanner & Picker) - Right (Fiqh Form) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
         {/* Left Column: 5 Cols on Desktop - Search & Scan */}
         <div className="lg:col-span-5 space-y-3">
           {/* 1. Scan Card Quick Button */}
-          <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-3.5 shadow-2xs space-y-2.5">
+          <div className="bg-white/95 backdrop-blur-xs border border-pink-100 rounded-2xl p-3.5 sm:p-4 shadow-[0_4px_16px_rgba(244,114,182,0.06)] space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                <QrCode className="w-3.5 h-3.5 text-rose-600" />
+                <QrCode className="w-3.5 h-3.5 text-pink-500" />
                 Scan Kartu Santriwati
               </span>
-              <span className="text-[10px] text-slate-500 font-medium">QR / Barcode</span>
+              <span className="text-[10px] text-pink-600 bg-pink-50 font-bold px-2 py-0.5 rounded-full border border-pink-100">
+                QR / Barcode
+              </span>
             </div>
 
             <button
@@ -302,7 +313,7 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                 setScanFeedback(null);
                 setIsCameraScannerOpen(true);
               }}
-              className="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 active:scale-98 text-white text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+              className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-pink-500 to-rose-400 hover:from-pink-600 hover:to-rose-500 active:scale-98 text-white text-xs font-black transition-all flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(244,114,182,0.3)] cursor-pointer"
             >
               <QrCode className="w-4 h-4 text-white animate-pulse" />
               <span>Buka Kamera Scan Kartu</span>
@@ -311,7 +322,7 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
             {/* Scan Feedback Banner */}
             {scanFeedback && (
               <div
-                className={`p-2 rounded-lg text-xs font-medium flex items-center justify-between gap-1.5 ${
+                className={`p-2 rounded-xl text-xs font-medium flex items-center justify-between gap-1.5 ${
                   scanFeedback.isError
                     ? 'bg-rose-50 text-rose-800 border border-rose-200'
                     : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
@@ -330,13 +341,13 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
           </div>
 
           {/* 2. Manual Student Search & Picker (Filtered for Girls) */}
-          <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-3.5 shadow-2xs space-y-2.5">
+          <div className="bg-white/95 backdrop-blur-xs border border-pink-100 rounded-2xl p-3.5 sm:p-4 shadow-[0_4px_16px_rgba(244,114,182,0.06)] space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                <Search className="w-3.5 h-3.5 text-rose-600" />
+                <Search className="w-3.5 h-3.5 text-pink-500" />
                 Cari Santriwati ({femaleStudents.length})
               </span>
-              <span className="text-[10px] text-rose-700 font-bold bg-rose-50 px-1.5 py-0.2 rounded border border-rose-100">
+              <span className="text-[10px] text-pink-700 font-bold bg-pink-50 px-2 py-0.5 rounded-full border border-pink-200">
                 Khusus Putri
               </span>
             </div>
@@ -346,7 +357,7 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
               <select
                 value={selectedClass}
                 onChange={(e) => setSelectedClass(e.target.value)}
-                className="px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium focus:ring-1 focus:ring-rose-500 focus:outline-none"
+                className="px-2.5 py-1.5 text-xs bg-pink-50/50 border border-pink-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-pink-400 focus:outline-none"
               >
                 <option value="SEMUA">Semua Kelas Putri</option>
                 {femaleClasses.map((cls) => (
@@ -362,14 +373,14 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                   placeholder="Ketik nama / NIK..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-7 pr-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:ring-1 focus:ring-rose-500 focus:outline-none"
+                  className="w-full pl-7 pr-2.5 py-1.5 text-xs bg-pink-50/50 border border-pink-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-pink-400 focus:outline-none"
                 />
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2" />
+                <Search className="w-3.5 h-3.5 text-pink-400 absolute left-2.5 top-2" />
               </div>
             </div>
 
             {/* Student List Box (Max Height with Slim Scrollbar) */}
-            <div className="max-h-[260px] sm:max-h-[300px] overflow-y-auto space-y-1 pr-1">
+            <div className="max-h-[260px] sm:max-h-[300px] overflow-y-auto space-y-1.5 pr-1">
               {filteredFemaleStudents.length === 0 ? (
                 <div className="p-4 text-center text-xs text-slate-400 italic">
                   Santriwati tidak ditemukan
@@ -393,10 +404,10 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                           setIsFiqhWarningModalOpen(true);
                         }
                       }}
-                      className={`p-2 rounded-lg border transition-all cursor-pointer flex items-center justify-between gap-2 select-none ${
+                      className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 select-none ${
                         isSelected
-                          ? 'bg-rose-50/90 border-rose-400 ring-1 ring-rose-400 shadow-2xs'
-                          : 'bg-white hover:bg-slate-50 border-slate-150'
+                          ? 'bg-pink-50 border-pink-400 ring-2 ring-pink-300 shadow-xs'
+                          : 'bg-white hover:bg-pink-50/40 border-pink-100'
                       }`}
                     >
                       <div className="flex items-center gap-2 min-w-0">
@@ -404,10 +415,10 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                           <img
                             src={s.foto}
                             alt={s.nama}
-                            className="w-7 h-7 rounded-full object-cover border border-slate-200 shrink-0"
+                            className="w-7 h-7 rounded-full object-cover border border-pink-200 shrink-0"
                           />
                         ) : (
-                          <div className="w-7 h-7 rounded-full bg-rose-100 text-rose-800 font-bold text-[10px] flex items-center justify-center shrink-0">
+                          <div className="w-7 h-7 rounded-full bg-pink-100 text-pink-700 font-bold text-[10px] flex items-center justify-center shrink-0">
                             {s.nama.charAt(0)}
                           </div>
                         )}
@@ -423,15 +434,15 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
 
                       <div className="flex items-center gap-1 shrink-0">
                         {isCurrentlyHaid ? (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-100 text-rose-700 border border-rose-200">
                             Sedang Haid
                           </span>
                         ) : itemSuci.hasPreviousRecord && itemSuci.isUnder15Days ? (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
                             Suci Hari {itemSuci.days}
                           </span>
                         ) : (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
                             Suci
                           </span>
                         )}
@@ -446,19 +457,19 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
 
         {/* Right Column: 7 Cols on Desktop - Fiqh Form & Analysis */}
         <div className="lg:col-span-7 space-y-3">
-          <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-xl p-3.5 sm:p-4 shadow-2xs space-y-3">
+          <form onSubmit={handleSubmit} className="bg-white/95 backdrop-blur-xs border border-pink-100 rounded-2xl p-4 sm:p-5 shadow-[0_4px_16px_rgba(244,114,182,0.06)] space-y-3.5">
             {/* Selected Student Banner */}
             {selectedStudent ? (
-              <div className="p-3 rounded-xl bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200 flex items-center justify-between gap-3">
+              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-pink-50 via-rose-50 to-pink-50 border border-pink-200 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">
                   {selectedStudent.foto ? (
                     <img
                       src={selectedStudent.foto}
                       alt={selectedStudent.nama}
-                      className="w-10 h-10 rounded-full object-cover border-2 border-rose-300 shrink-0"
+                      className="w-10 h-10 rounded-full object-cover border-2 border-pink-300 shrink-0"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-rose-200 text-rose-900 font-bold text-sm flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-pink-200 text-pink-800 font-bold text-sm flex items-center justify-center shrink-0">
                       {selectedStudent.nama.charAt(0)}
                     </div>
                   )}
@@ -467,7 +478,7 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                       <span className="text-xs font-black text-slate-900 truncate">
                         {selectedStudent.nama}
                       </span>
-                      <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-200 text-rose-900">
+                      <span className="px-2 py-0.2 rounded-full text-[9px] font-bold bg-pink-200 text-pink-800">
                         {selectedStudent.kelas}
                       </span>
                     </div>
@@ -480,15 +491,15 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setSelectedStudent(null)}
-                  className="text-xs text-rose-700 hover:text-rose-900 font-bold shrink-0 p-1 cursor-pointer"
+                  className="text-xs text-pink-700 hover:text-pink-900 font-bold shrink-0 p-1 cursor-pointer underline"
                   title="Ganti Santri"
                 >
                   Ganti
                 </button>
               </div>
             ) : (
-              <div className="p-4 rounded-xl bg-slate-50 border border-dashed border-slate-300 text-center space-y-1">
-                <UserCheck className="w-6 h-6 text-slate-400 mx-auto" />
+              <div className="p-4 rounded-2xl bg-pink-50/40 border border-dashed border-pink-200 text-center space-y-1">
+                <UserCheck className="w-6 h-6 text-pink-400 mx-auto" />
                 <p className="text-xs font-bold text-slate-700">
                   Belum Ada Santriwati yang Dipilih
                 </p>
@@ -594,13 +605,13 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
             {/* ========================================================================= */}
             {/* FITUR FIQIH: "SANTRIWATI DITANYA: SUDAH HARI KE BERAPA?"                  */}
             {/* ========================================================================= */}
-            <div className="p-3 rounded-xl bg-rose-50/60 border border-rose-200/80 space-y-2">
+            <div className="p-3 rounded-2xl bg-pink-50/60 border border-pink-200/80 space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-black text-rose-950 flex items-center gap-1.5">
-                  <CalendarDays className="w-3.5 h-3.5 text-rose-700" />
+                <label className="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                  <CalendarDays className="w-3.5 h-3.5 text-pink-600" />
                   <span>Kondisi Saat Ini: Santriwati Sedang di Hari Ke-?</span>
                 </label>
-                <span className="text-[10px] font-bold text-rose-700 bg-white px-1.5 py-0.2 rounded border border-rose-200">
+                <span className="text-[10px] font-bold text-pink-700 bg-white px-2 py-0.5 rounded-full border border-pink-200 shadow-2xs">
                   Hitung Otomatis Fiqih
                 </span>
               </div>
@@ -609,20 +620,20 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
               </p>
 
               {/* Quick Day Chips 1 to 7 and custom */}
-              <div className="grid grid-cols-4 sm:grid-cols-7 gap-1">
+              <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
                 {[1, 2, 3, 4, 5, 6, 7].map((d) => (
                   <button
                     key={d}
                     type="button"
                     onClick={() => handleReportedDaySelect(d)}
-                    className={`py-1.5 px-1 rounded-lg text-xs font-black transition-all flex flex-col items-center justify-center cursor-pointer border ${
+                    className={`py-2 px-1 rounded-xl text-xs font-black transition-all flex flex-col items-center justify-center cursor-pointer border ${
                       reportedDay === d
-                        ? 'bg-rose-700 text-white border-rose-800 shadow-2xs scale-102'
-                        : 'bg-white text-slate-700 hover:bg-rose-100/50 border-slate-200'
+                        ? 'bg-gradient-to-tr from-pink-600 to-rose-500 text-white border-pink-500 shadow-xs scale-102'
+                        : 'bg-white text-slate-700 hover:bg-pink-50/60 border-pink-100'
                     }`}
                   >
                     <span className="leading-none text-[11px] sm:text-xs">Hari {d}</span>
-                    <span className="text-[8px] font-normal opacity-80 mt-0.5">
+                    <span className="text-[8px] font-normal opacity-85 mt-0.5">
                       {d === 1 ? 'Hari Ini' : d === 2 ? 'Kemarin' : `${d - 1} hr lalu`}
                     </span>
                   </button>
@@ -640,7 +651,7 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                     value={startDate}
                     max={getTodayDateStr()}
                     onChange={(e) => handleStartDateChange(e.target.value)}
-                    className="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 font-bold focus:ring-1 focus:ring-rose-500 focus:outline-none"
+                    className="w-full px-2.5 py-1.5 text-xs bg-white border border-pink-200 rounded-xl text-slate-800 font-bold focus:ring-2 focus:ring-pink-400 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -651,20 +662,20 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                     type="time"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
-                    className="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 font-medium focus:ring-1 focus:ring-rose-500 focus:outline-none"
+                    className="w-full px-2.5 py-1.5 text-xs bg-white border border-pink-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-pink-400 focus:outline-none"
                   />
                 </div>
               </div>
             </div>
 
             {/* Fiqh Status Live Analysis Box */}
-            <div className={`p-2.5 rounded-lg border ${fiqhAnalysis.badgeBg} ${fiqhAnalysis.badgeBorder} space-y-1`}>
+            <div className={`p-3 rounded-2xl border ${fiqhAnalysis.badgeBg} ${fiqhAnalysis.badgeBorder} space-y-1.5`}>
               <div className="flex items-center justify-between">
                 <span className={`text-xs font-black ${fiqhAnalysis.badgeColor} flex items-center gap-1`}>
                   <BookOpen className="w-3.5 h-3.5" />
                   Status Fiqih: {fiqhAnalysis.stageTitle}
                 </span>
-                <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded bg-white/80 border border-slate-200 text-slate-700">
+                <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/90 border border-pink-200 text-slate-700 shadow-2xs">
                   Durasi: {fiqhAnalysis.dayCount} Hari
                 </span>
               </div>
@@ -685,7 +696,7 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                 <select
                   value={bloodColor}
                   onChange={(e) => setBloodColor(e.target.value as HaidBloodColor)}
-                  className="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium focus:ring-1 focus:ring-rose-500 focus:outline-none"
+                  className="w-full px-2.5 py-2 text-xs bg-pink-50/40 border border-pink-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-pink-400 focus:outline-none"
                 >
                   <option value="merah">Merah (Darah Haid Segar)</option>
                   <option value="hitam">Hitam (Darah Kuat / Ashal)</option>
@@ -704,7 +715,7 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                   value={recordedBy}
                   onChange={(e) => setRecordedBy(e.target.value)}
                   placeholder="Nama Ustadzah"
-                  className="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium focus:ring-1 focus:ring-rose-500 focus:outline-none"
+                  className="w-full px-2.5 py-2 text-xs bg-pink-50/40 border border-pink-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-pink-400 focus:outline-none"
                 />
               </div>
             </div>
@@ -719,30 +730,30 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Contoh: Nyeri haid hari 1-2, minum jamu kunyit asam, istirahat di asrama..."
-                className="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:ring-1 focus:ring-rose-500 focus:outline-none"
+                className="w-full px-2.5 py-2 text-xs bg-pink-50/40 border border-pink-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-pink-400 focus:outline-none"
               />
             </div>
 
             {/* Fasting Sync Option */}
-            <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">
+            <div className="p-2.5 rounded-xl bg-pink-50/50 border border-pink-200 flex items-center justify-between gap-2">
               <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-800">
                 <input
                   type="checkbox"
                   checked={autoUpdateFasting}
                   onChange={(e) => setAutoUpdateFasting(e.target.checked)}
-                  className="w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500 cursor-pointer"
+                  className="w-4 h-4 text-pink-600 rounded border-pink-300 focus:ring-pink-400 cursor-pointer"
                 />
                 <span className="font-semibold">
                   Otomatis tandai presensi puasa sebagai "Halangan / Udzur Syar'i"
                 </span>
               </label>
-              <span className="text-[10px] text-slate-500 hidden sm:inline">
+              <span className="text-[10px] text-pink-700 font-bold hidden sm:inline">
                 Raport Tetap Adil
               </span>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-pink-100">
               <button
                 type="button"
                 onClick={() => {
@@ -751,7 +762,7 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                   setStartDate(getTodayDateStr());
                   setNotes('');
                 }}
-                className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer flex items-center gap-1"
+                className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-pink-50 border border-pink-200 transition-all cursor-pointer flex items-center gap-1 active:scale-95"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset</span>
@@ -760,7 +771,7 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
               <button
                 type="submit"
                 disabled={!selectedStudent}
-                className="px-4 py-2 rounded-lg text-xs font-black bg-rose-600 hover:bg-rose-700 active:scale-98 disabled:opacity-50 disabled:pointer-events-none text-white transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
+                className="px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-pink-500 via-rose-500 to-pink-500 hover:from-pink-600 hover:to-rose-600 active:scale-98 disabled:opacity-50 disabled:pointer-events-none text-white transition-all shadow-[0_4px_15px_rgba(244,114,182,0.3)] flex items-center gap-1.5 cursor-pointer"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 <span>Simpan Catatan Haid</span>
@@ -773,37 +784,37 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
       {/* ========================================================================= */}
       {/* 3. PANDUAN RINGKAS FIQIH HAID (Madzhab Syafi'i)                            */}
       {/* ========================================================================= */}
-      <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-3.5 shadow-2xs space-y-2">
+      <div className="relative z-10 bg-white/95 backdrop-blur-xs border border-pink-100 rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-[0_4px_16px_rgba(244,114,182,0.06)] space-y-2.5">
         <div className="flex items-center gap-2">
-          <BookOpen className="w-4 h-4 text-rose-700" />
+          <BookOpen className="w-4 h-4 text-pink-600" />
           <h3 className="text-xs sm:text-sm font-black text-slate-900">
             Panduan Fiqih Haid & Suci Santriwati (Kaidah Madzhab Syafi'i)
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-          <div className="p-2.5 rounded-lg bg-rose-50/60 border border-rose-100 space-y-0.5">
-            <span className="font-bold text-rose-900 block text-[11px]">1. Batas Minimal Haid</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 text-xs">
+          <div className="p-3 rounded-2xl bg-pink-50/60 border border-pink-200/80 space-y-0.5">
+            <span className="font-bold text-pink-900 block text-[11px]">1. Batas Minimal Haid</span>
             <p className="text-[10px] text-slate-600 leading-snug">
               Minimal <strong>1 hari 1 malam (24 jam)</strong> secara akumulatif dalam rentang 15 hari.
             </p>
           </div>
 
-          <div className="p-2.5 rounded-lg bg-amber-50/60 border border-amber-100 space-y-0.5">
-            <span className="font-bold text-amber-900 block text-[11px]">2. Kebiasaan / Ghalib</span>
+          <div className="p-3 rounded-2xl bg-rose-50/60 border border-rose-200/80 space-y-0.5">
+            <span className="font-bold text-rose-900 block text-[11px]">2. Kebiasaan / Ghalib</span>
             <p className="text-[10px] text-slate-600 leading-snug">
               Umumnya berlangsung selama <strong>6 sampai 7 hari</strong>.
             </p>
           </div>
 
-          <div className="p-2.5 rounded-lg bg-red-50/60 border border-red-100 space-y-0.5">
-            <span className="font-bold text-red-900 block text-[11px]">3. Batas Maksimal Haid</span>
+          <div className="p-3 rounded-2xl bg-pink-50/60 border border-pink-200/80 space-y-0.5">
+            <span className="font-bold text-pink-900 block text-[11px]">3. Batas Maksimal Haid</span>
             <p className="text-[10px] text-slate-600 leading-snug">
               Maksimal <strong>15 hari 15 malam</strong>. Lewat dari 15 hari adalah <strong>Istihadhah</strong> (Wajib Mandi).
             </p>
           </div>
 
-          <div className="p-2.5 rounded-lg bg-emerald-50/60 border border-emerald-100 space-y-0.5">
+          <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-0.5">
             <span className="font-bold text-emerald-900 block text-[11px]">4. Minimal Masa Suci</span>
             <p className="text-[10px] text-slate-600 leading-snug">
               Jarak suci antara dua haid minimal <strong>15 hari 15 malam</strong>.

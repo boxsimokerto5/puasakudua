@@ -49,6 +49,7 @@ import { useAutoUpdate } from './hooks/useAutoUpdate';
 import { UpdateNotificationToast } from './components/UpdateNotificationToast';
 import { INDONESIA_CITIES, CityLocation } from './utils/prayerTimes';
 import { Sparkles, Cloud, CloudCheck, RefreshCw, Download } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 const USER_SESSION_KEY = 'sr_kediri_user_session_v1';
 const PRAYER_CITY_KEY = 'sr_kediri_prayer_city_v1';
@@ -138,6 +139,7 @@ export default function App() {
         const u = JSON.parse(saved);
         if (u.role === 'admin') return 'admin';
         if (u.role === 'penginput') return 'input';
+        if (u.role === 'haid') return 'catat_haid';
         return 'checker';
       }
     } catch {}
@@ -265,6 +267,8 @@ export default function App() {
       setActiveAdminTab('admin');
     } else if (session.role === 'penginput') {
       setActiveAdminTab('input');
+    } else if (session.role === 'haid') {
+      setActiveAdminTab('catat_haid');
     } else {
       setActiveAdminTab('checker');
     }
@@ -772,38 +776,51 @@ export default function App() {
               )}
 
             {/* View Switcher based on User Role & Selected Navigation Tab */}
-            {activeAdminTab === 'catat_haid' ? (
-              <CatatHaidView
-                students={students}
-                haidRecords={haidRecords}
-                activeSession={activeSession}
-                currentUserName={user.nama}
-                preselectedStudent={preselectedHaidStudent}
-                onSaveHaidRecord={handleSaveHaidRecord}
-                onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
-                onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
-              />
-            ) : activeAdminTab === 'daftar_haid' ? (
-              <DaftarHaidView
-                students={students}
-                haidRecords={haidRecords}
-                currentUserName={user.nama}
-                onFinishHaid={handleFinishHaid}
-                onUpdateHaidRecord={handleUpdateHaidRecord}
-                onDeleteHaidRecord={handleDeleteHaidRecord}
-                onNavigateToCatatHaid={() => {
-                  setPreselectedHaidStudent(undefined);
-                  setActiveAdminTab('catat_haid');
-                }}
-                onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
-              />
-            ) : activeAdminTab === 'daftar_suci' ? (
-              <DaftarSuciView
-                students={students}
-                haidRecords={haidRecords}
-                onNavigateToCatatHaid={handleNavigateToCatatHaid}
-                onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
-              />
+            {activeAdminTab === 'catat_haid' || activeAdminTab === 'daftar_haid' || activeAdminTab === 'daftar_suci' ? (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeAdminTab}
+                  initial={{ opacity: 0, y: 10, scale: 0.995, filter: 'drop-shadow(0 0 16px rgba(244,114,182,0.4))' }}
+                  animate={{ opacity: 1, y: 0, scale: 1, filter: 'drop-shadow(0 0 0px transparent)' }}
+                  exit={{ opacity: 0, y: -8, scale: 0.995, filter: 'drop-shadow(0 0 10px rgba(244,114,182,0.25))' }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="w-full relative"
+                >
+                  {activeAdminTab === 'catat_haid' ? (
+                    <CatatHaidView
+                      students={students}
+                      haidRecords={haidRecords}
+                      activeSession={activeSession}
+                      currentUserName={user.name}
+                      preselectedStudent={preselectedHaidStudent}
+                      onSaveHaidRecord={handleSaveHaidRecord}
+                      onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
+                      onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
+                    />
+                  ) : activeAdminTab === 'daftar_haid' ? (
+                    <DaftarHaidView
+                      students={students}
+                      haidRecords={haidRecords}
+                      currentUserName={user.name}
+                      onFinishHaid={handleFinishHaid}
+                      onUpdateHaidRecord={handleUpdateHaidRecord}
+                      onDeleteHaidRecord={handleDeleteHaidRecord}
+                      onNavigateToCatatHaid={() => {
+                        setPreselectedHaidStudent(undefined);
+                        setActiveAdminTab('catat_haid');
+                      }}
+                      onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
+                    />
+                  ) : (
+                    <DaftarSuciView
+                      students={students}
+                      haidRecords={haidRecords}
+                      onNavigateToCatatHaid={handleNavigateToCatatHaid}
+                      onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
+                    />
+                  )}
+                </motion.div>
+              </AnimatePresence>
             ) : activeAdminTab === 'calendar' ? (
               <CalendarView
                 sessions={Object.values(sessions)}

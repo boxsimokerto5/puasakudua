@@ -29,6 +29,7 @@ import {
   Sparkle,
 } from 'lucide-react';
 import { playScanSuccessSound } from '../utils/audioNotification';
+import { CrystalSnowEffect } from './CrystalSnowEffect';
 
 interface DaftarHaidViewProps {
   students: Student[];
@@ -161,34 +162,41 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-3.5 sm:space-y-4 animate-in fade-in duration-200">
-      {/* Header Banner - Slim, Compact & Proportional */}
-      <div className="bg-gradient-to-r from-rose-800 via-pink-800 to-rose-900 text-white rounded-xl sm:rounded-2xl p-3.5 sm:p-4 shadow-sm border border-rose-600/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-xs flex items-center justify-center border border-white/25 shrink-0 shadow-inner">
-            <HeartPulse className="w-5 h-5 text-rose-200" />
+    <div className="relative max-w-6xl mx-auto space-y-4 sm:space-y-5 animate-pink-fade-in animate-pink-aura p-2 sm:p-4 rounded-3xl bg-gradient-to-b from-[#fff5f8]/70 via-[#fef2f6]/50 to-[#fce7f3]/40">
+      {/* Floating Soft Crystal Snow Effect */}
+      <CrystalSnowEffect count={18} />
+
+      {/* Header Banner - Sweet Soft Pink Theme */}
+      <div className="relative z-10 bg-gradient-to-r from-pink-500 via-rose-400 to-pink-600 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-[0_8px_25px_rgba(244,114,182,0.25)] border border-white/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 overflow-hidden">
+        {/* Soft decorative background circles */}
+        <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 blur-xl pointer-events-none" />
+        <div className="absolute -left-6 -bottom-6 w-28 h-28 rounded-full bg-pink-300/20 blur-lg pointer-events-none" />
+
+        <div className="relative z-10 flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-xs flex items-center justify-center border border-white/30 shrink-0 shadow-inner">
+            <HeartPulse className="w-6 h-6 text-pink-50" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-base sm:text-lg font-black tracking-tight leading-tight">
                 Daftar Santriwati Sedang Haid (Udzur Syar'i)
               </h2>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-rose-500/40 text-rose-100 border border-rose-400/40">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/25 text-pink-50 border border-white/30 backdrop-blur-xs shadow-2xs">
                 {activeRecords.length} Aktif
               </span>
             </div>
-            <p className="text-[11px] sm:text-xs text-rose-200 leading-tight mt-0.5">
+            <p className="text-[11px] sm:text-xs text-pink-100/90 leading-tight mt-0.5">
               Pemantauan masa haid aktif, perhitungan hari berjalan fiqih, dan konfirmasi mandi suci.
             </p>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-1.5 self-end sm:self-auto print:hidden">
+        <div className="relative z-10 flex items-center gap-2 self-end sm:self-auto print:hidden">
           <button
             type="button"
             onClick={onNavigateToCatatHaid}
-            className="px-3 py-1.5 rounded-lg text-xs font-black bg-white hover:bg-rose-50 text-rose-900 transition-all flex items-center gap-1 shadow-sm cursor-pointer"
+            className="px-3.5 py-2 rounded-xl text-xs font-black bg-white hover:bg-pink-50 text-pink-800 transition-all flex items-center gap-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)] active:scale-95 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>+ Catat Haid</span>
@@ -197,16 +205,16 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
           <button
             type="button"
             onClick={onNavigateToDaftarSuci}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/40 transition-all flex items-center gap-1 shadow-2xs cursor-pointer"
+            className="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-500/90 hover:bg-emerald-500 text-white border border-emerald-300/40 transition-all flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-200" />
             <span>Daftar Suci</span>
           </button>
 
           <button
             type="button"
             onClick={() => window.print()}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-rose-700 hover:bg-rose-600 text-white border border-rose-500/40 transition-all flex items-center gap-1 shadow-2xs cursor-pointer"
+            className="px-3 py-2 rounded-xl text-xs font-bold bg-white/20 hover:bg-white/30 text-white border border-white/30 transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer"
             title="Cetak Rekapitulasi"
           >
             <Printer className="w-3.5 h-3.5" />
@@ -215,21 +223,21 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
         </div>
       </div>
 
-      {/* KPI Stats Cards - Slim, Compact, Tight Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-2.5">
-        <div className="bg-white border border-rose-200 rounded-xl p-2.5 sm:p-3 shadow-2xs">
-          <span className="text-[10px] font-bold text-rose-700 uppercase tracking-wider block">
+      {/* KPI Stats Cards - Soft Pastel Glow */}
+      <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+        <div className="bg-white/95 backdrop-blur-xs border border-pink-100 rounded-2xl p-3 sm:p-3.5 shadow-[0_4px_16px_rgba(244,114,182,0.06)]">
+          <span className="text-[10px] font-bold text-pink-700 uppercase tracking-wider block">
             Total Sedang Haid
           </span>
           <div className="flex items-baseline gap-1 mt-0.5">
-            <span className="text-xl sm:text-2xl font-black text-rose-950">
+            <span className="text-xl sm:text-2xl font-black text-slate-900">
               {stats.total}
             </span>
             <span className="text-[10px] text-slate-500">santriwati</span>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-3 shadow-2xs">
+        <div className="bg-white/95 backdrop-blur-xs border border-pink-100/80 rounded-2xl p-3 sm:p-3.5 shadow-[0_4px_16px_rgba(244,114,182,0.06)]">
           <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block">
             Masa Awal (Hari 1)
           </span>
@@ -241,7 +249,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-3 shadow-2xs">
+        <div className="bg-white/95 backdrop-blur-xs border border-pink-100/80 rounded-2xl p-3 sm:p-3.5 shadow-[0_4px_16px_rgba(244,114,182,0.06)]">
           <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider block">
             Ghalib (Hari 6-7)
           </span>
@@ -253,22 +261,22 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-3 shadow-2xs">
-          <span className="text-[10px] font-bold text-orange-700 uppercase tracking-wider block">
+        <div className="bg-white/95 backdrop-blur-xs border border-pink-100/80 rounded-2xl p-3 sm:p-3.5 shadow-[0_4px_16px_rgba(244,114,182,0.06)]">
+          <span className="text-[10px] font-bold text-rose-700 uppercase tracking-wider block">
             Lanjutan (Hari 8-15)
           </span>
           <div className="flex items-baseline gap-1 mt-0.5">
-            <span className="text-xl sm:text-2xl font-black text-orange-900">
+            <span className="text-xl sm:text-2xl font-black text-rose-900">
               {stats.lanjutan}
             </span>
             <span className="text-[10px] text-slate-500">santriwati</span>
           </div>
         </div>
 
-        <div className={`rounded-xl p-2.5 sm:p-3 shadow-2xs border ${
+        <div className={`rounded-2xl p-3 sm:p-3.5 shadow-2xs border ${
           stats.istihadhah > 0
-            ? 'bg-red-50 border-red-300 ring-1 ring-red-400'
-            : 'bg-white border-slate-200'
+            ? 'bg-red-50/90 border-red-200 ring-1 ring-red-300'
+            : 'bg-white/95 backdrop-blur-xs border-pink-100'
         }`}>
           <span className={`text-[10px] font-black uppercase tracking-wider block ${
             stats.istihadhah > 0 ? 'text-red-800' : 'text-slate-500'
@@ -286,14 +294,14 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
         </div>
       </div>
 
-      {/* Filter & View Mode Bar - Slim */}
-      <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-3 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+      {/* Filter & View Mode Bar - Soft Pastel */}
+      <div className="relative z-10 bg-white/95 backdrop-blur-xs border border-pink-100 rounded-2xl p-3 shadow-[0_4px_16px_rgba(244,114,182,0.06)] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
         <div className="flex items-center gap-2 flex-1">
           {/* Class Filter */}
           <select
             value={selectedClass}
             onChange={(e) => setSelectedClass(e.target.value)}
-            className="px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium focus:ring-1 focus:ring-rose-500 focus:outline-none shrink-0"
+            className="px-3 py-2 text-xs bg-pink-50/40 border border-pink-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-pink-400 focus:outline-none shrink-0"
           >
             <option value="SEMUA">Semua Kelas ({activeRecords.length})</option>
             {classes.map((cls) => (
@@ -310,9 +318,9 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
               placeholder="Cari santriwati haid..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-7 pr-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:ring-1 focus:ring-rose-500 focus:outline-none"
+              className="w-full pl-8 pr-3 py-2 text-xs bg-pink-50/40 border border-pink-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-pink-400 focus:outline-none"
             />
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2" />
+            <Search className="w-3.5 h-3.5 text-pink-400 absolute left-2.5 top-2.5" />
           </div>
         </div>
 
@@ -321,34 +329,36 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
           <button
             type="button"
             onClick={() => setViewMode('card')}
-            className={`p-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               viewMode === 'card'
-                ? 'bg-rose-100 text-rose-800 border border-rose-200'
-                : 'text-slate-500 hover:bg-slate-100'
+                ? 'bg-pink-100 text-pink-800 border border-pink-300'
+                : 'text-slate-500 hover:bg-pink-50'
             }`}
             title="Tampilan Kartu"
           >
-            <LayoutGrid className="w-3.5 h-3.5" />
+            <LayoutGrid className="w-4 h-4" />
           </button>
           <button
             type="button"
             onClick={() => setViewMode('table')}
-            className={`p-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               viewMode === 'table'
-                ? 'bg-rose-100 text-rose-800 border border-rose-200'
-                : 'text-slate-500 hover:bg-slate-100'
+                ? 'bg-pink-100 text-pink-800 border border-pink-300'
+                : 'text-slate-500 hover:bg-pink-50'
             }`}
             title="Tampilan Tabel"
           >
-            <List className="w-3.5 h-3.5" />
+            <List className="w-4 h-4" />
           </button>
         </div>
       </div>
 
       {/* Main Content: Card or Table View */}
       {filteredRecords.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-xl p-8 text-center space-y-2">
-          <Sparkles className="w-8 h-8 text-emerald-500 mx-auto" />
+        <div className="relative z-10 bg-white/95 backdrop-blur-xs border border-pink-100 rounded-2xl p-8 text-center space-y-2.5 shadow-[0_4px_16px_rgba(244,114,182,0.06)]">
+          <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200">
+            <Sparkles className="w-6 h-6" />
+          </div>
           <h3 className="text-sm font-black text-slate-800">
             Alhamdulillah, Tidak Ada Santriwati Sedang Haid
           </h3>
@@ -360,7 +370,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
         </div>
       ) : viewMode === 'card' ? (
         /* CARD VIEW: Tight, Compact Bento Grid */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5">
           {filteredRecords.map((record) => {
             const photo = getStudentPhoto(record.studentId);
             const fiqh = analyzeFiqhHaid(record.startDate);
@@ -369,26 +379,26 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
             return (
               <div
                 key={record.id}
-                className={`bg-white border rounded-xl p-3 sm:p-3.5 shadow-2xs flex flex-col justify-between gap-2.5 transition-all ${
+                className={`bg-white/95 backdrop-blur-xs border rounded-2xl p-4 shadow-[0_4px_16px_rgba(244,114,182,0.06)] flex flex-col justify-between gap-3 transition-all hover:shadow-md ${
                   fiqh.isExceedingMax
-                    ? 'border-red-400 bg-red-50/30 ring-1 ring-red-300'
+                    ? 'border-red-300 bg-red-50/40 ring-1 ring-red-300'
                     : fiqh.dayCount >= 6 && fiqh.dayCount <= 7
-                    ? 'border-amber-300 bg-amber-50/20'
-                    : 'border-slate-200 hover:border-rose-300'
+                    ? 'border-amber-200 bg-amber-50/30'
+                    : 'border-pink-100 hover:border-pink-300'
                 }`}
               >
                 {/* Top Info */}
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
+                    <div className="flex items-center gap-2.5 min-w-0">
                       {photo ? (
                         <img
                           src={photo}
                           alt={record.studentName}
-                          className="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0"
+                          className="w-10 h-10 rounded-full object-cover border border-pink-200 shrink-0 shadow-2xs"
                         />
                       ) : (
-                        <div className="w-9 h-9 rounded-full bg-rose-100 text-rose-800 font-bold text-xs flex items-center justify-center shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-pink-100 text-pink-700 font-bold text-xs flex items-center justify-center shrink-0 border border-pink-200">
                           {record.studentName.charAt(0)}
                         </div>
                       )}
@@ -396,7 +406,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                         <h4 className="text-xs font-black text-slate-900 truncate leading-tight">
                           {record.studentName}
                         </h4>
-                        <p className="text-[10px] text-slate-500 leading-tight">
+                        <p className="text-[10px] text-slate-500 leading-tight mt-0.5">
                           {record.studentClass} • NIK: {record.studentNik || '-'}
                         </p>
                       </div>
@@ -404,26 +414,26 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
 
                     {/* Day Badge */}
                     <span
-                      className={`px-2 py-0.5 rounded-md text-[10px] font-black shrink-0 border uppercase tracking-wider ${fiqh.badgeBg} ${fiqh.badgeColor} ${fiqh.badgeBorder}`}
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-black shrink-0 border uppercase tracking-wider ${fiqh.badgeBg} ${fiqh.badgeColor} ${fiqh.badgeBorder}`}
                     >
                       Hari ke-{fiqh.dayCount}
                     </span>
                   </div>
 
                   {/* Fiqh Progress Bar (Scale 1 to 15 days) */}
-                  <div className="space-y-1 bg-slate-50 p-2 rounded-lg border border-slate-150">
+                  <div className="space-y-1 bg-pink-50/40 p-2.5 rounded-xl border border-pink-100">
                     <div className="flex items-center justify-between text-[10px]">
                       <span className="font-bold text-slate-700">{fiqh.stageTitle}</span>
                       <span className="text-slate-500 font-medium">{fiqh.dayCount}/15 Hari</span>
                     </div>
-                    <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-pink-100 h-2 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-300 ${
                           fiqh.isExceedingMax
-                            ? 'bg-red-600'
+                            ? 'bg-red-500'
                             : fiqh.dayCount >= 6
-                            ? 'bg-amber-500'
-                            : 'bg-rose-500'
+                            ? 'bg-amber-400'
+                            : 'bg-gradient-to-r from-pink-500 to-rose-400'
                         }`}
                         style={{ width: `${progressPercent}%` }}
                       />
@@ -431,7 +441,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                   </div>
 
                   {/* Fiqh Details & Warning */}
-                  <div className="space-y-1 text-[11px] text-slate-600">
+                  <div className="space-y-1.5 text-[11px] text-slate-600">
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500">Mulai:</span>
                       <span className="font-semibold text-slate-800">
@@ -447,14 +457,14 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                       </div>
                     )}
                     {record.notes && (
-                      <p className="text-[10px] text-slate-500 italic bg-white p-1.5 rounded border border-slate-150">
+                      <p className="text-[10px] text-slate-500 italic bg-pink-50/30 p-2 rounded-lg border border-pink-100">
                         💬 "{record.notes}"
                       </p>
                     )}
 
                     {/* Istihadhah Alert */}
                     {fiqh.isExceedingMax && (
-                      <div className="p-1.5 rounded bg-red-100 text-red-900 border border-red-200 text-[10px] font-medium leading-tight">
+                      <div className="p-2 rounded-xl bg-red-100 text-red-900 border border-red-200 text-[10px] font-medium leading-tight">
                         ⚠️ <strong>Istihadhah:</strong> Darah &gt;15 hari. Wajib mandi wajib dan thaharah sholat/puasa.
                       </div>
                     )}
@@ -462,7 +472,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                 </div>
 
                 {/* Bottom Quick Action: Konfirmasi Selesai / Mandi Wajib */}
-                <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1.5">
+                <div className="pt-2.5 border-t border-pink-100 flex items-center justify-between gap-1.5">
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
@@ -471,7 +481,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                         setEditStartDate(record.startDate);
                         setEditNotes(record.notes || '');
                       }}
-                      className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 text-xs transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-pink-600 hover:bg-pink-50 text-xs transition-colors cursor-pointer"
                       title="Edit Data"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
@@ -479,7 +489,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                     <button
                       type="button"
                       onClick={() => onDeleteHaidRecord(record.id)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 text-xs transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 text-xs transition-colors cursor-pointer"
                       title="Hapus Catatan"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -492,7 +502,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                       setTargetFinishRecord(record);
                       setFinishDate(getTodayDateStr());
                     }}
-                    className="px-2.5 py-1.5 rounded-lg text-xs font-black bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white transition-all flex items-center gap-1 shadow-2xs cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl text-xs font-black bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white transition-all flex items-center gap-1 shadow-2xs cursor-pointer"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>Selesai & Mandi</span>
@@ -504,61 +514,61 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
         </div>
       ) : (
         /* TABLE VIEW: Compact, Slim rows */
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+        <div className="relative z-10 bg-white/95 backdrop-blur-xs border border-pink-100 rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(244,114,182,0.06)]">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-700">
-              <thead className="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-600 border-b border-slate-200">
+              <thead className="bg-pink-50/60 text-[11px] uppercase tracking-wider text-slate-600 border-b border-pink-100">
                 <tr>
-                  <th className="py-2.5 px-3">Santriwati</th>
-                  <th className="py-2.5 px-3">Kelas</th>
-                  <th className="py-2.5 px-3">Tanggal Mulai</th>
-                  <th className="py-2.5 px-3">Hari Ke-</th>
-                  <th className="py-2.5 px-3">Status Fiqih</th>
-                  <th className="py-2.5 px-3">Catatan</th>
-                  <th className="py-2.5 px-3 text-right">Aksi</th>
+                  <th className="py-3 px-3.5">Santriwati</th>
+                  <th className="py-3 px-3.5">Kelas</th>
+                  <th className="py-3 px-3.5">Tanggal Mulai</th>
+                  <th className="py-3 px-3.5">Hari Ke-</th>
+                  <th className="py-3 px-3.5">Status Fiqih</th>
+                  <th className="py-3 px-3.5">Catatan</th>
+                  <th className="py-3 px-3.5 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-pink-50">
                 {filteredRecords.map((record) => {
                   const fiqh = analyzeFiqhHaid(record.startDate);
                   const photo = getStudentPhoto(record.studentId);
 
                   return (
-                    <tr key={record.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-2 px-3">
+                    <tr key={record.id} className="hover:bg-pink-50/40 transition-colors">
+                      <td className="py-2.5 px-3.5">
                         <div className="flex items-center gap-2">
                           {photo ? (
                             <img
                               src={photo}
                               alt={record.studentName}
-                              className="w-6 h-6 rounded-full object-cover border shrink-0"
+                              className="w-7 h-7 rounded-full object-cover border border-pink-200 shrink-0"
                             />
                           ) : (
-                            <div className="w-6 h-6 rounded-full bg-rose-100 text-rose-800 font-bold text-[10px] flex items-center justify-center shrink-0">
+                            <div className="w-7 h-7 rounded-full bg-pink-100 text-pink-700 font-bold text-[10px] flex items-center justify-center shrink-0 border border-pink-200">
                               {record.studentName.charAt(0)}
                             </div>
                           )}
                           <span className="font-bold text-slate-900">{record.studentName}</span>
                         </div>
                       </td>
-                      <td className="py-2 px-3 font-medium text-slate-600">{record.studentClass}</td>
-                      <td className="py-2 px-3 font-semibold text-rose-800">
+                      <td className="py-2.5 px-3.5 font-medium text-slate-600">{record.studentClass}</td>
+                      <td className="py-2.5 px-3.5 font-semibold text-rose-700">
                         {record.startDate} {record.startTime && `(${record.startTime})`}
                       </td>
-                      <td className="py-2 px-3">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-black ${fiqh.badgeBg} ${fiqh.badgeColor} border ${fiqh.badgeBorder}`}>
+                      <td className="py-2.5 px-3.5">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${fiqh.badgeBg} ${fiqh.badgeColor} border ${fiqh.badgeBorder}`}>
                           Hari {fiqh.dayCount}
                         </span>
                       </td>
-                      <td className="py-2 px-3">
+                      <td className="py-2.5 px-3.5">
                         <span className="text-[11px] font-medium text-slate-700">
                           {fiqh.stageTitle}
                         </span>
                       </td>
-                      <td className="py-2 px-3 text-[11px] text-slate-500 max-w-xs truncate">
+                      <td className="py-2.5 px-3.5 text-[11px] text-slate-500 max-w-xs truncate">
                         {record.notes || '-'}
                       </td>
-                      <td className="py-2 px-3 text-right">
+                      <td className="py-2.5 px-3.5 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             type="button"
@@ -566,7 +576,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                               setTargetFinishRecord(record);
                               setFinishDate(getTodayDateStr());
                             }}
-                            className="px-2 py-1 rounded-md text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all flex items-center gap-1 cursor-pointer"
+                            className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
                           >
                             <CheckCircle2 className="w-3 h-3" />
                             <span>Mandi Wajib</span>
@@ -574,7 +584,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                           <button
                             type="button"
                             onClick={() => onDeleteHaidRecord(record.id)}
-                            className="p-1 text-slate-400 hover:text-red-600 cursor-pointer"
+                            className="p-1.5 text-slate-400 hover:text-red-500 cursor-pointer"
                             title="Hapus"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -593,11 +603,11 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
       {/* Modal: Konfirmasi Selesai & Mandi Wajib */}
       {targetFinishRecord && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-2xl max-w-md w-full p-4 sm:p-5 shadow-xl border border-slate-200 space-y-3.5">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center">
-                  <CheckCircle2 className="w-4 h-4" />
+          <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-pink-100 space-y-4">
+            <div className="flex items-center justify-between border-b border-pink-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                  <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="text-sm font-black text-slate-900">
@@ -617,8 +627,8 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
               </button>
             </div>
 
-            <form onSubmit={handleConfirmFinish} className="space-y-3 text-xs">
-              <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 space-y-1">
+            <form onSubmit={handleConfirmFinish} className="space-y-3.5 text-xs">
+              <div className="p-3 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-emerald-900 space-y-1">
                 <div className="flex items-center justify-between font-bold">
                   <span>Mulai Haid: {targetFinishRecord.startDate}</span>
                   <span>Durasi: {calculateDaysBetween(targetFinishRecord.startDate, finishDate)} Hari</span>
@@ -628,7 +638,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2.5">
                 <div>
                   <label className="text-[10px] font-bold text-slate-700 block mb-0.5">
                     Tanggal Bersih / Mandi:
@@ -638,7 +648,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                     value={finishDate}
                     onChange={(e) => setFinishDate(e.target.value)}
                     max={getTodayDateStr()}
-                    className="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-bold focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                    className="w-full px-2.5 py-2 text-xs bg-pink-50/40 border border-pink-200 rounded-xl text-slate-800 font-bold focus:ring-2 focus:ring-emerald-400 focus:outline-none"
                     required
                   />
                 </div>
@@ -650,7 +660,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                     type="time"
                     value={finishTime}
                     onChange={(e) => setFinishTime(e.target.value)}
-                    className="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                    className="w-full px-2.5 py-2 text-xs bg-pink-50/40 border border-pink-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-emerald-400 focus:outline-none"
                   />
                 </div>
               </div>
@@ -664,21 +674,21 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                   value={finishNotes}
                   onChange={(e) => setFinishNotes(e.target.value)}
                   placeholder="Catatan..."
-                  className="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                  className="w-full px-2.5 py-2 text-xs bg-pink-50/40 border border-pink-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-400 focus:outline-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-pink-100">
                 <button
                   type="button"
                   onClick={() => setTargetFinishRecord(null)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-pink-50 border border-pink-200 transition-all cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 rounded-lg text-xs font-black bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-black bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Simpan Suci & Mandi</span>
@@ -692,8 +702,8 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
       {/* Modal: Edit Record */}
       {targetEditRecord && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-2xl max-w-md w-full p-4 sm:p-5 shadow-xl border border-slate-200 space-y-3.5">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-pink-100 space-y-4">
+            <div className="flex items-center justify-between border-b border-pink-100 pb-3">
               <h3 className="text-sm font-black text-slate-900">
                 Edit Catatan Haid: {targetEditRecord.studentName}
               </h3>
@@ -706,7 +716,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
               </button>
             </div>
 
-            <form onSubmit={handleConfirmEdit} className="space-y-3 text-xs">
+            <form onSubmit={handleConfirmEdit} className="space-y-3.5 text-xs">
               <div>
                 <label className="text-[10px] font-bold text-slate-700 block mb-0.5">
                   Tanggal Mulai Keluar Darah:
@@ -715,7 +725,7 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                   type="date"
                   value={editStartDate}
                   onChange={(e) => setEditStartDate(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-bold focus:ring-1 focus:ring-rose-500 focus:outline-none"
+                  className="w-full px-2.5 py-2 text-xs bg-pink-50/40 border border-pink-200 rounded-xl text-slate-800 font-bold focus:ring-2 focus:ring-pink-400 focus:outline-none"
                   required
                 />
               </div>
@@ -728,21 +738,21 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
                   type="text"
                   value={editNotes}
                   onChange={(e) => setEditNotes(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:ring-1 focus:ring-rose-500 focus:outline-none"
+                  className="w-full px-2.5 py-2 text-xs bg-pink-50/40 border border-pink-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-pink-400 focus:outline-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-pink-100">
                 <button
                   type="button"
                   onClick={() => setTargetEditRecord(null)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-pink-50 border border-pink-200 transition-all cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 rounded-lg text-xs font-black bg-rose-600 hover:bg-rose-700 text-white transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white transition-all shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Simpan Perubahan</span>

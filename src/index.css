@@ -34,3 +34,41 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Pink Sweet Transition Fade-In for Haid & Suci Views */
+@keyframes pinkFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.992);
+    filter: drop-shadow(0 0 20px rgba(244, 114, 182, 0.45));
+  }
+  60% {
+    filter: drop-shadow(0 0 10px rgba(244, 114, 182, 0.25));
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 0 0px transparent);
+  }
+}
+
+.animate-pink-fade-in {
+  animation: pinkFadeIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes pinkAuraGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(244, 114, 182, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 28px 6px rgba(244, 114, 182, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(244, 114, 182, 0);
+  }
+}
+
+.animate-pink-aura {
+  animation: pinkAuraGlow 0.6s ease-out forwards;
+}
+

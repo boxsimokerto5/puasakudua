@@ -11,6 +11,12 @@ import {
   Moon,
   Clock,
   BookOpen,
+  Droplets,
+  HeartPulse,
+  Heart,
+  Flower2,
+  ChevronLeft,
+  CalendarCheck,
 } from 'lucide-react';
 
 interface LoginFormProps {
@@ -37,6 +43,16 @@ interface StarParticle {
   isSparkle?: boolean;
 }
 
+interface FloatingPetal {
+  id: number;
+  top: number;
+  left: number;
+  size: number;
+  duration: number;
+  delay: number;
+  rotate: number;
+}
+
 export const LoginForm: React.FC<LoginFormProps> = ({
   onLogin,
   error: propError,
@@ -46,8 +62,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onOpenPrayerModal,
   onOpenSurahsModal,
 }) => {
+  // Mode: 'main' (Ramadhan green) or 'haid' (Feminine pink theme)
+  const [loginMode, setLoginMode] = useState<'main' | 'haid'>('main');
+
+  // Main login credentials
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  // Haid login credentials
+  const [haidUsername, setHaidUsername] = useState('');
+  const [haidPassword, setHaidPassword] = useState('');
+
   const [error, setError] = useState<string | null>(propError || null);
 
   // Generate organic starry field for Ramadan login ambiance
@@ -72,7 +97,25 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     return list;
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Generate gentle floating flower petals for Pink Haid login ambiance
+  const pinkPetals = useMemo<FloatingPetal[]>(() => {
+    const list: FloatingPetal[] = [];
+    for (let i = 0; i < 26; i++) {
+      list.push({
+        id: i,
+        top: Math.random() * 95,
+        left: Math.random() * 94 + 3,
+        size: Math.random() * 12 + 10,
+        duration: Math.random() * 5 + 4,
+        delay: Math.random() * 3,
+        rotate: Math.random() * 360,
+      });
+    }
+    return list;
+  }, []);
+
+  // Main Login Submit
+  const handleMainSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -97,11 +140,223 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         role: 'pengecek',
         name: 'Petugas Pengecek / Verifikator',
       });
+    } else if (cleanUser === 'inputhaid' && cleanPass === 'inputhaid') {
+      onLogin({
+        username: 'inputhaid',
+        role: 'haid',
+        name: 'Petugas Catat Haid & Suci',
+      });
     } else {
       setError('Username atau Password salah! Pastikan kredensial yang Anda masukkan sesuai.');
     }
   };
 
+  // Pink Haid Login Submit
+  const handleHaidSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    const cleanUser = haidUsername.trim().toLowerCase();
+    const cleanPass = haidPassword.trim();
+
+    if (cleanUser === 'inputhaid' && cleanPass === 'inputhaid') {
+      onLogin({
+        username: 'inputhaid',
+        role: 'haid',
+        name: 'Petugas Catat Haid & Suci',
+      });
+    } else if (cleanUser === 'admin' && cleanPass === 'admin') {
+      onLogin({
+        username: 'admin',
+        role: 'admin',
+        name: 'Administrator Asrama',
+      });
+    } else {
+      setError('Username atau Password Petugas Haid salah! Gunakan user: inputhaid');
+    }
+  };
+
+  // =========================================================================
+  // VIEW 2: HALAMAN LOGIN KHUSUS PENCATATAN HAID (TEMA SOFT PASTEL PINK MANIS)
+  // =========================================================================
+  if (loginMode === 'haid') {
+    return (
+      <div className="relative min-h-screen flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#fff0f5] via-[#ffe4e9] to-[#fce7f3] text-slate-800 overflow-hidden select-none">
+        {/* Soft Pink Glow & Floating Animation */}
+        <style>{`
+          @keyframes pinkFloatSoft {
+            0%, 100% {
+              transform: translateY(0px) rotate(0deg);
+              opacity: 0.45;
+            }
+            50% {
+              transform: translateY(-14px) rotate(14deg);
+              opacity: 0.85;
+            }
+          }
+          @keyframes softPulseGlow {
+            0%, 100% {
+              filter: drop-shadow(0 0 12px rgba(244, 114, 182, 0.35));
+            }
+            50% {
+              filter: drop-shadow(0 0 24px rgba(251, 113, 133, 0.6));
+            }
+          }
+        `}</style>
+
+        {/* Soft Pink Ambiance & Floating Petals Layer */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+          <div className="absolute inset-0 bg-[radial-gradient(#f472b6_1px,transparent_1px)] [background-size:24px_24px] opacity-20" />
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[550px] h-[550px] bg-pink-300/35 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-10 -right-20 w-80 h-80 bg-rose-200/50 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-1/3 -left-20 w-72 h-72 bg-fuchsia-200/40 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Floating Pastel Pink Flowers & Hearts */}
+          {pinkPetals.map((petal) => (
+            <div
+              key={petal.id}
+              style={{
+                position: 'absolute',
+                top: `${petal.top}%`,
+                left: `${petal.left}%`,
+                width: `${petal.size}px`,
+                height: `${petal.size}px`,
+                animation: `pinkFloatSoft ${petal.duration}s ease-in-out infinite ${petal.delay}s`,
+                transform: `rotate(${petal.rotate}deg)`,
+              }}
+              className="pointer-events-none text-pink-400/50"
+            >
+              {petal.id % 2 === 0 ? (
+                <Flower2 className="w-full h-full fill-pink-300/40 text-pink-400" />
+              ) : (
+                <Heart className="w-full h-full fill-rose-300/40 text-rose-400" />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Main Soft Pink Card Container */}
+        <div className="relative z-10 max-w-md w-full space-y-5 bg-white/90 p-7 sm:p-9 rounded-3xl shadow-[0_15px_40px_rgba(244,114,182,0.18)] border border-pink-200/80 backdrop-blur-md">
+          {/* Back Button to Main Login */}
+          <button
+            type="button"
+            onClick={() => {
+              setError(null);
+              setLoginMode('main');
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 transition-all cursor-pointer shadow-xs active:scale-95"
+          >
+            <ChevronLeft className="w-4 h-4 text-pink-600" />
+            <span>Kembali ke Login Utama</span>
+          </button>
+
+          {/* Header Branding (Tema Manis Santriwati) */}
+          <div className="text-center space-y-2.5">
+            <div className="relative inline-block">
+              <div className="absolute -inset-2 bg-gradient-to-r from-pink-300/50 via-rose-200/60 to-pink-300/50 rounded-3xl blur-md animate-pulse" />
+              <div className="relative p-3 rounded-2xl bg-gradient-to-tr from-pink-400 to-rose-400 text-white shadow-md border border-pink-100 [animation:softPulseGlow_3s_ease-in-out_infinite]">
+                <Droplets className="w-9 h-9 text-white" />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-center gap-2">
+                <Heart className="w-4 h-4 text-pink-400 fill-pink-400/40" />
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight font-sans">
+                  Pencatatan Haid
+                </h2>
+                <Heart className="w-4 h-4 text-pink-400 fill-pink-400/40" />
+              </div>
+              <div className="flex items-center justify-center gap-2 mt-1">
+                <div className="h-[1.5px] w-6 bg-gradient-to-r from-transparent to-pink-300 rounded-full" />
+                <span className="px-3 py-0.5 rounded-full text-[10.5px] font-black bg-pink-100 text-pink-700 border border-pink-200 shadow-xs tracking-wider">
+                  PORTAL KHUSUS SANTRIWATI
+                </span>
+                <div className="h-[1.5px] w-6 bg-gradient-to-l from-transparent to-pink-300 rounded-full" />
+              </div>
+              <p className="text-xs text-slate-600 font-medium mt-1.5 max-w-xs mx-auto">
+                Pencatatan Udzur Syar'i, Pemantauan Haid & Masa Suci Fiqih Syafi'i
+              </p>
+            </div>
+          </div>
+
+          {/* Form Login Soft Pink */}
+          <form onSubmit={handleHaidSubmit} className="space-y-3.5 pt-1">
+            {error && (
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-start gap-2 shadow-xs animate-in fade-in duration-150">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1">
+                Username Petugas Haid
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-pink-400">
+                  <User className="w-4 h-4" />
+                </div>
+                <input
+                  type="text"
+                  value={haidUsername}
+                  onChange={(e) => setHaidUsername(e.target.value)}
+                  placeholder="Masukkan username (inputhaid)"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-pink-50/60 border border-pink-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all shadow-xs"
+                  required
+                  autoComplete="username"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1">
+                Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-pink-400">
+                  <Lock className="w-4 h-4" />
+                </div>
+                <input
+                  type="password"
+                  value={haidPassword}
+                  onChange={(e) => setHaidPassword(e.target.value)}
+                  placeholder="Masukkan password"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-pink-50/60 border border-pink-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all shadow-xs"
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-pink-500 via-rose-400 to-pink-500 hover:from-pink-600 hover:to-rose-500 active:scale-98 text-white font-black text-sm shadow-[0_4px_15px_rgba(244,114,182,0.35)] border border-pink-200 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer mt-3"
+            >
+              <Droplets className="w-4 h-4 text-pink-100" />
+              <span>Masuk Portal Haid & Suci</span>
+              <ArrowRight className="w-4 h-4 text-pink-100" />
+            </button>
+          </form>
+
+          {/* Sweet Footer Note */}
+          <div className="pt-3 border-t border-pink-100 text-center space-y-1">
+            <p className="text-[11px] text-pink-800 flex items-center justify-center gap-1 font-semibold">
+              <HeartPulse className="w-3.5 h-3.5 text-rose-500" />
+              <span>Portal Terproteksi Khusus Ustadzah & Siswi</span>
+            </p>
+            <p className="text-[10.5px] text-slate-500">
+              SMP / SMA SRT 1 Kediri
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // VIEW 1: HALAMAN LOGIN UTAMA (TEMA RAMADHAN EMERALD & GOLD)
+  // =========================================================================
   return (
     <div className="relative min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#021c15] via-[#033123] to-[#01140e] text-white overflow-hidden select-none">
       {/* Dynamic Keyframes for Login Ramadan Sky & Animated Walking Camel */}
@@ -295,7 +550,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </div>
 
         {/* Form Login */}
-        <form onSubmit={handleSubmit} className="space-y-4 pt-1">
+        <form onSubmit={handleMainSubmit} className="space-y-4 pt-1">
           {error && (
             <div className="p-3.5 rounded-xl bg-red-950/80 border border-red-500/70 text-red-200 text-xs font-semibold flex items-start gap-2.5 shadow-md animate-in fade-in duration-150">
               <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
@@ -335,7 +590,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Masukkan username (admin / puasa / cekpuasa)"
+                placeholder="admin / puasa / cekpuasa"
                 className="w-full pl-10 pr-4 py-2.5 text-sm bg-emerald-950/70 border border-emerald-700/80 rounded-xl text-white placeholder-emerald-400/50 focus:bg-emerald-950 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all shadow-inner"
                 required
                 autoComplete="username"
@@ -365,10 +620,24 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
           <button
             type="submit"
-            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm shadow-[0_0_20px_rgba(16,185,129,0.35)] border border-emerald-400/40 hover:border-amber-300/70 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer mt-5"
+            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm shadow-[0_0_20px_rgba(16,185,129,0.35)] border border-emerald-400/40 hover:border-amber-300/70 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer mt-4"
           >
             <span>Masuk ke Sistem</span>
             <ArrowRight className="w-4 h-4 text-amber-200" />
+          </button>
+
+          {/* Button: Pencatatan Haid (Opens Beautiful Pink Feminine Login View) */}
+          <button
+            type="button"
+            onClick={() => {
+              setError(null);
+              setLoginMode('haid');
+            }}
+            className="w-full py-2.5 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-pink-950/90 via-rose-900/90 to-pink-950/90 hover:from-rose-900 hover:via-pink-800 hover:to-rose-900 text-pink-200 border-2 border-pink-400/60 shadow-[0_0_15px_rgba(244,114,182,0.25)] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+          >
+            <Droplets className="w-4 h-4 text-pink-300 shrink-0 animate-bounce" />
+            <span>Pencatatan Haid</span>
+            <Heart className="w-3.5 h-3.5 text-pink-400 fill-pink-400/40 shrink-0" />
           </button>
         </form>
 
