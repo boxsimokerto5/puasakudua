@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { UserSession } from '../types';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
+import { UserSession, AdminTabType } from '../types';
 import { CityLocation } from '../utils/prayerTimes';
 import { PrayerTimeHeaderPill } from './PrayerTimeHeaderPill';
 import {
@@ -20,6 +20,10 @@ import {
   Sparkles,
   BookOpen,
   CalendarCheck,
+  Droplets,
+  HeartPulse,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 interface HeaderNavbarProps {
@@ -27,8 +31,8 @@ interface HeaderNavbarProps {
   onLogout: () => void;
   activeSessionTitle?: string;
   activeSessionDate?: string;
-  activeAdminTab?: 'admin' | 'input' | 'checker' | 'raport' | 'calendar';
-  onSelectAdminTab?: (tab: 'admin' | 'input' | 'checker' | 'raport' | 'calendar') => void;
+  activeAdminTab?: AdminTabType;
+  onSelectAdminTab?: (tab: AdminTabType) => void;
   isSupabaseConnected?: boolean;
   onOpenSupabaseConfig?: () => void;
   onInstallPwa?: () => void;
@@ -69,6 +73,51 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
   const isAdmin = user.role === 'admin';
   const isPenginput = user.role === 'penginput';
   const isPengecek = user.role === 'pengecek';
+
+  // Navigation slider scroll management
+  const navSliderRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScrollability = () => {
+    if (navSliderRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = navSliderRef.current;
+      setCanScrollLeft(scrollLeft > 4);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 4);
+    }
+  };
+
+  useEffect(() => {
+    checkScrollability();
+    window.addEventListener('resize', checkScrollability);
+    return () => window.removeEventListener('resize', checkScrollability);
+  }, []);
+
+  // Ensure active tab is smoothly visible in the slider
+  useEffect(() => {
+    if (navSliderRef.current && activeAdminTab) {
+      const activeButton = navSliderRef.current.querySelector<HTMLElement>('[data-active="true"]');
+      if (activeButton) {
+        activeButton.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center',
+        });
+      }
+      setTimeout(checkScrollability, 350);
+    }
+  }, [activeAdminTab]);
+
+  const handleScrollNav = (direction: 'left' | 'right') => {
+    if (navSliderRef.current) {
+      const scrollAmount = 220;
+      navSliderRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+      setTimeout(checkScrollability, 300);
+    }
+  };
 
   // Generate subtle stars for Header background
   const headerStars = useMemo<HeaderStar[]>(() => {
@@ -255,84 +304,166 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
             </div>
           </div>
 
-          {/* Navigation Tabs - Proportional Segmented Control */}
+          {/* Navigation Tabs - Smooth Horizontal Slider Segmented Control */}
           {onSelectAdminTab && (
-            <nav className="w-full lg:w-auto bg-emerald-950/90 p-1 rounded-xl border border-emerald-700/60 shadow-inner backdrop-blur-xs">
-              <div className="grid grid-flow-col auto-cols-fr sm:flex sm:flex-wrap items-center gap-1">
-                {isAdmin && (
-                  <button
-                    type="button"
-                    onClick={() => onSelectAdminTab('admin')}
-                    className={`px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                      activeAdminTab === 'admin'
-                        ? 'bg-purple-600 text-white shadow-md'
-                        : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
-                    }`}
-                  >
-                    <Sliders className="w-3.5 h-3.5 shrink-0" />
-                    <span>Admin</span>
-                  </button>
-                )}
-
-                {(isAdmin || isPenginput) && (
-                  <button
-                    type="button"
-                    onClick={() => onSelectAdminTab('input')}
-                    className={`px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                      activeAdminTab === 'input'
-                        ? 'bg-emerald-600 text-white shadow-md'
-                        : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
-                    }`}
-                  >
-                    <Edit3 className="w-3.5 h-3.5 shrink-0" />
-                    <span>Form Input</span>
-                  </button>
-                )}
-
-                {(isAdmin || isPengecek) && (
-                  <button
-                    type="button"
-                    onClick={() => onSelectAdminTab('checker')}
-                    className={`px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                      activeAdminTab === 'checker'
-                        ? 'bg-amber-500 text-emerald-950 shadow-md font-black'
-                        : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
-                    }`}
-                  >
-                    <CheckSquare className="w-3.5 h-3.5 shrink-0" />
-                    <span>Ceklist</span>
-                  </button>
-                )}
-
-                {/* Raport & Sertifikat Imtaq Tab */}
+            <div className="relative w-full lg:w-auto flex items-center group/nav">
+              {/* Left Scroll Arrow (Appears when content can be scrolled left) */}
+              {canScrollLeft && (
                 <button
                   type="button"
-                  onClick={() => onSelectAdminTab('raport')}
-                  className={`px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                    activeAdminTab === 'raport'
-                      ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-emerald-950 shadow-md ring-1 ring-amber-300 font-black'
-                      : 'text-amber-300 hover:text-amber-200 hover:bg-emerald-800/70'
-                  }`}
+                  onClick={() => handleScrollNav('left')}
+                  className="absolute -left-2 z-20 w-6 h-6 rounded-full bg-emerald-900/90 border border-amber-400/60 text-amber-300 flex items-center justify-center shadow-md hover:bg-emerald-800 transition-all cursor-pointer backdrop-blur-xs"
+                  title="Geser ke kiri"
+                  aria-label="Geser tab ke kiri"
                 >
-                  <Trophy className="w-3.5 h-3.5 text-amber-400 fill-amber-400/30 shrink-0" />
-                  <span>Raport</span>
+                  <ChevronLeft className="w-4 h-4" />
                 </button>
+              )}
 
-                {/* Kalender Puasa & Hijriah Tab */}
+              <nav className="w-full bg-emerald-950/90 p-1 rounded-xl border border-emerald-700/60 shadow-inner backdrop-blur-xs overflow-hidden">
+                <div
+                  ref={navSliderRef}
+                  onScroll={checkScrollability}
+                  className="flex items-center gap-1 overflow-x-auto no-scrollbar scroll-smooth py-0.5 px-0.5"
+                >
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      data-active={activeAdminTab === 'admin'}
+                      onClick={() => onSelectAdminTab('admin')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                        activeAdminTab === 'admin'
+                          ? 'bg-purple-600 text-white shadow-md ring-1 ring-purple-400'
+                          : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
+                      }`}
+                    >
+                      <Sliders className="w-3.5 h-3.5 shrink-0" />
+                      <span>Admin</span>
+                    </button>
+                  )}
+
+                  {(isAdmin || isPenginput) && (
+                    <button
+                      type="button"
+                      data-active={activeAdminTab === 'input'}
+                      onClick={() => onSelectAdminTab('input')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                        activeAdminTab === 'input'
+                          ? 'bg-emerald-600 text-white shadow-md ring-1 ring-emerald-400'
+                          : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
+                      }`}
+                    >
+                      <Edit3 className="w-3.5 h-3.5 shrink-0" />
+                      <span>Form Input</span>
+                    </button>
+                  )}
+
+                  {(isAdmin || isPengecek) && (
+                    <button
+                      type="button"
+                      data-active={activeAdminTab === 'checker'}
+                      onClick={() => onSelectAdminTab('checker')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                        activeAdminTab === 'checker'
+                          ? 'bg-amber-500 text-emerald-950 shadow-md font-black ring-1 ring-amber-300'
+                          : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
+                      }`}
+                    >
+                      <CheckSquare className="w-3.5 h-3.5 shrink-0" />
+                      <span>Ceklist</span>
+                    </button>
+                  )}
+
+                  {/* Raport & Sertifikat Imtaq Tab */}
+                  <button
+                    type="button"
+                    data-active={activeAdminTab === 'raport'}
+                    onClick={() => onSelectAdminTab('raport')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                      activeAdminTab === 'raport'
+                        ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-emerald-950 shadow-md ring-1 ring-amber-300 font-black'
+                        : 'text-amber-300 hover:text-amber-200 hover:bg-emerald-800/70'
+                    }`}
+                  >
+                    <Trophy className="w-3.5 h-3.5 text-amber-400 fill-amber-400/30 shrink-0" />
+                    <span>Raport</span>
+                  </button>
+
+                  {/* Kalender Puasa & Hijriah Tab */}
+                  <button
+                    type="button"
+                    data-active={activeAdminTab === 'calendar'}
+                    onClick={() => onSelectAdminTab('calendar')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                      activeAdminTab === 'calendar'
+                        ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-md ring-1 ring-teal-300 font-black'
+                        : 'text-teal-300 hover:text-white hover:bg-emerald-800/70'
+                    }`}
+                  >
+                    <CalendarCheck className="w-3.5 h-3.5 text-teal-300 shrink-0" />
+                    <span>Kalender</span>
+                  </button>
+
+                  {/* Catat Haid Tab */}
+                  <button
+                    type="button"
+                    data-active={activeAdminTab === 'catat_haid'}
+                    onClick={() => onSelectAdminTab('catat_haid')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                      activeAdminTab === 'catat_haid'
+                        ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md ring-1 ring-rose-300 font-black'
+                        : 'text-rose-300 hover:text-white hover:bg-emerald-800/70'
+                    }`}
+                  >
+                    <Droplets className="w-3.5 h-3.5 text-rose-300 shrink-0" />
+                    <span>Catat Haid</span>
+                  </button>
+
+                  {/* Daftar Haid Tab */}
+                  <button
+                    type="button"
+                    data-active={activeAdminTab === 'daftar_haid'}
+                    onClick={() => onSelectAdminTab('daftar_haid')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                      activeAdminTab === 'daftar_haid'
+                        ? 'bg-gradient-to-r from-rose-600 to-pink-700 text-white shadow-md ring-1 ring-rose-300 font-black'
+                        : 'text-rose-300 hover:text-white hover:bg-emerald-800/70'
+                    }`}
+                  >
+                    <HeartPulse className="w-3.5 h-3.5 text-rose-300 shrink-0" />
+                    <span>Daftar Haid</span>
+                  </button>
+
+                  {/* Daftar Suci Tab */}
+                  <button
+                    type="button"
+                    data-active={activeAdminTab === 'daftar_suci'}
+                    onClick={() => onSelectAdminTab('daftar_suci')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                      activeAdminTab === 'daftar_suci'
+                        ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-md ring-1 ring-emerald-300 font-black'
+                        : 'text-emerald-300 hover:text-white hover:bg-emerald-800/70'
+                    }`}
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                    <span>Daftar Suci</span>
+                  </button>
+                </div>
+              </nav>
+
+              {/* Right Scroll Arrow (Appears when content can be scrolled right) */}
+              {canScrollRight && (
                 <button
                   type="button"
-                  onClick={() => onSelectAdminTab('calendar')}
-                  className={`px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                    activeAdminTab === 'calendar'
-                      ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-md ring-1 ring-teal-300 font-black'
-                      : 'text-teal-300 hover:text-white hover:bg-emerald-800/70'
-                  }`}
+                  onClick={() => handleScrollNav('right')}
+                  className="absolute -right-2 z-20 w-6 h-6 rounded-full bg-emerald-900/90 border border-amber-400/60 text-amber-300 flex items-center justify-center shadow-md hover:bg-emerald-800 transition-all cursor-pointer backdrop-blur-xs"
+                  title="Geser ke kanan"
+                  aria-label="Geser tab ke kanan"
                 >
-                  <CalendarCheck className="w-3.5 h-3.5 text-teal-300 shrink-0" />
-                  <span>Kalender</span>
+                  <ChevronRight className="w-4 h-4" />
                 </button>
-              </div>
-            </nav>
+              )}
+            </div>
           )}
 
           {/* Quick Islamic Tools & Desktop Actions Bar */}

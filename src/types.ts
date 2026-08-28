@@ -69,7 +69,30 @@ export interface AdminSettings {
   defaultDeadlineTime: string;
 }
 
-export type AdminTabType = 'admin' | 'input' | 'checker' | 'raport' | 'calendar';
+export type AdminTabType = 'admin' | 'input' | 'checker' | 'raport' | 'calendar' | 'catat_haid' | 'daftar_haid' | 'daftar_suci';
+
+export type HaidBloodColor = 'hitam' | 'merah' | 'coklat' | 'kuning' | 'keruh';
+export type HaidStatus = 'haid_aktif' | 'selesai_mandi';
+
+export interface HaidRecord {
+  id: string; // unique ID e.g. "haid-1724839200-12"
+  studentId: number;
+  studentName: string;
+  studentClass: string;
+  studentNik: string;
+  startDate: string; // YYYY-MM-DD
+  startTime?: string; // HH:mm
+  initialInputDay: number; // e.g. 1 (lapor hari 1), 3 (lapor saat hari ke-3)
+  endDate?: string; // YYYY-MM-DD (when completed)
+  endTime?: string;
+  mandiWajibAt?: string; // ISO string / date
+  status: HaidStatus;
+  bloodColor?: HaidBloodColor;
+  notes?: string; // Keluhan, nyeri haid, dsb.
+  recordedBy: string; // Ustadzah / Admin
+  recordedAt: string; // ISO timestamp
+  updatedAt?: string;
+}
 
 export interface SchoolCalendarEvent {
   id: string;

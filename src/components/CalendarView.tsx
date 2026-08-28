@@ -250,72 +250,72 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-200 print:m-0 print:p-0">
+    <div className="max-w-5xl mx-auto space-y-2.5 sm:space-y-3.5 animate-in fade-in duration-200 print:m-0 print:p-0">
       {/* ========================================================================= */}
-      {/* 1. CLEAN CALENDAR CONTAINER (PAPER STYLE - PURE BRIGHT)                  */}
+      {/* 1. CLEAN CALENDAR CONTAINER (SLIM, TIGHT & PROPORTIONAL)                 */}
       {/* ========================================================================= */}
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden print:border-none print:shadow-none">
+      <div className="bg-white border border-slate-200 rounded-xl sm:rounded-2xl shadow-2xs overflow-hidden print:border-none print:shadow-none">
         
-        {/* Navigation & Month Title Header (Super Clean & Minimalist) */}
-        <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white">
+        {/* Navigation & Month Title Header (Slim & Compact) */}
+        <div className="px-3.5 py-2.5 sm:px-4 sm:py-3 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-white">
           {/* Month & Hijri Subtitle */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={handlePrevMonth}
-                className="p-2 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-200 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-200 transition-colors cursor-pointer"
                 title="Bulan Sebelumnya"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-3.5 h-3.5" />
               </button>
               <button
                 type="button"
                 onClick={handleNextMonth}
-                className="p-2 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-200 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-200 transition-colors cursor-pointer"
                 title="Bulan Berikutnya"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
             <div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-2 leading-tight">
                 <span>{MONTH_NAMES_ID[currentMonth]} {currentYear}</span>
               </h2>
-              <p className="text-xs font-bold text-emerald-700">
+              <p className="text-[10px] sm:text-[11px] font-bold text-emerald-700 leading-tight">
                 {currentMonthHijriRange}
               </p>
             </div>
           </div>
 
           {/* Quick Actions (Bulan Ini & Cetak) */}
-          <div className="flex items-center gap-2 self-end sm:self-auto print:hidden">
+          <div className="flex items-center gap-1.5 self-end sm:self-auto print:hidden">
             <button
               type="button"
               onClick={handleGoToToday}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all cursor-pointer flex items-center gap-1"
+              className="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all cursor-pointer flex items-center gap-1"
             >
-              <Sun className="w-3.5 h-3.5 text-amber-500" />
+              <Sun className="w-3 h-3 text-amber-500" />
               <span>Hari Ini</span>
             </button>
 
             <button
               type="button"
               onClick={() => window.print()}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+              className="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
               title="Cetak Kalender"
             >
-              <Printer className="w-3.5 h-3.5" />
+              <Printer className="w-3 h-3" />
               <span>Cetak</span>
             </button>
           </div>
         </div>
 
-        {/* Calendar Grid Matrix */}
-        <div className="p-3 sm:p-5">
+        {/* Calendar Grid Matrix (Compact & Tight) */}
+        <div className="p-2 sm:p-3">
           {/* Day of Week Headers */}
-          <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-2">
+          <div className="grid grid-cols-7 gap-1 sm:gap-1.5 mb-1 sm:mb-1.5">
             {DAY_NAMES_ID.map((name, idx) => {
               const isSunday = idx === 0;
               const isFriday = idx === 5;
@@ -323,7 +323,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               return (
                 <div
                   key={name}
-                  className={`py-2 text-center text-xs font-bold rounded-xl select-none uppercase tracking-wider ${
+                  className={`py-1 text-center text-[10px] sm:text-xs font-bold rounded-md select-none uppercase tracking-wider ${
                     isSunday
                       ? 'bg-red-50 text-red-600 border border-red-100'
                       : isFriday
@@ -338,8 +338,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             })}
           </div>
 
-          {/* Grid of 35 or 42 Days */}
-          <div className="grid grid-cols-7 gap-1 sm:gap-2">
+          {/* Grid of 35 or 42 Days (Proportional Height) */}
+          <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
             {calendarDays.map((day) => {
               const isSelected = day.dateStr === selectedDateStr;
               const daySession = sessionByDate[day.dateStr];
@@ -351,7 +351,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               let dateNumColor = 'text-slate-800';
 
               if (!day.isCurrentMonth) {
-                cellBg = 'bg-slate-50/50 border-slate-100 opacity-35';
+                cellBg = 'bg-slate-50/40 border-slate-100 opacity-30';
                 dateNumColor = 'text-slate-300';
               } else if (day.isHoliday || day.isSunday) {
                 dateNumColor = 'text-red-600';
@@ -368,31 +368,31 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 <div
                   key={day.dateStr}
                   onClick={() => setSelectedDateStr(day.dateStr)}
-                  className={`min-h-[80px] sm:min-h-[96px] p-1.5 sm:p-2 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none ${cellBg} ${
+                  className={`min-h-[58px] sm:min-h-[72px] md:min-h-[78px] p-1 sm:p-1.5 rounded-lg border transition-all cursor-pointer flex flex-col justify-between select-none ${cellBg} ${
                     isSelected
-                      ? 'ring-2 ring-emerald-500 border-emerald-500 bg-emerald-50/40 shadow-xs'
+                      ? 'ring-1.5 ring-emerald-500 border-emerald-500 bg-emerald-50/40 shadow-2xs'
                       : ''
                   } ${
                     day.isToday && !isSelected
-                      ? 'ring-2 ring-amber-400 border-amber-400'
+                      ? 'ring-1.5 ring-amber-400 border-amber-400'
                       : ''
                   }`}
                 >
                   {/* Top: Gregorian Day & Hijri Date */}
                   <div className="flex items-start justify-between">
                     <div className="leading-none">
-                      <span className={`text-base sm:text-xl font-bold ${dateNumColor}`}>
+                      <span className={`text-xs sm:text-base font-bold ${dateNumColor}`}>
                         {day.dayOfMonth}
                       </span>
                       {day.isCurrentMonth && (
-                        <span className="block text-[9px] text-slate-400 italic">
+                        <span className="block text-[8px] sm:text-[9px] text-slate-400 italic">
                           {day.pasaran.name}
                         </span>
                       )}
                     </div>
 
                     {day.isCurrentMonth && (
-                      <span className="text-[10px] sm:text-xs font-bold text-slate-400 font-sans">
+                      <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 font-sans">
                         {day.hijri.day}
                       </span>
                     )}
@@ -403,7 +403,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     {/* Fasting Badge */}
                     {day.isCurrentMonth && day.fastingTypes.length > 0 && !day.isHaramFasting && (
                       <div
-                        className={`px-1 py-0.5 rounded text-[8px] sm:text-[9px] font-bold truncate flex items-center gap-0.5 ${
+                        className={`px-1 py-0.2 rounded text-[7.5px] sm:text-[8.5px] font-bold truncate flex items-center gap-0.5 leading-tight ${
                           isRamadanDay
                             ? 'bg-emerald-100 text-emerald-900'
                             : 'bg-teal-100 text-teal-900'
@@ -411,9 +411,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                         title={day.primaryFasting.name}
                       >
                         {isRamadanDay ? (
-                          <Moon className="w-2.5 h-2.5 text-emerald-700 shrink-0" />
+                          <Moon className="w-2 h-2 text-emerald-700 shrink-0" />
                         ) : (
-                          <Sparkles className="w-2.5 h-2.5 text-teal-700 shrink-0" />
+                          <Sparkles className="w-2 h-2 text-teal-700 shrink-0" />
                         )}
                         <span className="truncate hidden sm:inline">
                           {isRamadanDay ? `Ramadhan ${day.hijri.day}` : day.primaryFasting.name.replace('Puasa Sunnah ', '')}
@@ -423,27 +423,27 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
                     {/* Haram Fasting Badge */}
                     {day.isHaramFasting && day.isCurrentMonth && (
-                      <div className="px-1 py-0.5 rounded bg-red-100 text-red-800 text-[8px] sm:text-[9px] font-bold truncate">
-                        Haram Puasa
+                      <div className="px-1 py-0.2 rounded bg-red-100 text-red-800 text-[7.5px] sm:text-[8.5px] font-bold truncate leading-tight">
+                        Haram
                       </div>
                     )}
 
                     {/* Holiday Label */}
                     {day.isCurrentMonth && day.holidayName && (
-                      <div className="px-1 py-0.2 rounded bg-red-50 text-red-700 text-[8px] font-bold truncate">
+                      <div className="px-1 py-0.2 rounded bg-red-50 text-red-700 text-[7.5px] sm:text-[8.5px] font-bold truncate leading-tight">
                         {day.holidayName}
                       </div>
                     )}
                   </div>
 
                   {/* Bottom: Session indicator or Today tag */}
-                  <div className="flex items-center justify-between text-[8px] sm:text-[9px]">
+                  <div className="flex items-center justify-between text-[7.5px] sm:text-[8.5px] leading-tight">
                     {daySession ? (
-                      <span className="w-full text-center px-1 py-0.2 rounded bg-purple-100 text-purple-900 font-bold truncate">
+                      <span className="w-full text-center px-0.5 py-0.2 rounded bg-purple-100 text-purple-900 font-bold truncate">
                         Sesi Ada
                       </span>
                     ) : day.isToday ? (
-                      <span className="w-full text-center px-1 py-0.2 rounded bg-amber-300 text-amber-950 font-bold uppercase tracking-tighter">
+                      <span className="w-full text-center px-0.5 py-0.2 rounded bg-amber-300 text-amber-950 font-bold uppercase tracking-tighter">
                         Hari Ini
                       </span>
                     ) : (
@@ -458,39 +458,39 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. KETERANGAN & DETAIL DI BAWAH KALENDER (Clean, Tidy, Minimalist)        */}
+      {/* 2. KETERANGAN & DETAIL DI BAWAH KALENDER (Compact, Slim & Tidy)          */}
       {/* ========================================================================= */}
-      <div className="space-y-4">
-        {/* A. Legenda Warna Kalender */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
-          <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-700">
-            <div className="flex flex-wrap items-center gap-4">
+      <div className="space-y-2.5 sm:space-y-3">
+        {/* A. Legenda Warna Kalender (Slim) */}
+        <div className="bg-white border border-slate-200 rounded-xl p-2.5 sm:p-3 shadow-2xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-700">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                <span className="font-semibold">Hari Minggu / Libur</span>
+                <span className="w-2 h-2 rounded-full bg-red-500" />
+                <span className="font-medium">Minggu/Libur</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
-                <span className="font-semibold">Puasa Wajib Ramadhan</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                <span className="font-medium">Ramadhan</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-teal-500" />
-                <span className="font-semibold">Puasa Sunnah (Senin, Kamis, Ayyamul Bidh)</span>
+                <span className="w-2 h-2 rounded-full bg-teal-500" />
+                <span className="font-medium">Puasa Sunnah</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />
-                <span className="font-semibold">Sesi Puasa Siswa</span>
+                <span className="w-2 h-2 rounded-full bg-purple-500" />
+                <span className="font-medium">Sesi Terjadwal</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
-                <span className="font-semibold">Hari Diharamkan</span>
+                <span className="w-2 h-2 rounded-full bg-rose-400" />
+                <span className="font-medium">Hari Haram</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 text-[11px] text-slate-400 font-medium">
-              <span>* Kemenag RI (Kriteria MABIMS)</span>
+            <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
+              <span>* Kemenag RI (MABIMS)</span>
               <span>•</span>
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-0.5">
                 <span>Dibuat oleh</span>
                 <strong className="text-emerald-800 font-bold">eccko developer</strong>
               </span>
@@ -498,42 +498,42 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           </div>
         </div>
 
-        {/* B. Detail Tanggal Terpilih (Muncul Rapi di Bawah Kalender) */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4 text-slate-800">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+        {/* B. Detail Tanggal Terpilih (Slim & Compact Card) */}
+        <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 shadow-2xs space-y-2.5 text-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-slate-900">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h3 className="text-sm sm:text-base font-bold text-slate-900">
                   {selectedDayData.dayName}, {selectedDayData.dayOfMonth} {MONTH_NAMES_ID[selectedDayData.date.getMonth()]} {selectedDayData.date.getFullYear()}
                 </h3>
-                <span className="text-xs italic text-slate-400">
+                <span className="text-[11px] italic text-slate-400">
                   ({selectedDayData.pasaran.name})
                 </span>
                 {selectedDayData.isToday && (
-                  <span className="px-2 py-0.5 rounded-md bg-amber-300 text-amber-950 text-[10px] font-black">
+                  <span className="px-1.5 py-0.2 rounded bg-amber-300 text-amber-950 text-[9px] font-black">
                     Hari Ini
                   </span>
                 )}
               </div>
-              <p className="text-xs font-bold text-emerald-700 mt-0.5">
+              <p className="text-[11px] font-bold text-emerald-700 mt-0.2">
                 {selectedDayData.hijri.formatted} ({selectedDayData.hijri.formattedArabic})
               </p>
             </div>
 
             {/* Quick Sesi Action for Teachers/Admin */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {selectedDaySession ? (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={() => {
                       onSelectSession(selectedDaySession.id);
                       onNavigateToTab('input');
                     }}
-                    className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all flex items-center gap-1 cursor-pointer"
+                    className="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all flex items-center gap-1 cursor-pointer"
                   >
-                    <Edit3 className="w-3.5 h-3.5" />
-                    <span>Buka Form Input</span>
+                    <Edit3 className="w-3 h-3" />
+                    <span>Form Input</span>
                   </button>
                   <button
                     type="button"
@@ -541,9 +541,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       onSelectSession(selectedDaySession.id);
                       onNavigateToTab('checker');
                     }}
-                    className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 transition-all flex items-center gap-1 cursor-pointer"
+                    className="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 transition-all flex items-center gap-1 cursor-pointer"
                   >
-                    <CheckSquare className="w-3.5 h-3.5" />
+                    <CheckSquare className="w-3 h-3" />
                     <span>Ceklist</span>
                   </button>
                 </div>
@@ -552,55 +552,55 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   <button
                     type="button"
                     onClick={handleCreateSession}
-                    className="px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-700 hover:bg-purple-800 text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    className="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-700 hover:bg-purple-800 text-white transition-all flex items-center gap-1 cursor-pointer shadow-2xs"
                     title="Buat Sesi Puasa Baru (Khusus Admin)"
                   >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>+ Buat Sesi Puasa Hari Ini</span>
+                    <Plus className="w-3 h-3" />
+                    <span>+ Buat Sesi</span>
                   </button>
                 )
               )}
             </div>
           </div>
 
-          {/* Fasting Details & Niat */}
+          {/* Fasting Details & Niat (Compact) */}
           {selectedDayData.fastingTypes.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {selectedDayData.fastingTypes.map((ft) => (
                 <div
                   key={ft.id}
-                  className={`p-4 rounded-xl border ${
+                  className={`p-2.5 sm:p-3 rounded-lg border ${
                     ft.id === 'ramadhan'
                       ? 'bg-emerald-50/50 border-emerald-200'
                       : ft.category === 'haram'
                       ? 'bg-red-50 border-red-200'
                       : 'bg-teal-50/50 border-teal-200'
-                  } space-y-2`}
+                  } space-y-1.5`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
-                      {ft.id === 'ramadhan' ? <Moon className="w-4 h-4 text-emerald-700" /> : <Sparkles className="w-4 h-4 text-teal-700" />}
+                    <span className="font-bold text-xs sm:text-sm text-slate-900 flex items-center gap-1">
+                      {ft.id === 'ramadhan' ? <Moon className="w-3.5 h-3.5 text-emerald-700" /> : <Sparkles className="w-3.5 h-3.5 text-teal-700" />}
                       {ft.name}
                     </span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase bg-white border border-slate-200 text-slate-700">
+                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded uppercase bg-white border border-slate-200 text-slate-700">
                       {ft.category.replace('_', ' ')}
                     </span>
                   </div>
 
-                  <p className="text-xs text-slate-600 leading-relaxed">
+                  <p className="text-[11px] text-slate-600 leading-relaxed">
                     {ft.description}
                   </p>
 
                   {/* Niat Puasa */}
                   {ft.niatArabic && (
-                    <div className="mt-2 pt-2 border-t border-slate-200/80 space-y-1 bg-white p-3 rounded-lg border border-slate-100">
-                      <p className="font-serif text-right text-base sm:text-lg text-slate-900 leading-relaxed">
+                    <div className="mt-1 pt-1.5 border-t border-slate-200/80 space-y-0.5 bg-white p-2 sm:p-2.5 rounded-md border border-slate-100">
+                      <p className="font-arabic text-right text-sm sm:text-base text-slate-900 leading-relaxed">
                         {ft.niatArabic}
                       </p>
-                      <p className="text-xs italic text-emerald-700 font-medium">
+                      <p className="text-[11px] italic text-emerald-700 font-medium">
                         {ft.niatLatin}
                       </p>
-                      <p className="text-xs text-slate-600">
+                      <p className="text-[11px] text-slate-600">
                         "{ft.niatArti}"
                       </p>
                     </div>
@@ -608,7 +608,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
                   {/* Dalil */}
                   {ft.dalil && (
-                    <p className="text-[11px] text-slate-500 italic">
+                    <p className="text-[10px] text-slate-500 italic">
                       {ft.dalil}
                     </p>
                   )}
@@ -616,35 +616,35 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               ))}
             </div>
           ) : (
-            <div className="p-3 rounded-xl bg-slate-50 text-xs text-slate-500">
+            <div className="p-2.5 rounded-lg bg-slate-50 text-[11px] text-slate-500">
               Tidak ada anjuran puasa khusus pada hari ini (Hari biasa / Mubah).
             </div>
           )}
 
           {/* School Events if Any */}
           {selectedDayEvents.length > 0 && (
-            <div className="pt-2 border-t border-slate-100 space-y-2">
-              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <div className="pt-1.5 border-t border-slate-100 space-y-1.5">
+              <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                 Agenda Kegiatan Sekolah ({selectedDayEvents.length})
               </h4>
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 {selectedDayEvents.map((ev) => (
                   <div
                     key={ev.id}
-                    className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-between text-xs"
+                    className="p-2 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-between text-xs"
                   >
                     <div>
                       <span className="font-bold text-amber-950">{ev.title}</span>
-                      {ev.time && <span className="text-slate-500 ml-2">({ev.time})</span>}
+                      {ev.time && <span className="text-slate-500 ml-2 text-[11px]">({ev.time})</span>}
                     </div>
                     {(user.role === 'admin' || user.role === 'penginput') && (
                       <button
                         type="button"
                         onClick={() => handleDeleteEvent(ev.id)}
-                        className="text-slate-400 hover:text-red-600 p-1 cursor-pointer"
+                        className="text-slate-400 hover:text-red-600 p-0.5 cursor-pointer"
                         title="Hapus"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3 h-3" />
                       </button>
                     )}
                   </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { UserSession, FastingSession, FastingStatus, Student, AdminSettings } from './types';
+import { UserSession, FastingSession, FastingStatus, Student, AdminSettings, HaidRecord, AdminTabType } from './types';
 import {
   getStoredStudents,
   saveStoredStudents,
@@ -12,6 +12,7 @@ import {
   saveStoredAdminSettings,
   build101FastingRecords,
 } from './data/students';
+import { getStoredHaidRecords, saveStoredHaidRecords } from './utils/fiqhHaid';
 import { isSupabaseConfigured } from './lib/supabase';
 import {
   fetchSessionsFromSupabase,
@@ -39,6 +40,9 @@ import { PrayerTimesModal } from './components/PrayerTimesModal';
 import { PrayerTimeBannerCard } from './components/PrayerTimeBannerCard';
 import { ShortSurahsModal } from './components/ShortSurahsModal';
 import { CalendarView } from './components/CalendarView';
+import { CatatHaidView } from './components/CatatHaidView';
+import { DaftarHaidView } from './components/DaftarHaidView';
+import { DaftarSuciView } from './components/DaftarSuciView';
 import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { usePwaInstall } from './hooks/usePwaInstall';
 import { useAutoUpdate } from './hooks/useAutoUpdate';
@@ -127,7 +131,7 @@ export default function App() {
   const [isCloudSyncing, setIsCloudSyncing] = useState<boolean>(false);
 
   // Active sub-view tab for navigation
-  const [activeAdminTab, setActiveAdminTab] = useState<'admin' | 'input' | 'checker' | 'raport' | 'calendar'>(() => {
+  const [activeAdminTab, setActiveAdminTab] = useState<AdminTabType>(() => {
     try {
       const saved = localStorage.getItem(USER_SESSION_KEY);
       if (saved) {
@@ -139,6 +143,10 @@ export default function App() {
     } catch {}
     return 'admin';
   });
+
+  // Haid Records (Fiqih Udzur Syar'i)
+  const [haidRecords, setHaidRecords] = useState<HaidRecord[]>(() => getStoredHaidRecords());
+  const [preselectedHaidStudent, setPreselectedHaidStudent] = useState<Student | undefined>(undefined);
 
   // Active Session ID
   const [activeSessionId, setActiveSessionId] = useState<string>(() => {
@@ -552,6 +560,98 @@ export default function App() {
     }
   };
 
+  // --- HAID & SUCI (FIQIH UDZUR SYAR'I) HANDLERS ---
+  const handleSaveHaidRecord = (record: HaidRecord, autoUpdateFasting: boolean) => {
+    // 1. Save or replace in HaidRecords
+    const existingIndex = haidRecords.findIndex((r) => r.id === record.id);
+    let updated: HaidRecord[];
+    if (existingIndex >= 0) {
+      updated = [...haidRecords];
+      updated[existingIndex] = record;
+    } else {
+      updated = [record, ...haidRecords];
+    }
+    setHaidRecords(updated);
+    saveStoredHaidRecords(updated);
+
+    // 2. If autoUpdateFasting is true, update the active session's record for this student to 'halangan'
+    if (autoUpdateFasting && activeSession) {
+      const currentActive = sessions[activeSessionId];
+      if (currentActive) {
+        const updatedRecords = {
+          ...currentActive.records,
+          [record.studentId]: {
+            studentId: record.studentId,
+            status: 'halangan' as FastingStatus,
+            notes: `Udzur Syar'i (Haid) - Dicatat oleh ${record.recordedBy}`,
+            updatedAt: new Date().toISOString(),
+          },
+        };
+        const updatedSession: FastingSession = {
+          ...currentActive,
+          records: updatedRecords,
+          updatedAt: new Date().toISOString(),
+        };
+        saveSession(updatedSession);
+        setSessions((prev) => ({
+          ...prev,
+          [activeSessionId]: updatedSession,
+        }));
+        if (isSupabaseConfigured()) {
+          upsertSessionToSupabase(updatedSession);
+        }
+      }
+    }
+
+    showToast(`✅ Catatan haid ${record.studentName} berhasil disimpan!`);
+  };
+
+  const handleFinishHaid = (
+    recordId: string,
+    endDate: string,
+    endTime: string,
+    mandiNotes?: string
+  ) => {
+    const updated = haidRecords.map((r) => {
+      if (r.id === recordId) {
+        return {
+          ...r,
+          status: 'selesai_mandi' as const,
+          endDate,
+          endTime,
+          mandiWajibAt: `${endDate} ${endTime}`,
+          notes: mandiNotes ? `${r.notes ? r.notes + ' | ' : ''}${mandiNotes}` : r.notes,
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      return r;
+    });
+
+    setHaidRecords(updated);
+    saveStoredHaidRecords(updated);
+    showToast(`🌸 Status santriwati berhasil diperbarui ke DAFTAR SUCI (Siap Ibadah)!`);
+  };
+
+  const handleUpdateHaidRecord = (record: HaidRecord) => {
+    const updated = haidRecords.map((r) => (r.id === record.id ? record : r));
+    setHaidRecords(updated);
+    saveStoredHaidRecords(updated);
+    showToast(`✅ Perubahan catatan haid ${record.studentName} disimpan.`);
+  };
+
+  const handleDeleteHaidRecord = (recordId: string) => {
+    const target = haidRecords.find((r) => r.id === recordId);
+    const updated = haidRecords.filter((r) => r.id !== recordId);
+    setHaidRecords(updated);
+    saveStoredHaidRecords(updated);
+    showToast(`Catatan haid ${target?.studentName || ''} berhasil dihapus.`);
+  };
+
+  const handleNavigateToCatatHaid = (student?: Student) => {
+    setPreselectedHaidStudent(student);
+    setActiveAdminTab('catat_haid');
+  };
+
   // Get active session object safely
   const activeSession = sessions[activeSessionId] || {
     id: activeSessionId,
@@ -636,31 +736,75 @@ export default function App() {
 
           {/* Main Container */}
           <main className="max-w-7xl w-full mx-auto px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3.5 flex-1 space-y-3 sm:space-y-4">
-            {/* Live Ramadan Prayer Times & Imsakiyah Banner Card (Hidden on Admin, Ceklist, Form Input, Raport, and Calendar for a clean focused view) */}
-            {activeAdminTab !== 'admin' && activeAdminTab !== 'calendar' && activeAdminTab !== 'input' && activeAdminTab !== 'raport' && activeAdminTab !== 'checker' && (
-              <PrayerTimeBannerCard
-                onOpenModal={() => setShowPrayerModal(true)}
-                onOpenSurahsModal={() => handleOpenSurahsModal('juz_amma')}
-                onOpenCalendar={() => setActiveAdminTab('calendar')}
-                city={selectedCity}
-              />
-            )}
+            {/* Live Ramadan Prayer Times & Imsakiyah Banner Card (Hidden on Admin, Ceklist, Form Input, Raport, Calendar, Catat Haid, Daftar Haid, and Daftar Suci for a clean focused view) */}
+            {activeAdminTab !== 'admin' &&
+              activeAdminTab !== 'calendar' &&
+              activeAdminTab !== 'input' &&
+              activeAdminTab !== 'raport' &&
+              activeAdminTab !== 'checker' &&
+              activeAdminTab !== 'catat_haid' &&
+              activeAdminTab !== 'daftar_haid' &&
+              activeAdminTab !== 'daftar_suci' && (
+                <PrayerTimeBannerCard
+                  onOpenModal={() => setShowPrayerModal(true)}
+                  onOpenSurahsModal={() => handleOpenSurahsModal('juz_amma')}
+                  onOpenCalendar={() => setActiveAdminTab('calendar')}
+                  city={selectedCity}
+                />
+              )}
 
-            {/* Session Selector / Creator Block (Shown on regular session workflows; hidden on admin since AdminPanel has complete session management) */}
-            {activeAdminTab !== 'admin' && activeAdminTab !== 'raport' && activeAdminTab !== 'calendar' && (
-              <SessionSelector
-                sessions={sessions}
-                activeSessionId={activeSessionId}
-                onSelectSession={(id) => setActiveSessionId(id)}
-                onCreateSession={handleCreateSession}
-                onDeleteSession={isAdmin ? handleDeleteSession : undefined}
-                isAdmin={isAdmin}
-                canCreateSession={isAdmin}
-              />
-            )}
+            {/* Session Selector / Creator Block (Shown on regular fasting session workflows; hidden on admin, raport, calendar, catat haid, daftar haid, and daftar suci) */}
+            {activeAdminTab !== 'admin' &&
+              activeAdminTab !== 'raport' &&
+              activeAdminTab !== 'calendar' &&
+              activeAdminTab !== 'catat_haid' &&
+              activeAdminTab !== 'daftar_haid' &&
+              activeAdminTab !== 'daftar_suci' && (
+                <SessionSelector
+                  sessions={sessions}
+                  activeSessionId={activeSessionId}
+                  onSelectSession={(id) => setActiveSessionId(id)}
+                  onCreateSession={handleCreateSession}
+                  onDeleteSession={isAdmin ? handleDeleteSession : undefined}
+                  isAdmin={isAdmin}
+                  canCreateSession={isAdmin}
+                />
+              )}
 
             {/* View Switcher based on User Role & Selected Navigation Tab */}
-            {activeAdminTab === 'calendar' ? (
+            {activeAdminTab === 'catat_haid' ? (
+              <CatatHaidView
+                students={students}
+                haidRecords={haidRecords}
+                activeSession={activeSession}
+                currentUserName={user.nama}
+                preselectedStudent={preselectedHaidStudent}
+                onSaveHaidRecord={handleSaveHaidRecord}
+                onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
+                onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
+              />
+            ) : activeAdminTab === 'daftar_haid' ? (
+              <DaftarHaidView
+                students={students}
+                haidRecords={haidRecords}
+                currentUserName={user.nama}
+                onFinishHaid={handleFinishHaid}
+                onUpdateHaidRecord={handleUpdateHaidRecord}
+                onDeleteHaidRecord={handleDeleteHaidRecord}
+                onNavigateToCatatHaid={() => {
+                  setPreselectedHaidStudent(undefined);
+                  setActiveAdminTab('catat_haid');
+                }}
+                onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
+              />
+            ) : activeAdminTab === 'daftar_suci' ? (
+              <DaftarSuciView
+                students={students}
+                haidRecords={haidRecords}
+                onNavigateToCatatHaid={handleNavigateToCatatHaid}
+                onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
+              />
+            ) : activeAdminTab === 'calendar' ? (
               <CalendarView
                 sessions={Object.values(sessions)}
                 students={students}
