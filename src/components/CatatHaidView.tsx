@@ -11,6 +11,7 @@ import {
 import { InlineCameraScanner } from './InlineCameraScanner';
 import { validateScannedCard } from '../utils/cardSecurity';
 import { CrystalSnowEffect } from './CrystalSnowEffect';
+import { VirtualizedStudentList } from './VirtualizedStudentList';
 import {
   QrCode,
   Search,
@@ -51,75 +52,6 @@ interface CatatHaidViewProps {
   onNavigateToDaftarSuci: () => void;
 }
 
-// Memoized, high-performance Student Row item
-const StudentRowItem = React.memo(({
-  student,
-  isSelected,
-  isCurrentlyHaid,
-  suciDays,
-  isUnder15Days,
-  hasPreviousRecord,
-  onSelect,
-}: {
-  student: Student;
-  isSelected: boolean;
-  isCurrentlyHaid: boolean;
-  suciDays: number;
-  isUnder15Days: boolean;
-  hasPreviousRecord: boolean;
-  onSelect: (s: Student) => void;
-}) => {
-  return (
-    <div
-      onClick={() => onSelect(student)}
-      className={`p-2.5 rounded-xl border transition-colors cursor-pointer flex items-center justify-between gap-2 select-none ${
-        isSelected
-          ? 'bg-pink-50 border-pink-400 ring-2 ring-pink-300'
-          : 'bg-white hover:bg-pink-50/50 border-pink-100'
-      }`}
-    >
-      <div className="flex items-center gap-2 min-w-0">
-        {student.foto ? (
-          <img
-            src={student.foto}
-            alt={student.nama}
-            loading="lazy"
-            className="w-7 h-7 rounded-full object-cover border border-pink-200 shrink-0"
-          />
-        ) : (
-          <div className="w-7 h-7 rounded-full bg-pink-100 text-pink-700 font-bold text-[10px] flex items-center justify-center shrink-0">
-            {student.nama.charAt(0)}
-          </div>
-        )}
-        <div className="min-w-0">
-          <p className="text-xs font-bold text-slate-900 truncate leading-tight">
-            {student.nama}
-          </p>
-          <p className="text-[10px] text-slate-500 leading-tight">
-            {student.kelas} • NIK: {student.nik || '-'}
-          </p>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-1 shrink-0">
-        {isCurrentlyHaid ? (
-          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-100 text-rose-700 border border-rose-200">
-            Sedang Haid
-          </span>
-        ) : hasPreviousRecord && isUnder15Days ? (
-          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
-            Suci Hari {suciDays}
-          </span>
-        ) : (
-          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-            Suci
-          </span>
-        )}
-      </div>
-    </div>
-  );
-});
-
 export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
   students = [],
   haidRecords = [],
@@ -138,6 +70,11 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
   // Selected student state
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(preselectedStudent || null);
   const [isFiqhWarningModalOpen, setIsFiqhWarningModalOpen] = useState<boolean>(false);
+  const [activeHaidModalInfo, setActiveHaidModalInfo] = useState<{
+    student: Student;
+    record: HaidRecord;
+    currentDay: number;
+  } | null>(null);
 
   // Pre-calculated O(1) status lookup map for all students to prevent repeated date calculations
   const studentStatusMap = useMemo(() => {
@@ -311,6 +248,23 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
     setSelectedStudent(matchedStudent);
     setSearchQuery('');
 
+    // Check if student is already in active haid
+    const existingActive = haidRecords.find((r) => r.studentId === matchedStudent.id && r.status === 'haid_aktif');
+    if (existingActive) {
+      const currentDay = calculateDaysBetween(existingActive.startDate, getTodayDateStr());
+      setActiveHaidModalInfo({
+        student: matchedStudent,
+        record: existingActive,
+        currentDay,
+      });
+      playScanSuccessSound();
+      setScanFeedback({
+        message: `ℹ️ ${matchedStudent.nama} sedang dalam masa haid (Hari ke-${currentDay}).`,
+        isError: false,
+      });
+      return;
+    }
+
     // Check purity status for anti-lie warning popup immediately
     const checkSuci = calculateSuciDaysForStudent(matchedStudent.id, haidRecords);
     if (checkSuci.hasPreviousRecord && checkSuci.isUnder15Days) {
@@ -371,12 +325,26 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
   const handleSelectStudent = useCallback((s: Student) => {
     setSelectedStudent(s);
     setScanFeedback(null);
+
+    // Check if student is already in active haid
+    const existingActive = haidRecords.find((r) => r.studentId === s.id && r.status === 'haid_aktif');
+    if (existingActive) {
+      const currentDay = calculateDaysBetween(existingActive.startDate, getTodayDateStr());
+      setActiveHaidModalInfo({
+        student: s,
+        record: existingActive,
+        currentDay,
+      });
+      playScanSuccessSound();
+      return;
+    }
+
     const status = studentStatusMap.get(s.id);
     if (status?.suciInfo.hasPreviousRecord && status.suciInfo.isUnder15Days) {
       playScanErrorSound();
       setIsFiqhWarningModalOpen(true);
     }
-  }, [studentStatusMap]);
+  }, [studentStatusMap, haidRecords]);
 
   return (
     <div className="relative max-w-6xl mx-auto space-y-3.5 sm:space-y-4 animate-pink-fade-in p-2 sm:p-3 rounded-3xl bg-gradient-to-b from-[#fff5f8] via-[#fef2f6] to-[#fce7f3] border border-pink-100/80 shadow-[0_10px_35px_rgba(244,114,182,0.12)]">
@@ -542,37 +510,25 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
 
             {/* Search Results (Shown only when typing or filtering class) */}
             {searchQuery.trim().length > 0 || selectedClass !== 'SEMUA' ? (
-              <div className="max-h-[220px] sm:max-h-[260px] overflow-y-auto space-y-1.5 pr-1 animate-in fade-in duration-100">
+              <div className="space-y-1.5 animate-in fade-in duration-100">
                 {filteredFemaleStudents.length === 0 ? (
                   <div className="p-3 text-center text-xs text-slate-400 italic bg-pink-50/30 rounded-xl border border-pink-100">
                     Santriwati dengan kata kunci "{searchQuery}" tidak ditemukan
                   </div>
                 ) : (
                   <>
-                    <div className="text-[10px] font-bold text-slate-500 px-1">
-                      Hasil ({filteredFemaleStudents.length} santriwati):
+                    <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 px-1">
+                      <span>Hasil ({filteredFemaleStudents.length} santriwati):</span>
+                      <span className="text-pink-600 font-medium text-[9px]">⚡ Mode Cepat & Virtual</span>
                     </div>
-                    {filteredFemaleStudents.slice(0, 8).map((s) => {
-                      const status = studentStatusMap.get(s.id);
-                      const isSelected = selectedStudent?.id === s.id;
-                      const isCurrentlyHaid = status?.isCurrentlyHaid || false;
-                      const suciInfo = status?.suciInfo;
-
-                      return (
-                        <StudentRowItem
-                          key={s.id}
-                          student={s}
-                          isSelected={isSelected}
-                          isCurrentlyHaid={isCurrentlyHaid}
-                          suciDays={suciInfo?.days || 30}
-                          isUnder15Days={suciInfo?.isUnder15Days || false}
-                          hasPreviousRecord={suciInfo?.hasPreviousRecord || false}
-                          onSelect={(student) => {
-                            handleSelectStudent(student);
-                          }}
-                        />
-                      );
-                    })}
+                    <VirtualizedStudentList
+                      students={filteredFemaleStudents}
+                      studentStatusMap={studentStatusMap}
+                      selectedStudentId={selectedStudent?.id}
+                      onSelectStudent={handleSelectStudent}
+                      containerHeight={230}
+                      itemHeight={52}
+                    />
                   </>
                 )}
               </div>
@@ -1102,6 +1058,85 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                   Lihat Detail Form
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* POPUP MODAL: SEDANG DALAM MASA HAID HARI KE-X (Sentuh di mana saja untuk menutup) */}
+      {activeHaidModalInfo && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setActiveHaidModalInfo(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150 cursor-pointer touch-manipulation"
+        >
+          <div
+            onClick={(e) => {
+              // Clicking inside also allows dismissal, or user can tap close
+              e.stopPropagation();
+              setActiveHaidModalInfo(null);
+            }}
+            className="bg-white rounded-3xl max-w-sm w-full p-4 sm:p-5 shadow-2xl border-2 border-pink-300 space-y-3.5 animate-in zoom-in-95 duration-150 relative overflow-hidden cursor-pointer"
+          >
+            {/* Top decorative gradient glow */}
+            <div className="absolute -top-10 -right-10 w-28 h-28 bg-gradient-to-br from-pink-400/20 to-rose-500/30 rounded-full blur-xl pointer-events-none" />
+
+            {/* Header / Icon */}
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-600 text-white flex items-center justify-center shadow-md shrink-0 animate-pulse">
+                <HeartPulse className="w-6 h-6" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-200">
+                    Status Aktif
+                  </span>
+                  <span className="text-[10px] text-slate-400 italic">Sentuh untuk tutup ✕</span>
+                </div>
+                <h3 className="text-sm font-black text-slate-900 truncate mt-0.5">
+                  {activeHaidModalInfo.student.nama}
+                </h3>
+              </div>
+            </div>
+
+            {/* Main Highlight Box */}
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-pink-50 via-rose-50 to-pink-100/60 border border-pink-200/90 space-y-2 text-center">
+              <p className="text-[11px] font-bold text-pink-900 uppercase tracking-wider">
+                Sedang Dalam Masa Haid
+              </p>
+              <div className="inline-block px-4 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 text-white font-black text-lg sm:text-xl shadow-sm tracking-wide">
+                HARI KE-{activeHaidModalInfo.currentDay}
+              </div>
+              <p className="text-[11px] text-slate-600 leading-tight">
+                Mulai sejak <strong>{activeHaidModalInfo.record.startDate}</strong> ({activeHaidModalInfo.record.startTime || '00:00'})
+              </p>
+            </div>
+
+            {/* Compact Info Badges */}
+            <div className="grid grid-cols-2 gap-2 text-[11px]">
+              <div className="p-2 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 block text-[10px]">Kelas:</span>
+                <strong className="text-slate-800 font-bold">{activeHaidModalInfo.student.kelas}</strong>
+              </div>
+              <div className="p-2 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 block text-[10px]">Pencatat Awal:</span>
+                <strong className="text-slate-800 font-semibold truncate block">{activeHaidModalInfo.record.recordedBy || 'Ustadzah'}</strong>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-1.5 pt-1">
+              <button
+                type="button"
+                onClick={() => setActiveHaidModalInfo(null)}
+                className="w-full py-2.5 px-3 rounded-xl text-xs font-black bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 active:scale-98 text-white transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+              >
+                <span>Mengerti & Tutup</span>
+              </button>
+              <p className="text-[10px] text-center text-slate-400 font-medium">
+                Sentuh layar di mana saja untuk menutup
+              </p>
             </div>
           </div>
         </div>

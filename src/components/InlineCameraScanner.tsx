@@ -22,6 +22,7 @@ export const InlineCameraScanner: React.FC<InlineCameraScannerProps> = ({
   const [isStarting, setIsStarting] = useState<boolean>(true);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const lastScannedTimeRef = useRef<number>(0);
 
   useEffect(() => {
     if (!isActive) return;
@@ -37,8 +38,8 @@ export const InlineCameraScanner: React.FC<InlineCameraScannerProps> = ({
     const startScanner = async () => {
       try {
         const config = {
-          fps: 15,
-          qrbox: { width: 240, height: 160 },
+          fps: 12, // Smooth, low CPU/GPU usage
+          qrbox: { width: 220, height: 160 },
           aspectRatio: 1.333333,
         };
 
@@ -46,6 +47,13 @@ export const InlineCameraScanner: React.FC<InlineCameraScannerProps> = ({
           { facingMode: facingMode },
           config,
           (decodedText) => {
+            const now = Date.now();
+            // Prevent duplicate triggers within 1.2s
+            if (now - lastScannedTimeRef.current < 1200) {
+              return;
+            }
+            lastScannedTimeRef.current = now;
+
             if (isMounted) {
               playScanSuccessSound();
               if (navigator.vibrate) {
