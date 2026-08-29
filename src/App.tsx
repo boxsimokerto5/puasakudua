@@ -34,7 +34,6 @@ import { PrayerTimeBannerCard } from './components/PrayerTimeBannerCard';
 import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { usePwaInstall } from './hooks/usePwaInstall';
 import { useAutoUpdate } from './hooks/useAutoUpdate';
-import { UpdateNotificationToast } from './components/UpdateNotificationToast';
 import { INDONESIA_CITIES, CityLocation } from './utils/prayerTimes';
 import { Sparkles, Cloud, CloudCheck, RefreshCw, Download, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -748,6 +747,9 @@ export default function App() {
             onOpenPrayerModal={() => setShowPrayerModal(true)}
             onOpenSurahsModal={(tab) => handleOpenSurahsModal(tab || 'juz_amma')}
             selectedCity={selectedCity}
+            hasUpdate={autoUpdate.hasUpdate}
+            isUpdating={autoUpdate.isUpdating}
+            onApplyUpdate={autoUpdate.applyUpdate}
           />
 
           {/* Main Container */}
@@ -1078,13 +1080,6 @@ export default function App() {
           />
         </Suspense>
       )}
-
-      {/* Cloudflare Pages Auto Update Notification Toast */}
-      <UpdateNotificationToast
-        hasUpdate={autoUpdate.hasUpdate}
-        isUpdating={autoUpdate.isUpdating}
-        onUpdate={autoUpdate.applyUpdate}
-      />
     </>
   );
 }

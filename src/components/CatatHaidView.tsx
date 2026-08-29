@@ -915,8 +915,8 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
 
       {/* POPUP MODAL: PERINGATAN FIQIH TERINDIKASI ALASAN TIDAK VALID / BERBOHONG */}
       {isFiqhWarningModalOpen && selectedStudent && suciInfo && suciInfo.hasPreviousRecord && suciInfo.isUnder15Days && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/75 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl max-w-lg w-full p-4 sm:p-5 shadow-2xl border-t-4 sm:border-2 border-rose-500 space-y-3 max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-4 pt-4 sm:pt-8 bg-slate-950/75 backdrop-blur-xs animate-in fade-in duration-150 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full p-4 sm:p-5 shadow-2xl border-2 border-rose-500 space-y-3 max-h-[85vh] overflow-y-auto mt-2 sm:mt-4">
             {/* Header with Red Warning Badge */}
             <div className="flex items-start gap-2.5">
               <div className="w-10 h-10 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md">
@@ -1069,7 +1069,7 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
           role="dialog"
           aria-modal="true"
           onClick={() => setActiveHaidModalInfo(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150 cursor-pointer touch-manipulation"
+          className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-4 pt-4 sm:pt-8 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150 cursor-pointer touch-manipulation overscroll-contain overflow-y-auto"
         >
           <div
             onClick={(e) => {
@@ -1077,65 +1077,65 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
               e.stopPropagation();
               setActiveHaidModalInfo(null);
             }}
-            className="bg-white rounded-3xl max-w-sm w-full p-4 sm:p-5 shadow-2xl border-2 border-pink-300 space-y-3.5 animate-in zoom-in-95 duration-150 relative overflow-hidden cursor-pointer"
+            className="bg-white rounded-2xl sm:rounded-3xl max-w-xs sm:max-w-sm w-full p-3.5 sm:p-4.5 shadow-2xl border-2 border-pink-300 space-y-2.5 sm:space-y-3 animate-in zoom-in-95 duration-150 relative overflow-hidden cursor-pointer select-none max-h-[85vh] overflow-y-auto mt-2 sm:mt-4"
           >
             {/* Top decorative gradient glow */}
-            <div className="absolute -top-10 -right-10 w-28 h-28 bg-gradient-to-br from-pink-400/20 to-rose-500/30 rounded-full blur-xl pointer-events-none" />
+            <div className="absolute -top-10 -right-10 w-24 h-24 bg-gradient-to-br from-pink-400/20 to-rose-500/30 rounded-full blur-xl pointer-events-none" />
 
             {/* Header / Icon */}
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-600 text-white flex items-center justify-center shadow-md shrink-0 animate-pulse">
-                <HeartPulse className="w-6 h-6" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 text-white flex items-center justify-center shadow-sm shrink-0 animate-pulse">
+                <HeartPulse className="w-5 h-5" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-200">
+                  <span className="text-[9px] font-black uppercase tracking-wider text-pink-600 bg-pink-50 px-1.5 py-0.5 rounded-full border border-pink-200">
                     Status Aktif
                   </span>
-                  <span className="text-[10px] text-slate-400 italic">Sentuh untuk tutup ✕</span>
+                  <span className="text-[9px] text-slate-400 font-medium">Sentuh layar ✕</span>
                 </div>
-                <h3 className="text-sm font-black text-slate-900 truncate mt-0.5">
+                <h3 className="text-xs sm:text-sm font-black text-slate-900 truncate mt-0.5">
                   {activeHaidModalInfo.student.nama}
                 </h3>
               </div>
             </div>
 
             {/* Main Highlight Box */}
-            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-pink-50 via-rose-50 to-pink-100/60 border border-pink-200/90 space-y-2 text-center">
-              <p className="text-[11px] font-bold text-pink-900 uppercase tracking-wider">
+            <div className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-pink-50 via-rose-50 to-pink-100/60 border border-pink-200/90 space-y-1 text-center">
+              <p className="text-[10px] font-bold text-pink-900 uppercase tracking-wider">
                 Sedang Dalam Masa Haid
               </p>
-              <div className="inline-block px-4 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 text-white font-black text-lg sm:text-xl shadow-sm tracking-wide">
+              <div className="inline-block px-3.5 py-1 rounded-lg bg-gradient-to-r from-rose-600 to-pink-600 text-white font-black text-base sm:text-lg shadow-xs tracking-wide">
                 HARI KE-{activeHaidModalInfo.currentDay}
               </div>
-              <p className="text-[11px] text-slate-600 leading-tight">
+              <p className="text-[10px] sm:text-[11px] text-slate-600 leading-tight">
                 Mulai sejak <strong>{activeHaidModalInfo.record.startDate}</strong> ({activeHaidModalInfo.record.startTime || '00:00'})
               </p>
             </div>
 
             {/* Compact Info Badges */}
-            <div className="grid grid-cols-2 gap-2 text-[11px]">
-              <div className="p-2 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-slate-500 block text-[10px]">Kelas:</span>
-                <strong className="text-slate-800 font-bold">{activeHaidModalInfo.student.kelas}</strong>
+            <div className="grid grid-cols-2 gap-1.5 text-[10px] sm:text-[11px]">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 block text-[9px]">Kelas:</span>
+                <strong className="text-slate-800 font-bold truncate block">{activeHaidModalInfo.student.kelas}</strong>
               </div>
-              <div className="p-2 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-slate-500 block text-[10px]">Pencatat Awal:</span>
+              <div className="p-1.5 sm:p-2 rounded-lg bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 block text-[9px]">Pencatat:</span>
                 <strong className="text-slate-800 font-semibold truncate block">{activeHaidModalInfo.record.recordedBy || 'Ustadzah'}</strong>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="space-y-1.5 pt-1">
+            {/* Action Button */}
+            <div className="pt-0.5 space-y-1">
               <button
                 type="button"
                 onClick={() => setActiveHaidModalInfo(null)}
-                className="w-full py-2.5 px-3 rounded-xl text-xs font-black bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 active:scale-98 text-white transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
+                className="w-full py-2 px-3 rounded-xl text-xs font-black bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 active:scale-98 text-white transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
               >
                 <span>Mengerti & Tutup</span>
               </button>
-              <p className="text-[10px] text-center text-slate-400 font-medium">
-                Sentuh layar di mana saja untuk menutup
+              <p className="text-[9px] text-center text-slate-400 font-medium">
+                Sentuh di mana saja untuk menutup
               </p>
             </div>
           </div>
@@ -1144,8 +1144,8 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
 
       {/* Success Confirmation Modal */}
       {isSuccessModalOpen && savedRecordSummary && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-4 sm:p-5 shadow-2xl border border-slate-200 space-y-3">
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-3 sm:p-4 pt-4 sm:pt-8 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-150 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-md w-full p-4 sm:p-5 shadow-2xl border border-slate-200 space-y-3 mt-2 sm:mt-0">
             <div className="text-center space-y-1">
               <div className="w-11 h-11 rounded-full bg-rose-100 text-rose-700 mx-auto flex items-center justify-center border border-rose-200">
                 <CheckCircle2 className="w-5 h-5" />

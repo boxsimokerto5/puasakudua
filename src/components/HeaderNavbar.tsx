@@ -24,6 +24,7 @@ import {
   HeartPulse,
   ChevronLeft,
   ChevronRight,
+  RefreshCw,
 } from 'lucide-react';
 
 interface HeaderNavbarProps {
@@ -41,6 +42,9 @@ interface HeaderNavbarProps {
   onOpenPrayerModal?: () => void;
   onOpenSurahsModal?: (tab?: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat') => void;
   selectedCity?: CityLocation;
+  hasUpdate?: boolean;
+  isUpdating?: boolean;
+  onApplyUpdate?: () => void;
 }
 
 interface HeaderStar {
@@ -69,6 +73,9 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
   onOpenPrayerModal,
   onOpenSurahsModal,
   selectedCity,
+  hasUpdate = false,
+  isUpdating = false,
+  onApplyUpdate,
 }) => {
   const isAdmin = user.role === 'admin';
   const isPenginput = user.role === 'penginput';
@@ -271,6 +278,29 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
               >
                 {isSupabaseConnected ? <Cloud className="w-3.5 h-3.5" /> : <CloudOff className="w-3.5 h-3.5" />}
               </button>
+
+              {/* Always Visible Refresh / Update Button */}
+              {onApplyUpdate && (
+                <button
+                  type="button"
+                  onClick={onApplyUpdate}
+                  disabled={isUpdating}
+                  title={hasUpdate ? 'Pembaruan versi baru tersedia! Klik untuk memuat ulang' : 'Segarkan / Reload Aplikasi'}
+                  className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-sm shrink-0 active:scale-95 ${
+                    hasUpdate
+                      ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 border-amber-300 ring-2 ring-amber-400/50 animate-pulse font-black'
+                      : 'bg-emerald-950/80 hover:bg-emerald-900/90 text-emerald-200 hover:text-white border-emerald-600/60'
+                  }`}
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isUpdating ? 'animate-spin' : hasUpdate ? 'text-emerald-950 animate-spin' : 'text-emerald-300'}`} />
+                  <span className="hidden xs:inline">
+                    {isUpdating ? 'Memuat...' : hasUpdate ? 'Update' : 'Refresh'}
+                  </span>
+                  {hasUpdate && (
+                    <span className="w-2 h-2 rounded-full bg-red-500 ring-1 ring-white animate-ping shrink-0" />
+                  )}
+                </button>
+              )}
 
               {/* User Chip */}
               <div
