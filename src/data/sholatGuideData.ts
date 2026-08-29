@@ -636,7 +636,7 @@ export const SHOLAT_GUIDE_DATA: SholatGuideItem[] = [
         arabic: 'أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ. اللَّهُمَّ اجْعَلْنِي مِنَ التَّوَّابِينَ، وَاجْعَلْنِي مِنَ الْمُتَطَهِّرِينَ، وَاجْعَلْنِي مِنْ عِبَادِكَ الصَّالِحِينَ',
         latin: 'Asyhadu allaa ilaaha illallaahu wahdahuu laa syariika lah, wa asyhadu anna Muhammadan \'abduhuu wa Rasuuluh. Allaahummaj\'alnii minat-tawwaabiin, waj\'alnii minal-mutathohhiriin, waj\'alnii min \'ibaadikash-shoolihiin.',
         translation: 'Aku bersaksi bahwa tiada Tuhan selain Allah Yang Maha Esa, tiada sekutu bagi-Nya, dan aku bersaksi bahwa Nabi Muhammad adalah hamba dan utusan-Nya. Ya Allah, jadikanlah aku termasuk golongan orang-orang yang bertaubat, jadikanlah aku termasuk golongan orang-orang yang suci, dan jadikanlah aku termasuk hamba-hamba-Mu yang sholeh.',
-        keutamaan: 'Barangsiapa berwudhu lalu membaca doa ini, maka akan dibukakan baginya 8 pintu surga dan ia boleh masuk dari pintu mana saja yang ia kehendaki (HR. Muslim).'
+        note: 'Keutamaan: Barangsiapa berwudhu lalu membaca doa ini, maka akan dibukakan baginya 8 pintu surga dan ia boleh masuk dari pintu mana saja yang ia kehendaki (HR. Muslim).'
       }
     ]
   },
@@ -683,7 +683,6 @@ export const SHOLAT_GUIDE_DATA: SholatGuideItem[] = [
     title: 'Sujud Sahwi (Karena Lupa / Ragu dalam Sholat)',
     arabicTitle: 'سُجُودُ السَّهْوِ',
     summary: 'Dua kali sujud yang dilakukan di akhir sholat sebelum salam ketika seseorang lupa meninggalkan sunnah ab\'adh atau ragu jumlah rakaat.',
-    arabicTitle: 'سُجُودُ السَّهْوِ',
     doaKhusus: {
       title: 'Bacaan Sujud Sahwi (Dibaca saat 2 kali sujud)',
       arabic: 'سُبْحَانَ مَنْ لَا يَنَامُ وَلَا يَسْهُو',

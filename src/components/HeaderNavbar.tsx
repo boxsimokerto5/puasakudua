@@ -39,7 +39,7 @@ interface HeaderNavbarProps {
   isPwaInstalled?: boolean;
   onOpenWisdomModal?: () => void;
   onOpenPrayerModal?: () => void;
-  onOpenSurahsModal?: (tab?: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian') => void;
+  onOpenSurahsModal?: (tab?: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat') => void;
   selectedCity?: CityLocation;
 }
 

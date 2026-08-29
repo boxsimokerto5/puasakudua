@@ -9,6 +9,12 @@ import { TAHLIL_DATA, TahlilItem } from '../data/tahlilData';
 import { MAHALUL_QIYAM_DATA, MahalulQiyamVerse } from '../data/mahalulQiyamData';
 import { DAILY_PRAYERS_DATA, DailyPrayer, PrayerCategory } from '../data/dailyPrayersData';
 import { DZIKIR_SHOLAT_DATA, DzikirSholatItem } from '../data/dzikirSholatData';
+import {
+  SHOLAT_GUIDE_DATA,
+  SHOLAT_GUIDE_CATEGORIES,
+  SholatGuideItem,
+  SholatCategory,
+} from '../data/sholatGuideData';
 import { useQuranAudioPlayer } from '../hooks/useQuranAudioPlayer';
 import {
   BookOpen,
@@ -22,6 +28,8 @@ import {
   Sparkles,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
+  ChevronUp,
   ArrowLeft,
   Headphones,
   Mic,
@@ -36,12 +44,13 @@ import {
   Layers,
   Star,
   Moon,
+  Compass,
 } from 'lucide-react';
 
 interface ShortSurahsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialTab?: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian';
+  initialTab?: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat';
 }
 
 /**
@@ -106,8 +115,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
   onClose,
   initialTab = 'juz_amma',
 }) => {
-  // Main Module Tab: Juz 'Amma, Surat Yasin, Tahlil, Mahalul Qiyam, Dzikir Sholat, or Doa Harian
-  const [mainTab, setMainTab] = useState<'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian'>(initialTab);
+  // Main Module Tab: Juz 'Amma, Surat Yasin, Tahlil, Mahalul Qiyam, Dzikir Sholat, Doa Harian, or Tata Cara Sholat
+  const [mainTab, setMainTab] = useState<'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat'>(initialTab);
 
   // Juz Amma Selected Surah
   const [selectedSurahNumber, setSelectedSurahNumber] = useState<number>(1);
@@ -136,6 +145,11 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
   const [doaCategoryFilter, setDoaCategoryFilter] = useState<'all' | PrayerCategory>('all');
   const [doaCounts, setDoaCounts] = useState<Record<number, number>>({});
   const [copiedDoaId, setCopiedDoaId] = useState<number | null>(null);
+
+  // Tata Cara Sholat category filter & expand state
+  const [sholatCategoryFilter, setSholatCategoryFilter] = useState<'all' | SholatCategory>('all');
+  const [expandedSholatId, setExpandedSholatId] = useState<string | null>('bacaan_lengkap_sholat');
+  const [copiedSholatId, setCopiedSholatId] = useState<string | null>(null);
 
   // Mobile tab state for Juz Amma: 'list' (Daftar Surat) or 'reader' (Baca Surat)
   const [mobileViewTab, setMobileViewTab] = useState<'list' | 'reader'>('reader');
@@ -246,6 +260,38 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
     return list;
   }, [doaCategoryFilter, searchQuery]);
 
+  // Filtered Tata Cara Sholat Data
+  const filteredSholatGuide = useMemo<SholatGuideItem[]>(() => {
+    let list = SHOLAT_GUIDE_DATA;
+    if (sholatCategoryFilter !== 'all') {
+      list = list.filter((item) => item.category === sholatCategoryFilter);
+    }
+    const q = searchQuery.toLowerCase().trim();
+    if (q) {
+      list = list.filter(
+        (item) =>
+          item.title.toLowerCase().includes(q) ||
+          (item.arabicTitle && item.arabicTitle.includes(q)) ||
+          item.summary.toLowerCase().includes(q) ||
+          item.categoryLabel.toLowerCase().includes(q) ||
+          (item.rakaat && item.rakaat.toLowerCase().includes(q)) ||
+          (item.waktuPelaksanaan && item.waktuPelaksanaan.toLowerCase().includes(q)) ||
+          (item.steps &&
+            item.steps.some(
+              (s) =>
+                s.title.toLowerCase().includes(q) ||
+                (s.latin && s.latin.toLowerCase().includes(q)) ||
+                (s.translation && s.translation.toLowerCase().includes(q))
+            )) ||
+          (item.doaKhusus &&
+            (item.doaKhusus.title.toLowerCase().includes(q) ||
+              item.doaKhusus.latin.toLowerCase().includes(q) ||
+              item.doaKhusus.translation.toLowerCase().includes(q)))
+      );
+    }
+    return list;
+  }, [sholatCategoryFilter, searchQuery]);
+
   // Reset audio & view on tab / surah change
   const handleSelectSurah = (surahNumber: number) => {
     stopAll();
@@ -262,7 +308,7 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
   const nextSurah = currentIndex < SHORT_SURAHS_DATA.length - 1 ? SHORT_SURAHS_DATA[currentIndex + 1] : null;
 
   // Handle Tab Switch
-  const handleTabChange = (newTab: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian') => {
+  const handleTabChange = (newTab: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat') => {
     stopAll();
     setMainTab(newTab);
     setSearchQuery('');
@@ -418,6 +464,69 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
     navigator.clipboard.writeText(text);
     setCopiedDoaId(item.id);
     setTimeout(() => setCopiedDoaId(null), 2000);
+  };
+
+  // Copy Single Panduan Sholat Item
+  const handleCopySholatGuideItem = (item: SholatGuideItem) => {
+    let text = `🕌 *PANDUAN SHOLAT: ${item.title.toUpperCase()}*\n`;
+    if (item.arabicTitle) text += `${item.arabicTitle}\n`;
+    text += `Kategori: ${item.categoryLabel}`;
+    if (item.rakaat) text += ` • Rakaat: ${item.rakaat}`;
+    if (item.waktuPelaksanaan) text += ` • Waktu: ${item.waktuPelaksanaan}`;
+    text += `\n\nRingkasan:\n${item.summary}\n\n`;
+
+    if (item.niat) {
+      text += `*--- LAFAL NIAT SHOLAT ---*\n`;
+      if (item.niat.munfarid) {
+        text += `[Sendiri / Munfarid]:\n${item.niat.munfarid.arabic}\n_${item.niat.munfarid.latin}_\n"${item.niat.munfarid.translation}"\n\n`;
+      }
+      if (item.niat.imam) {
+        text += `[Sebagai Imam]:\n${item.niat.imam.arabic}\n_${item.niat.imam.latin}_\n"${item.niat.imam.translation}"\n\n`;
+      }
+      if (item.niat.makmum) {
+        text += `[Sebagai Makmum]:\n${item.niat.makmum.arabic}\n_${item.niat.makmum.latin}_\n"${item.niat.makmum.translation}"\n\n`;
+      }
+    }
+
+    if (item.steps && item.steps.length > 0) {
+      text += `*--- URUTAN GERAKAN & BACAAN ---*\n`;
+      item.steps.forEach((step) => {
+        text += `${step.title}\n`;
+        if (step.postureDescription) text += `Posisi: ${step.postureDescription}\n`;
+        if (step.arabic) text += `${step.arabic}\n`;
+        if (step.latin) text += `_${step.latin}_\n`;
+        if (step.translation) text += `"${step.translation}"\n`;
+        if (step.note) text += `Catatan: ${step.note}\n`;
+        text += `\n`;
+      });
+    }
+
+    if (item.doaKhusus) {
+      text += `*--- ${item.doaKhusus.title.toUpperCase()} ---*\n`;
+      text += `${item.doaKhusus.arabic}\n\n_${item.doaKhusus.latin}_\n\n"${item.doaKhusus.translation}"\n\n`;
+    }
+
+    if (item.ketentuanKhusus && item.ketentuanKhusus.length > 0) {
+      text += `*--- KETENTUAN / SYARAT & RUKUN ---*\n`;
+      item.ketentuanKhusus.forEach((k) => {
+        text += `• ${k}\n`;
+      });
+      text += `\n`;
+    }
+
+    if (item.keutamaan) {
+      text += `Keutamaan: ${item.keutamaan}\n\n`;
+    }
+
+    text += `(Aplikasi PUASAKU - SMP/SMA SRT 1 Kediri)`;
+
+    navigator.clipboard.writeText(text);
+    setCopiedSholatId(item.id);
+    setTimeout(() => setCopiedSholatId(null), 2000);
+  };
+
+  const handleToggleSholatExpand = (id: string) => {
+    setExpandedSholatId((prev) => (prev === id ? null : id));
   };
 
   // Tasbih & Counter helpers
@@ -596,6 +705,19 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
               >
                 <HeartHandshake className="w-3 h-3 text-teal-300 shrink-0" />
                 <span>Doa Harian</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleTabChange('tata_cara_sholat')}
+                className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                  mainTab === 'tata_cara_sholat'
+                    ? 'bg-gradient-to-r from-amber-600 via-emerald-600 to-teal-700 text-white shadow-xs ring-1 ring-amber-300/60 font-black'
+                    : 'text-slate-300 hover:text-amber-300 hover:bg-white/5'
+                }`}
+              >
+                <Compass className="w-3 h-3 text-amber-300 shrink-0" />
+                <span>Tata Cara Sholat</span>
               </button>
             </div>
           </div>
@@ -2078,6 +2200,389 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                         <div className="mt-3 pt-2 border-t border-teal-100 flex items-start gap-1.5 text-[11px] text-teal-950 font-medium bg-teal-50/90 px-3 py-2 rounded-xl border border-teal-200/80">
                           <Info className="w-3.5 h-3.5 text-teal-700 shrink-0 mt-0.5" />
                           <span><strong>Adab & Petunjuk:</strong> {item.adab}</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* TAB 7: PANDUAN LENGKAP TATA CARA SHOLAT & FIKIH IBADAH */}
+          {/* ========================================================= */}
+          {mainTab === 'tata_cara_sholat' && (
+            <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 space-y-4 custom-scrollbar bg-[#faf8f5]">
+              {/* Header Banner */}
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#03281d] via-[#043e2d] to-[#022017] p-4 sm:p-5 text-white border border-emerald-700/60 shadow-md">
+                <RamadanStarryBackdrop variant="emerald" showCrescent={true} />
+                <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="p-1 rounded-lg bg-amber-400/20 text-amber-300 border border-amber-300/30">
+                        <Compass className="w-4 h-4" />
+                      </span>
+                      <h3 className="text-base sm:text-lg font-black text-amber-200 tracking-wide font-sans">
+                        Panduan Tata Cara Sholat & Fikih Ibadah
+                      </h3>
+                    </div>
+                    <p className="text-xs sm:text-sm text-emerald-200/90 mt-1 max-w-2xl">
+                      Panduan lengkap gerakan, bacaan rukun, lafal niat sholat fardhu & sunnah, wudhu, tayamum, serta sujud sahwi / tilawah / syukur sesuai sunnah Rasulullah SAW.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="px-3 py-1 rounded-xl text-xs font-bold bg-amber-400/20 text-amber-300 border border-amber-300/40">
+                      {filteredSholatGuide.length} Materi Panduan
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Category Filter Chips & Search Bar */}
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                  {SHOLAT_GUIDE_CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setSholatCategoryFilter(cat.id as any)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer shrink-0 ${
+                        sholatCategoryFilter === cat.id
+                          ? 'bg-gradient-to-r from-emerald-700 to-teal-700 text-white shadow-md ring-1 ring-emerald-400 font-black'
+                          : 'bg-white text-slate-700 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-800'
+                      }`}
+                    >
+                      <span>{cat.iconEmoji}</span>
+                      <span>{cat.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Search Input */}
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Cari panduan sholat, lafal niat, bacaan iftitah, sujud, rukun..."
+                    className="w-full pl-9 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-xs"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Sholat Guides List */}
+              <div className="space-y-4 my-2">
+                {filteredSholatGuide.map((item) => {
+                  const isExpanded = expandedSholatId === item.id;
+                  const isCopied = copiedSholatId === item.id;
+
+                  return (
+                    <div
+                      key={item.id}
+                      className={`rounded-2xl border transition-all duration-200 overflow-hidden shadow-xs ${
+                        isExpanded
+                          ? 'bg-white border-emerald-400/80 shadow-md ring-1 ring-emerald-300/40'
+                          : 'bg-white/90 border-slate-200 hover:border-emerald-300 hover:bg-white'
+                      }`}
+                    >
+                      {/* Card Header Accordion Trigger */}
+                      <div
+                        onClick={() => handleToggleSholatExpand(item.id)}
+                        className="p-4 sm:p-5 flex items-start justify-between gap-3 cursor-pointer select-none bg-gradient-to-r from-transparent via-emerald-50/20 to-transparent hover:bg-emerald-50/40 transition-colors"
+                      >
+                        <div className="space-y-1.5 flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="px-2 py-0.5 rounded-lg text-[11px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300/60">
+                              {item.categoryLabel}
+                            </span>
+                            {item.rakaat && (
+                              <span className="px-2 py-0.5 rounded-lg text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300/60">
+                                🕌 {item.rakaat}
+                              </span>
+                            )}
+                            {item.waktuPelaksanaan && (
+                              <span className="px-2 py-0.5 rounded-lg text-[11px] font-medium bg-teal-50 text-teal-800 border border-teal-200">
+                                ⏰ {item.waktuPelaksanaan}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-baseline justify-between gap-2 flex-wrap">
+                            <h4 className="text-sm sm:text-base font-black text-slate-900 tracking-tight">
+                              {item.title}
+                            </h4>
+                            {item.arabicTitle && (
+                              <span className="text-sm sm:text-base font-arabic font-bold text-emerald-800" dir="rtl">
+                                {item.arabicTitle}
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                            {item.summary}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 shrink-0 ml-2" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            type="button"
+                            onClick={() => handleCopySholatGuideItem(item)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-800 hover:bg-emerald-50 border border-slate-200 cursor-pointer transition-colors"
+                            title="Salin Seluruh Panduan Ini"
+                          >
+                            {isCopied ? (
+                              <Check className="w-4 h-4 text-emerald-600" />
+                            ) : (
+                              <Copy className="w-4 h-4" />
+                            )}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleToggleSholatExpand(item.id)}
+                            className="p-1.5 rounded-lg text-emerald-700 hover:bg-emerald-100 bg-emerald-50 border border-emerald-200 cursor-pointer transition-colors"
+                            title={isExpanded ? 'Tutup Detail' : 'Buka Detail Lengkap'}
+                          >
+                            {isExpanded ? (
+                              <ChevronUp className="w-4 h-4" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Expandable Detailed Content */}
+                      {isExpanded && (
+                        <div className="px-4 sm:px-6 pb-5 pt-1 space-y-4 border-t border-emerald-100 bg-slate-50/40">
+                          {/* 1. Niat Sholat Section */}
+                          {item.niat && (
+                            <div className="space-y-3 pt-2">
+                              <div className="flex items-center gap-2 border-b border-emerald-200/80 pb-1.5">
+                                <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                                <h5 className="text-xs sm:text-sm font-black text-emerald-950 uppercase tracking-wider">
+                                  Lafal Niat Sholat
+                                </h5>
+                              </div>
+
+                              <div className="grid grid-cols-1 gap-3">
+                                {item.niat.munfarid && (
+                                  <div className="p-3.5 rounded-xl bg-white border border-emerald-200 shadow-xs space-y-2">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                        Niat Sholat Sendiri (Munfarid)
+                                      </span>
+                                    </div>
+                                    <p
+                                      className={`text-right font-arabic font-bold text-slate-900 whitespace-pre-line ${getArabicSizeClass()}`}
+                                      dir="rtl"
+                                    >
+                                      {item.niat.munfarid.arabic}
+                                    </p>
+                                    {showLatin && (
+                                      <p className="text-xs sm:text-sm font-sans font-semibold text-emerald-800 leading-relaxed">
+                                        {item.niat.munfarid.latin}
+                                      </p>
+                                    )}
+                                    {showTranslation && (
+                                      <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed italic">
+                                        "{item.niat.munfarid.translation}"
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
+
+                                {item.niat.imam && (
+                                  <div className="p-3.5 rounded-xl bg-white border border-teal-200 shadow-xs space-y-2">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[11px] font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                                        Niat Sebagai Imam
+                                      </span>
+                                    </div>
+                                    <p
+                                      className={`text-right font-arabic font-bold text-slate-900 whitespace-pre-line ${getArabicSizeClass()}`}
+                                      dir="rtl"
+                                    >
+                                      {item.niat.imam.arabic}
+                                    </p>
+                                    {showLatin && (
+                                      <p className="text-xs sm:text-sm font-sans font-semibold text-teal-800 leading-relaxed">
+                                        {item.niat.imam.latin}
+                                      </p>
+                                    )}
+                                    {showTranslation && (
+                                      <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed italic">
+                                        "{item.niat.imam.translation}"
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
+
+                                {item.niat.makmum && (
+                                  <div className="p-3.5 rounded-xl bg-white border border-amber-200 shadow-xs space-y-2">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                        Niat Sebagai Makmum (Berjamaah)
+                                      </span>
+                                    </div>
+                                    <p
+                                      className={`text-right font-arabic font-bold text-slate-900 whitespace-pre-line ${getArabicSizeClass()}`}
+                                      dir="rtl"
+                                    >
+                                      {item.niat.makmum.arabic}
+                                    </p>
+                                    {showLatin && (
+                                      <p className="text-xs sm:text-sm font-sans font-semibold text-amber-900 leading-relaxed">
+                                        {item.niat.makmum.latin}
+                                      </p>
+                                    )}
+                                    {showTranslation && (
+                                      <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed italic">
+                                        "{item.niat.makmum.translation}"
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* 2. Step-by-Step Gerakan & Bacaan Section */}
+                          {item.steps && item.steps.length > 0 && (
+                            <div className="space-y-3 pt-2">
+                              <div className="flex items-center gap-2 border-b border-emerald-200/80 pb-1.5">
+                                <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                                <h5 className="text-xs sm:text-sm font-black text-emerald-950 uppercase tracking-wider">
+                                  Urutan Langkah & Bacaan
+                                </h5>
+                              </div>
+
+                              <div className="space-y-3">
+                                {item.steps.map((step) => (
+                                  <div
+                                    key={step.stepNumber}
+                                    className="p-4 rounded-xl bg-white border border-slate-200/90 shadow-xs space-y-2.5 hover:border-emerald-300 transition-colors"
+                                  >
+                                    <div className="flex items-center justify-between gap-2">
+                                      <h6 className="text-xs sm:text-sm font-black text-slate-800">
+                                        {step.title}
+                                      </h6>
+                                      <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-900 text-[11px] font-bold flex items-center justify-center shrink-0">
+                                        {step.stepNumber}
+                                      </span>
+                                    </div>
+
+                                    {step.postureDescription && (
+                                      <p className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100 leading-relaxed">
+                                        <strong>Posisi/Gerakan:</strong> {step.postureDescription}
+                                      </p>
+                                    )}
+
+                                    {step.arabic && (
+                                      <p
+                                        className={`text-right font-arabic font-bold text-slate-900 whitespace-pre-line leading-loose ${getArabicSizeClass()}`}
+                                        dir="rtl"
+                                      >
+                                        {step.arabic}
+                                      </p>
+                                    )}
+
+                                    {step.latin && showLatin && (
+                                      <p className="text-xs sm:text-sm font-sans font-semibold text-emerald-800 leading-relaxed">
+                                        {step.latin}
+                                      </p>
+                                    )}
+
+                                    {step.translation && showTranslation && (
+                                      <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed italic">
+                                        "{step.translation}"
+                                      </p>
+                                    )}
+
+                                    {step.note && (
+                                      <div className="flex items-start gap-1.5 text-[11px] text-amber-900 font-medium bg-amber-50/90 p-2 rounded-lg border border-amber-200">
+                                        <Info className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
+                                        <span><strong>Catatan:</strong> {step.note}</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* 3. Doa Khusus Section (e.g. Qunut, Doa Sholat Sunnah) */}
+                          {item.doaKhusus && (
+                            <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50/80 to-teal-50/80 border border-emerald-200 space-y-2.5">
+                              <div className="flex items-center gap-2">
+                                <Sparkles className="w-4 h-4 text-emerald-700" />
+                                <h5 className="text-xs sm:text-sm font-black text-emerald-950">
+                                  {item.doaKhusus.title}
+                                </h5>
+                              </div>
+
+                              <p
+                                className={`text-right font-arabic font-bold text-slate-900 whitespace-pre-line leading-loose ${getArabicSizeClass()}`}
+                                dir="rtl"
+                              >
+                                {item.doaKhusus.arabic}
+                              </p>
+
+                              {showLatin && (
+                                <p className="text-xs sm:text-sm font-sans font-semibold text-emerald-800 leading-relaxed">
+                                  {item.doaKhusus.latin}
+                                </p>
+                              )}
+
+                              {showTranslation && (
+                                <p className="text-xs sm:text-sm font-sans text-slate-600 leading-relaxed italic">
+                                  "{item.doaKhusus.translation}"
+                                </p>
+                              )}
+
+                              {item.doaKhusus.keutamaan && (
+                                <p className="text-[11px] text-emerald-900 bg-white/80 p-2 rounded-lg border border-emerald-100">
+                                  <strong>Keutamaan:</strong> {item.doaKhusus.keutamaan}
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          {/* 4. Ketentuan / Syarat & Rukun Points */}
+                          {item.ketentuanKhusus && item.ketentuanKhusus.length > 0 && (
+                            <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-2">
+                              <h5 className="text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                <Info className="w-3.5 h-3.5 text-teal-700" />
+                                <span>Ketentuan, Syarat & Rukun:</span>
+                              </h5>
+                              <ul className="space-y-1.5 pl-4 list-disc text-xs sm:text-sm text-slate-700 leading-relaxed">
+                                {item.ketentuanKhusus.map((k, idx) => (
+                                  <li key={idx}>{k}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* 5. Keutamaan Footer Banner */}
+                          {item.keutamaan && (
+                            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 text-xs sm:text-sm flex items-start gap-2">
+                              <Star className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                              <p>
+                                <strong>Keutamaan Ibadah:</strong> {item.keutamaan}
+                              </p>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

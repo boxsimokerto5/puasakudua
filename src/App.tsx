@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { UserSession, FastingSession, FastingStatus, Student, AdminSettings, HaidRecord, AdminTabType } from './types';
 import {
   getStoredStudents,
@@ -29,27 +29,39 @@ import { LoginForm } from './components/LoginForm';
 import { SessionSelector } from './components/SessionSelector';
 import { FastingInputterView } from './components/FastingInputterView';
 import { FastingCheckerView } from './components/FastingCheckerView';
-import { AdminPanel } from './components/AdminPanel';
-import { RaportImtaqView } from './components/RaportImtaqView';
-import { StudentDataModal } from './components/StudentDataModal';
-import { StudentPhotoUploadModal } from './components/StudentPhotoUploadModal';
-import { SupabaseConfigModal } from './components/SupabaseConfigModal';
 import { SplashScreen } from './components/SplashScreen';
-import { FastingWisdomModal } from './components/FastingWisdomModal';
-import { PrayerTimesModal } from './components/PrayerTimesModal';
 import { PrayerTimeBannerCard } from './components/PrayerTimeBannerCard';
-import { ShortSurahsModal } from './components/ShortSurahsModal';
-import { CalendarView } from './components/CalendarView';
-import { CatatHaidView } from './components/CatatHaidView';
-import { DaftarHaidView } from './components/DaftarHaidView';
-import { DaftarSuciView } from './components/DaftarSuciView';
 import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { usePwaInstall } from './hooks/usePwaInstall';
 import { useAutoUpdate } from './hooks/useAutoUpdate';
 import { UpdateNotificationToast } from './components/UpdateNotificationToast';
 import { INDONESIA_CITIES, CityLocation } from './utils/prayerTimes';
-import { Sparkles, Cloud, CloudCheck, RefreshCw, Download } from 'lucide-react';
+import { Sparkles, Cloud, CloudCheck, RefreshCw, Download, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+
+// Lazy-loaded heavy components (loaded only on-demand when user opens them)
+const AdminPanel = lazy(() => import('./components/AdminPanel').then(m => ({ default: m.AdminPanel })));
+const RaportImtaqView = lazy(() => import('./components/RaportImtaqView').then(m => ({ default: m.RaportImtaqView })));
+const ShortSurahsModal = lazy(() => import('./components/ShortSurahsModal').then(m => ({ default: m.ShortSurahsModal })));
+const PrayerTimesModal = lazy(() => import('./components/PrayerTimesModal').then(m => ({ default: m.PrayerTimesModal })));
+const FastingWisdomModal = lazy(() => import('./components/FastingWisdomModal').then(m => ({ default: m.FastingWisdomModal })));
+const CalendarView = lazy(() => import('./components/CalendarView').then(m => ({ default: m.CalendarView })));
+const CatatHaidView = lazy(() => import('./components/CatatHaidView').then(m => ({ default: m.CatatHaidView })));
+const DaftarHaidView = lazy(() => import('./components/DaftarHaidView').then(m => ({ default: m.DaftarHaidView })));
+const DaftarSuciView = lazy(() => import('./components/DaftarSuciView').then(m => ({ default: m.DaftarSuciView })));
+const StudentDataModal = lazy(() => import('./components/StudentDataModal').then(m => ({ default: m.StudentDataModal })));
+const StudentPhotoUploadModal = lazy(() => import('./components/StudentPhotoUploadModal').then(m => ({ default: m.StudentPhotoUploadModal })));
+const SupabaseConfigModal = lazy(() => import('./components/SupabaseConfigModal').then(m => ({ default: m.SupabaseConfigModal })));
+
+// Graceful, lightweight loading spinner for lazy-loaded tabs and views
+function ViewLoadingSpinner({ label = 'Memuat modul...' }: { label?: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-20 px-4 space-y-3">
+      <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+      <span className="text-xs font-semibold text-emerald-800 tracking-wide">{label}</span>
+    </div>
+  );
+}
 
 const USER_SESSION_KEY = 'sr_kediri_user_session_v1';
 const PRAYER_CITY_KEY = 'sr_kediri_prayer_city_v1';
@@ -72,9 +84,9 @@ export default function App() {
 
   // Short Surahs Modal State
   const [showSurahsModal, setShowSurahsModal] = useState(false);
-  const [surahsModalTab, setSurahsModalTab] = useState<'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian'>('juz_amma');
+  const [surahsModalTab, setSurahsModalTab] = useState<'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat'>('juz_amma');
 
-  const handleOpenSurahsModal = (tab: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' = 'juz_amma') => {
+  const handleOpenSurahsModal = (tab: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat' = 'juz_amma') => {
     setSurahsModalTab(tab);
     setShowSurahsModal(true);
   };
@@ -776,198 +788,212 @@ export default function App() {
               )}
 
             {/* View Switcher based on User Role & Selected Navigation Tab */}
-            {activeAdminTab === 'catat_haid' || activeAdminTab === 'daftar_haid' || activeAdminTab === 'daftar_suci' ? (
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeAdminTab}
-                  initial={{ opacity: 0, y: 10, scale: 0.995, filter: 'drop-shadow(0 0 16px rgba(244,114,182,0.4))' }}
-                  animate={{ opacity: 1, y: 0, scale: 1, filter: 'drop-shadow(0 0 0px transparent)' }}
-                  exit={{ opacity: 0, y: -8, scale: 0.995, filter: 'drop-shadow(0 0 10px rgba(244,114,182,0.25))' }}
-                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                  className="w-full relative"
-                >
-                  {activeAdminTab === 'catat_haid' ? (
-                    <CatatHaidView
-                      students={students}
-                      haidRecords={haidRecords}
-                      activeSession={activeSession}
-                      currentUserName={user.name}
-                      preselectedStudent={preselectedHaidStudent}
-                      onSaveHaidRecord={handleSaveHaidRecord}
-                      onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
-                      onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
-                    />
-                  ) : activeAdminTab === 'daftar_haid' ? (
-                    <DaftarHaidView
-                      students={students}
-                      haidRecords={haidRecords}
-                      currentUserName={user.name}
-                      onFinishHaid={handleFinishHaid}
-                      onUpdateHaidRecord={handleUpdateHaidRecord}
-                      onDeleteHaidRecord={handleDeleteHaidRecord}
-                      onNavigateToCatatHaid={() => {
-                        setPreselectedHaidStudent(undefined);
-                        setActiveAdminTab('catat_haid');
-                      }}
-                      onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
-                    />
-                  ) : (
-                    <DaftarSuciView
-                      students={students}
-                      haidRecords={haidRecords}
-                      onNavigateToCatatHaid={handleNavigateToCatatHaid}
-                      onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
-                    />
-                  )}
-                </motion.div>
-              </AnimatePresence>
-            ) : activeAdminTab === 'calendar' ? (
-              <CalendarView
-                sessions={Object.values(sessions)}
-                students={students}
-                user={user}
-                activeSessionId={activeSessionId}
-                onSelectSession={(id) => {
-                  setActiveSessionId(id);
-                }}
-                onCreateSessionForDate={(dateStr, title) => {
-                  if (isAdmin) {
-                    handleCreateSession(title, dateStr);
-                    setActiveAdminTab('input');
-                  } else {
-                    showToast('⚠️ Hanya Administrator yang berhak membuat sesi baru.');
-                  }
-                }}
-                onNavigateToTab={(tab) => setActiveAdminTab(tab)}
-              />
-            ) : activeAdminTab === 'raport' ? (
-              <RaportImtaqView
-                students={students}
-                sessions={sessions}
-                user={user}
-              />
-            ) : isAdmin ? (
-              activeAdminTab === 'admin' ? (
-                <AdminPanel
-                  sessions={sessions}
+            <Suspense fallback={<ViewLoadingSpinner />}>
+              {activeAdminTab === 'catat_haid' || activeAdminTab === 'daftar_haid' || activeAdminTab === 'daftar_suci' ? (
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeAdminTab}
+                    initial={{ opacity: 0, y: 10, scale: 0.995, filter: 'drop-shadow(0 0 16px rgba(244,114,182,0.4))' }}
+                    animate={{ opacity: 1, y: 0, scale: 1, filter: 'drop-shadow(0 0 0px transparent)' }}
+                    exit={{ opacity: 0, y: -8, scale: 0.995, filter: 'drop-shadow(0 0 10px rgba(244,114,182,0.25))' }}
+                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    className="w-full relative"
+                  >
+                    {activeAdminTab === 'catat_haid' ? (
+                      <CatatHaidView
+                        students={students}
+                        haidRecords={haidRecords}
+                        activeSession={activeSession}
+                        currentUserName={user.name}
+                        preselectedStudent={preselectedHaidStudent}
+                        onSaveHaidRecord={handleSaveHaidRecord}
+                        onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
+                        onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
+                      />
+                    ) : activeAdminTab === 'daftar_haid' ? (
+                      <DaftarHaidView
+                        students={students}
+                        haidRecords={haidRecords}
+                        currentUserName={user.name}
+                        onFinishHaid={handleFinishHaid}
+                        onUpdateHaidRecord={handleUpdateHaidRecord}
+                        onDeleteHaidRecord={handleDeleteHaidRecord}
+                        onNavigateToCatatHaid={() => {
+                          setPreselectedHaidStudent(undefined);
+                          setActiveAdminTab('catat_haid');
+                        }}
+                        onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
+                      />
+                    ) : (
+                      <DaftarSuciView
+                        students={students}
+                        haidRecords={haidRecords}
+                        onNavigateToCatatHaid={handleNavigateToCatatHaid}
+                        onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
+                      />
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              ) : activeAdminTab === 'calendar' ? (
+                <CalendarView
+                  sessions={Object.values(sessions)}
+                  students={students}
+                  user={user}
                   activeSessionId={activeSessionId}
-                  activeSession={activeSession}
-                  students={students}
-                  adminSettings={adminSettings}
-                  onToggleLockSession={handleToggleLockSession}
-                  onUpdateAdminSettings={handleUpdateAdminSettings}
-                  onDeleteSession={handleDeleteSession}
-                  onSelectSession={(id) => setActiveSessionId(id)}
-                  onCreateSession={handleCreateSession}
-                  onSwitchView={(tab) => setActiveAdminTab(tab)}
-                  onOpenStudentModal={() => setIsStudentModalOpen(true)}
-                  onOpenPhotoModal={handleOpenPhotoModal}
-                  onRestore101Records={handleRestore101Records}
-                  onUpdateStudents={handleUpdateStudents}
-                  isSupabaseConnected={isCloudConnected}
-                  onOpenSupabaseConfig={() => setIsSupabaseModalOpen(true)}
+                  onSelectSession={(id) => {
+                    setActiveSessionId(id);
+                  }}
+                  onCreateSessionForDate={(dateStr, title) => {
+                    if (isAdmin) {
+                      handleCreateSession(title, dateStr);
+                      setActiveAdminTab('input');
+                    } else {
+                      showToast('⚠️ Hanya Administrator yang berhak membuat sesi baru.');
+                    }
+                  }}
+                  onNavigateToTab={(tab) => setActiveAdminTab(tab)}
                 />
-              ) : activeAdminTab === 'input' ? (
-                <FastingInputterView
-                  students={students}
-                  activeSession={activeSession}
-                  onUpdateRecord={handleUpdateRecord}
-                  onBulkUpdateRecords={handleBulkUpdateRecords}
-                  onOpenStudentModal={() => setIsStudentModalOpen(true)}
-                  onOpenPhotoModal={() => handleOpenPhotoModal()}
-                  onRestore101Records={handleRestore101Records}
-                  isAdmin={true}
-                  onToggleLockSession={handleToggleLockSession}
-                  onLogout={handleLogout}
-                  onUpdateStudents={handleUpdateStudents}
-                />
-              ) : (
-                <FastingCheckerView
-                  students={students}
-                  activeSession={activeSession}
-                  user={user}
-                  onVerifySession={handleVerifySession}
-                  onLogout={handleLogout}
-                />
-              )
-            ) : isPenginput ? (
-              activeAdminTab === 'input' ? (
-                <FastingInputterView
-                  students={students}
-                  activeSession={activeSession}
-                  onUpdateRecord={handleUpdateRecord}
-                  onBulkUpdateRecords={handleBulkUpdateRecords}
-                  onOpenPhotoModal={() => handleOpenPhotoModal()}
-                  onRestore101Records={handleRestore101Records}
-                  isAdmin={false}
-                  onLogout={handleLogout}
-                  onUpdateStudents={handleUpdateStudents}
-                />
-              ) : (
+              ) : activeAdminTab === 'raport' ? (
                 <RaportImtaqView
                   students={students}
                   sessions={sessions}
                   user={user}
-                  onLogout={handleLogout}
                 />
-              )
-            ) : (
-              activeAdminTab === 'checker' ? (
-                <FastingCheckerView
-                  students={students}
-                  activeSession={activeSession}
-                  user={user}
-                  onVerifySession={handleVerifySession}
-                  onLogout={handleLogout}
-                />
+              ) : isAdmin ? (
+                activeAdminTab === 'admin' ? (
+                  <AdminPanel
+                    sessions={sessions}
+                    activeSessionId={activeSessionId}
+                    activeSession={activeSession}
+                    students={students}
+                    adminSettings={adminSettings}
+                    onToggleLockSession={handleToggleLockSession}
+                    onUpdateAdminSettings={handleUpdateAdminSettings}
+                    onDeleteSession={handleDeleteSession}
+                    onSelectSession={(id) => setActiveSessionId(id)}
+                    onCreateSession={handleCreateSession}
+                    onSwitchView={(tab) => setActiveAdminTab(tab)}
+                    onOpenStudentModal={() => setIsStudentModalOpen(true)}
+                    onOpenPhotoModal={handleOpenPhotoModal}
+                    onRestore101Records={handleRestore101Records}
+                    onUpdateStudents={handleUpdateStudents}
+                    isSupabaseConnected={isCloudConnected}
+                    onOpenSupabaseConfig={() => setIsSupabaseModalOpen(true)}
+                  />
+                ) : activeAdminTab === 'input' ? (
+                  <FastingInputterView
+                    students={students}
+                    activeSession={activeSession}
+                    onUpdateRecord={handleUpdateRecord}
+                    onBulkUpdateRecords={handleBulkUpdateRecords}
+                    onOpenStudentModal={() => setIsStudentModalOpen(true)}
+                    onOpenPhotoModal={() => handleOpenPhotoModal()}
+                    onRestore101Records={handleRestore101Records}
+                    isAdmin={true}
+                    onToggleLockSession={handleToggleLockSession}
+                    onLogout={handleLogout}
+                    onUpdateStudents={handleUpdateStudents}
+                  />
+                ) : (
+                  <FastingCheckerView
+                    students={students}
+                    activeSession={activeSession}
+                    user={user}
+                    onVerifySession={handleVerifySession}
+                    onLogout={handleLogout}
+                  />
+                )
+              ) : isPenginput ? (
+                activeAdminTab === 'input' ? (
+                  <FastingInputterView
+                    students={students}
+                    activeSession={activeSession}
+                    onUpdateRecord={handleUpdateRecord}
+                    onBulkUpdateRecords={handleBulkUpdateRecords}
+                    onOpenPhotoModal={() => handleOpenPhotoModal()}
+                    onRestore101Records={handleRestore101Records}
+                    isAdmin={false}
+                    onLogout={handleLogout}
+                    onUpdateStudents={handleUpdateStudents}
+                  />
+                ) : (
+                  <RaportImtaqView
+                    students={students}
+                    sessions={sessions}
+                    user={user}
+                    onLogout={handleLogout}
+                  />
+                )
               ) : (
-                <RaportImtaqView
-                  students={students}
-                  sessions={sessions}
-                  user={user}
-                  onLogout={handleLogout}
-                />
-              )
-            )}
+                activeAdminTab === 'checker' ? (
+                  <FastingCheckerView
+                    students={students}
+                    activeSession={activeSession}
+                    user={user}
+                    onVerifySession={handleVerifySession}
+                    onLogout={handleLogout}
+                  />
+                ) : (
+                  <RaportImtaqView
+                    students={students}
+                    sessions={sessions}
+                    user={user}
+                    onLogout={handleLogout}
+                  />
+                )
+              )}
+            </Suspense>
           </main>
 
           {/* Student Data Management Modal */}
-          <StudentDataModal
-            isOpen={isStudentModalOpen}
-            onClose={() => setIsStudentModalOpen(false)}
-            students={students}
-            onUpdateStudents={handleUpdateStudents}
-            onResetStudents={handleResetStudents}
-            onOpenPhotoModal={() => handleOpenPhotoModal()}
-          />
+          {isStudentModalOpen && (
+            <Suspense fallback={null}>
+              <StudentDataModal
+                isOpen={isStudentModalOpen}
+                onClose={() => setIsStudentModalOpen(false)}
+                students={students}
+                onUpdateStudents={handleUpdateStudents}
+                onResetStudents={handleResetStudents}
+                onOpenPhotoModal={() => handleOpenPhotoModal()}
+              />
+            </Suspense>
+          )}
 
           {/* Student Photo Upload & Management Modal */}
-          <StudentPhotoUploadModal
-            isOpen={isPhotoModalOpen}
-            onClose={() => {
-              setIsPhotoModalOpen(false);
-              setPhotoTargetStudent(null);
-            }}
-            students={students}
-            onUpdateStudents={handleUpdateStudents}
-            targetStudent={photoTargetStudent}
-          />
+          {isPhotoModalOpen && (
+            <Suspense fallback={null}>
+              <StudentPhotoUploadModal
+                isOpen={isPhotoModalOpen}
+                onClose={() => {
+                  setIsPhotoModalOpen(false);
+                  setPhotoTargetStudent(null);
+                }}
+                students={students}
+                onUpdateStudents={handleUpdateStudents}
+                targetStudent={photoTargetStudent}
+              />
+            </Suspense>
+          )}
 
           {/* Supabase Cloud Connection & Sync Modal */}
-          <SupabaseConfigModal
-            isOpen={isSupabaseModalOpen}
-            onClose={() => {
-              setIsSupabaseModalOpen(false);
-              setIsCloudConnected(isSupabaseConfigured());
-            }}
-            students={students}
-            sessions={sessions}
-            adminSettings={adminSettings}
-            onSyncCompleted={() => {
-              loadCloudData();
-              showToast('Data berhasil disinkronkan ke Supabase Cloud!');
-            }}
-          />
+          {isSupabaseModalOpen && (
+            <Suspense fallback={null}>
+              <SupabaseConfigModal
+                isOpen={isSupabaseModalOpen}
+                onClose={() => {
+                  setIsSupabaseModalOpen(false);
+                  setIsCloudConnected(isSupabaseConfigured());
+                }}
+                students={students}
+                sessions={sessions}
+                adminSettings={adminSettings}
+                onSyncCompleted={() => {
+                  loadCloudData();
+                  showToast('Data berhasil disinkronkan ke Supabase Cloud!');
+                }}
+              />
+            </Suspense>
+          )}
 
           {/* Clean Footer */}
           <footer className="bg-emerald-950 text-emerald-300/80 text-xs py-5 border-t border-emerald-900 mt-12">
@@ -1011,35 +1037,47 @@ export default function App() {
       )}
 
       {/* Ramadan Fasting Wisdom Modal (Hourly Rotated) */}
-      <FastingWisdomModal
-        isOpen={showWisdomModal}
-        onClose={() => setShowWisdomModal(false)}
-        userName={user?.name}
-        roleName={
-          user?.role === 'admin'
-            ? 'Administrator Utama'
-            : user?.role === 'penginput'
-            ? 'Penginput Data'
-            : user?.role === 'pengecek'
-            ? 'Petugas Pengecek'
-            : undefined
-        }
-      />
+      {showWisdomModal && (
+        <Suspense fallback={null}>
+          <FastingWisdomModal
+            isOpen={showWisdomModal}
+            onClose={() => setShowWisdomModal(false)}
+            userName={user?.name}
+            roleName={
+              user?.role === 'admin'
+                ? 'Administrator Utama'
+                : user?.role === 'penginput'
+                ? 'Penginput Data'
+                : user?.role === 'pengecek'
+                ? 'Petugas Pengecek'
+                : undefined
+            }
+          />
+        </Suspense>
+      )}
 
       {/* Ramadan Prayer Times & Imsakiyah Modal */}
-      <PrayerTimesModal
-        isOpen={showPrayerModal}
-        onClose={() => setShowPrayerModal(false)}
-        selectedCity={selectedCity}
-        onCityChange={handleCityChange}
-      />
+      {showPrayerModal && (
+        <Suspense fallback={null}>
+          <PrayerTimesModal
+            isOpen={showPrayerModal}
+            onClose={() => setShowPrayerModal(false)}
+            selectedCity={selectedCity}
+            onCityChange={handleCityChange}
+          />
+        </Suspense>
+      )}
 
       {/* Short Surahs (Juz 'Amma, Yasin, Tahlil, Mahalul Qiyam, Dzikir & Doa) Modal */}
-      <ShortSurahsModal
-        isOpen={showSurahsModal}
-        onClose={() => setShowSurahsModal(false)}
-        initialTab={surahsModalTab}
-      />
+      {showSurahsModal && (
+        <Suspense fallback={null}>
+          <ShortSurahsModal
+            isOpen={showSurahsModal}
+            onClose={() => setShowSurahsModal(false)}
+            initialTab={surahsModalTab}
+          />
+        </Suspense>
+      )}
 
       {/* Cloudflare Pages Auto Update Notification Toast */}
       <UpdateNotificationToast
