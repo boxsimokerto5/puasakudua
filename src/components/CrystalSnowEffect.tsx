@@ -64,9 +64,9 @@ export const CrystalSnowEffect: React.FC<{ density?: number; count?: number }> =
         }
       `}</style>
 
-      {/* Soft Ambient Pink Radial Backdrops */}
-      <div className="absolute -top-16 -right-16 w-64 h-64 bg-pink-300/15 rounded-full blur-2xl pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-64 h-64 bg-fuchsia-200/15 rounded-full blur-2xl pointer-events-none" />
+      {/* Soft Ambient Pink Radial Backdrops (Static without blur filter during scroll) */}
+      <div className="absolute -top-16 -right-16 w-64 h-64 bg-pink-200/20 rounded-full pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-64 h-64 bg-fuchsia-200/20 rounded-full pointer-events-none" />
 
       {/* Floating Crystal Snowflakes (Optimized without heavy drop-shadow filter animations) */}
       {particles.map((p) => (

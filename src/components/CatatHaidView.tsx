@@ -379,17 +379,17 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
   }, [studentStatusMap]);
 
   return (
-    <div className="relative max-w-6xl mx-auto space-y-3.5 sm:space-y-4 animate-pink-fade-in p-2 sm:p-3 rounded-3xl bg-gradient-to-b from-[#fff5f8]/90 via-[#fef2f6]/80 to-[#fce7f3]/50 border border-pink-100/80 shadow-[0_10px_35px_rgba(244,114,182,0.12)]">
+    <div className="relative max-w-6xl mx-auto space-y-3.5 sm:space-y-4 animate-pink-fade-in p-2 sm:p-3 rounded-3xl bg-gradient-to-b from-[#fff5f8] via-[#fef2f6] to-[#fce7f3] border border-pink-100/80 shadow-[0_10px_35px_rgba(244,114,182,0.12)]">
       {/* Salju Kristal Bertebaran (Ringan & Cepat) */}
-      <CrystalSnowEffect density={12} />
+      <CrystalSnowEffect density={8} />
 
       {/* Header Banner - Soft Rose Pink with Crystal Shimmer */}
-      <div className="relative z-10 bg-gradient-to-r from-pink-500 via-rose-400 to-pink-600 text-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-[0_6px_25px_rgba(244,114,182,0.35)] border border-pink-200/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 overflow-hidden">
+      <div className="relative z-10 bg-gradient-to-r from-pink-500 via-rose-400 to-pink-600 text-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-md border border-pink-200/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 overflow-hidden">
         {/* Subtle background decorative crystal glow */}
-        <div className="absolute -right-8 -top-8 w-36 h-36 bg-white/20 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -right-8 -top-8 w-36 h-36 bg-white/20 rounded-full pointer-events-none" />
 
         <div className="flex items-center gap-2.5 sm:gap-3 relative z-10 min-w-0">
-          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/40 shrink-0 shadow-inner">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-white/20 flex items-center justify-center border border-white/40 shrink-0 shadow-inner">
             <Droplets className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div className="min-w-0">

@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+/* 🚀 High-Performance Native Mobile Momentum Scrolling & Hardware Acceleration */
+html, body {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+  touch-action: pan-y pinch-zoom;
+  scroll-behavior: smooth;
+}
+
+/* Ensure smooth 60-120fps hardware acceleration on scrollable containers */
+.smooth-scroll, [class*="overflow-y-auto"], [class*="overflow-x-auto"] {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  will-change: scroll-position;
+}
+
 @layer utilities {
   .font-arabic {
     font-family: 'Amiri', 'Scheherazade New', 'Traditional Arabic', 'KFGQPC Uthman Taha Naskh', 'Arial', serif;
