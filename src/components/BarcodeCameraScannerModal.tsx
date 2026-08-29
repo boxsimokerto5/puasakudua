@@ -126,58 +126,58 @@ export const BarcodeCameraScannerModal: React.FC<BarcodeCameraScannerModalProps>
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-gray-100 flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl border border-gray-100 flex flex-col">
         {/* Header */}
-        <div className="bg-emerald-900 text-white px-5 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-700 flex items-center justify-center">
+        <div className="bg-emerald-900 text-white px-4 sm:px-5 py-3 sm:py-3.5 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-emerald-700 flex items-center justify-center shrink-0">
               <Camera className="w-4 h-4 text-emerald-100" />
             </div>
-            <div>
-              <h3 className="text-sm font-bold leading-tight">Scan QR Code / Barcode Santri</h3>
-              <p className="text-[10px] text-emerald-300">Arahkan kamera ke QR Code NIK pada kartu</p>
+            <div className="min-w-0">
+              <h3 className="text-xs sm:text-sm font-bold leading-tight truncate">Scan QR Code / Barcode Santri</h3>
+              <p className="text-[10px] text-emerald-300 truncate">Arahkan kamera ke QR Code NIK pada kartu</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
+            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer shrink-0 touch-manipulation"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Camera Scanner Viewport */}
-        <div className="p-4 bg-slate-900 flex flex-col items-center justify-center min-h-[300px] relative">
+        <div className="p-2 sm:p-4 bg-slate-900 flex flex-col items-center justify-center min-h-[260px] sm:min-h-[300px] relative overflow-hidden flex-1">
           <div
             id={qrRegionId}
             className="w-full max-w-[340px] rounded-2xl overflow-hidden shadow-inner bg-black"
           />
 
           {isStarting && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 text-white space-y-2 z-10">
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 text-white space-y-2 z-10 p-4 text-center">
               <RefreshCw className="w-8 h-8 text-emerald-400 animate-spin" />
               <p className="text-xs font-semibold">Mengaktifkan kamera...</p>
             </div>
           )}
 
           {scannerError && (
-            <div className="absolute inset-4 flex flex-col items-center justify-center bg-slate-900 text-white p-5 rounded-2xl text-center space-y-3 z-10 overflow-y-auto">
-              <AlertCircle className="w-9 h-9 text-amber-400 shrink-0" />
+            <div className="absolute inset-2 sm:inset-4 flex flex-col items-center justify-center bg-slate-900 text-white p-4 sm:p-5 rounded-2xl text-center space-y-3 z-10 overflow-y-auto">
+              <AlertCircle className="w-8 h-8 sm:w-9 sm:h-9 text-amber-400 shrink-0" />
               <p className="text-xs text-slate-200 leading-relaxed max-w-xs">{scannerError}</p>
-              <div className="flex flex-col sm:flex-row items-center gap-2 pt-1">
+              <div className="flex flex-col sm:flex-row items-center gap-2 pt-1 w-full sm:w-auto">
                 <button
                   onClick={() => setRetryCount((c) => c + 1)}
-                  className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md touch-manipulation"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                   <span>Coba Aktifkan Lagi</span>
                 </button>
                 <button
                   onClick={onClose}
-                  className="w-full sm:w-auto px-3.5 py-2 bg-white/10 hover:bg-white/20 text-slate-300 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+                  className="w-full sm:w-auto px-3.5 py-2.5 bg-white/10 hover:bg-white/20 text-slate-300 rounded-xl text-xs font-semibold transition-all cursor-pointer touch-manipulation"
                 >
-                  Gunakan Scanner USB / Input Manual
+                  Gunakan Input Manual
                 </button>
               </div>
             </div>
@@ -185,27 +185,27 @@ export const BarcodeCameraScannerModal: React.FC<BarcodeCameraScannerModalProps>
         </div>
 
         {/* Last Scanned Feedback & Footer */}
-        <div className="p-4 bg-gray-50 border-t border-gray-100 space-y-3">
+        <div className="p-3 sm:p-4 bg-gray-50 border-t border-gray-100 space-y-2.5 sm:space-y-3 shrink-0">
           {lastScanned && (
-            <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 text-xs text-emerald-900">
+            <div className="p-2 sm:p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 text-xs text-emerald-900">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <div className="min-w-0">
-                <p className="font-bold">Kode Terdeteksi:</p>
-                <p className="font-mono text-emerald-700 truncate">{lastScanned}</p>
+                <p className="font-bold text-[11px]">Kode Terdeteksi:</p>
+                <p className="font-mono text-emerald-700 text-xs truncate">{lastScanned}</p>
               </div>
             </div>
           )}
 
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <span className="flex items-center gap-1 text-emerald-700 font-medium">
-              <Volume2 className="w-3.5 h-3.5" />
-              <span>Suara beep & getar aktif saat scan berhasil.</span>
+          <div className="flex items-center justify-between gap-2 text-xs text-gray-500">
+            <span className="flex items-center gap-1 text-emerald-700 font-medium text-[11px] truncate">
+              <Volume2 className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Beep aktif saat scan</span>
             </span>
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl text-xs font-bold transition-all cursor-pointer"
+              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-gray-800 rounded-xl text-xs font-bold transition-all cursor-pointer touch-manipulation shrink-0"
             >
-              Selesai Scan
+              Tutup Scanner
             </button>
           </div>
         </div>

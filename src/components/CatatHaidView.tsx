@@ -8,7 +8,7 @@ import {
   FIQH_CONSTANTS,
   calculateSuciDaysForStudent,
 } from '../utils/fiqhHaid';
-import { BarcodeCameraScannerModal } from './BarcodeCameraScannerModal';
+import { InlineCameraScanner } from './InlineCameraScanner';
 import { validateScannedCard } from '../utils/cardSecurity';
 import { CrystalSnowEffect } from './CrystalSnowEffect';
 import {
@@ -384,47 +384,47 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
       <CrystalSnowEffect density={12} />
 
       {/* Header Banner - Soft Rose Pink with Crystal Shimmer */}
-      <div className="relative z-10 bg-gradient-to-r from-pink-500 via-rose-400 to-pink-600 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-[0_6px_25px_rgba(244,114,182,0.35)] border border-pink-200/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 overflow-hidden">
+      <div className="relative z-10 bg-gradient-to-r from-pink-500 via-rose-400 to-pink-600 text-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-[0_6px_25px_rgba(244,114,182,0.35)] border border-pink-200/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 overflow-hidden">
         {/* Subtle background decorative crystal glow */}
         <div className="absolute -right-8 -top-8 w-36 h-36 bg-white/20 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="flex items-center gap-3 relative z-10">
-          <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/40 shrink-0 shadow-inner">
-            <Droplets className="w-6 h-6 text-white" />
+        <div className="flex items-center gap-2.5 sm:gap-3 relative z-10 min-w-0">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/40 shrink-0 shadow-inner">
+            <Droplets className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base sm:text-xl font-black tracking-tight leading-tight text-white drop-shadow-xs">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+              <h2 className="text-sm sm:text-xl font-black tracking-tight leading-tight text-white drop-shadow-xs truncate">
                 Catat Haid Santriwati
               </h2>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/25 text-white border border-white/30 backdrop-blur-xs flex items-center gap-1">
-                <Snowflake className="w-3 h-3 text-pink-100" />
+              <span className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-white/25 text-white border border-white/30 backdrop-blur-xs flex items-center gap-1 shrink-0">
+                <Snowflake className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-pink-100" />
                 <span>Fiqih An-Nisa</span>
               </span>
             </div>
-            <p className="text-[11px] sm:text-xs text-pink-100 leading-tight mt-1 font-medium">
-              Pencatatan masa haid, deteksi hari berjalan, dan integrasi otomatis ke status presensi puasa.
+            <p className="text-[10px] sm:text-xs text-pink-100 leading-tight mt-0.5 font-medium">
+              Pencatatan masa haid dan integrasi status puasa.
             </p>
           </div>
         </div>
 
         {/* Quick Nav Buttons to Other Haid/Suci Tabs */}
-        <div className="flex items-center gap-2 self-end sm:self-auto relative z-10">
+        <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto relative z-10">
           <button
             type="button"
             onClick={onNavigateToDaftarHaid}
-            className="px-3 py-1.5 rounded-xl text-xs font-black bg-white/95 hover:bg-white text-pink-700 border border-pink-100 transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+            className="flex-1 sm:flex-initial justify-center px-2.5 sm:px-3 py-2 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-black bg-white/95 hover:bg-white text-pink-700 border border-pink-100 transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer touch-manipulation"
           >
-            <HeartPulse className="w-3.5 h-3.5 text-rose-500" />
-            <span>Daftar Haid ({haidRecords.filter((r) => r.status === 'haid_aktif').length})</span>
+            <HeartPulse className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+            <span className="truncate">Daftar Haid ({haidRecords.filter((r) => r.status === 'haid_aktif').length})</span>
           </button>
           <button
             type="button"
             onClick={onNavigateToDaftarSuci}
-            className="px-3 py-1.5 rounded-xl text-xs font-bold bg-pink-700/80 hover:bg-pink-800 text-white border border-pink-300/40 transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+            className="flex-1 sm:flex-initial justify-center px-2.5 sm:px-3 py-2 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-bold bg-pink-700/80 hover:bg-pink-800 text-white border border-pink-300/40 transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer touch-manipulation"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-200" />
-            <span>Daftar Suci</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-200 shrink-0" />
+            <span className="truncate">Daftar Suci</span>
           </button>
         </div>
       </div>
@@ -445,17 +445,31 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
               </span>
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                setScanFeedback(null);
-                setIsCameraScannerOpen(true);
-              }}
-              className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-pink-500 to-rose-400 hover:from-pink-600 hover:to-rose-500 active:scale-98 text-white text-xs font-black transition-all flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(244,114,182,0.3)] cursor-pointer"
-            >
-              <QrCode className="w-4 h-4 text-white animate-pulse" />
-              <span>Buka Kamera Scan Kartu</span>
-            </button>
+            {!isCameraScannerOpen ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setScanFeedback(null);
+                  setIsCameraScannerOpen(true);
+                }}
+                className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-pink-500 to-rose-400 hover:from-pink-600 hover:to-rose-500 active:scale-98 text-white text-xs font-black transition-all flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(244,114,182,0.3)] cursor-pointer touch-manipulation"
+              >
+                <QrCode className="w-4 h-4 text-white animate-pulse" />
+                <span>Buka Kamera Scan Kartu</span>
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <InlineCameraScanner
+                  isActive={isCameraScannerOpen}
+                  onClose={() => setIsCameraScannerOpen(false)}
+                  onScanSuccess={(code) => {
+                    handleScanCode(code);
+                  }}
+                  title="Kamera Scanner Kartu Santri"
+                  scannerId="catat-haid-scanner-region"
+                />
+              </div>
+            )}
 
             {/* Scan Feedback Banner */}
             {scanFeedback && (
@@ -478,15 +492,15 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
             )}
           </div>
 
-          {/* 2. Manual Student Search & Picker (Filtered for Girls) */}
+          {/* 2. Manual Student Search & Picker (Lightweight Search-on-Demand) */}
           <div className="bg-white/95 backdrop-blur-xs border border-pink-100 rounded-2xl p-3.5 sm:p-4 shadow-[0_4px_16px_rgba(244,114,182,0.06)] space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                 <Search className="w-3.5 h-3.5 text-pink-500" />
-                Cari Santriwati ({femaleStudents.length})
+                Cari Santriwati
               </span>
               <span className="text-[10px] text-pink-700 font-bold bg-pink-50 px-2 py-0.5 rounded-full border border-pink-200">
-                Khusus Putri
+                Pencarian Cepat
               </span>
             </div>
 
@@ -511,40 +525,67 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                   placeholder="Ketik nama / NIK..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-7 pr-2.5 py-1.5 text-xs bg-pink-50/50 border border-pink-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-pink-400 focus:outline-none"
+                  className="w-full pl-7 pr-7 py-1.5 text-xs bg-pink-50/50 border border-pink-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-pink-400 focus:outline-none"
                 />
                 <Search className="w-3.5 h-3.5 text-pink-400 absolute left-2.5 top-2" />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2 top-1.5 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* Student List Box (Max Height with Slim Scrollbar) */}
-            <div className="max-h-[260px] sm:max-h-[300px] overflow-y-auto space-y-1.5 pr-1">
-              {filteredFemaleStudents.length === 0 ? (
-                <div className="p-4 text-center text-xs text-slate-400 italic">
-                  Santriwati tidak ditemukan
-                </div>
-              ) : (
-                filteredFemaleStudents.map((s) => {
-                  const status = studentStatusMap.get(s.id);
-                  const isSelected = selectedStudent?.id === s.id;
-                  const isCurrentlyHaid = status?.isCurrentlyHaid || false;
-                  const suciInfo = status?.suciInfo;
+            {/* Search Results (Shown only when typing or filtering class) */}
+            {searchQuery.trim().length > 0 || selectedClass !== 'SEMUA' ? (
+              <div className="max-h-[220px] sm:max-h-[260px] overflow-y-auto space-y-1.5 pr-1 animate-in fade-in duration-100">
+                {filteredFemaleStudents.length === 0 ? (
+                  <div className="p-3 text-center text-xs text-slate-400 italic bg-pink-50/30 rounded-xl border border-pink-100">
+                    Santriwati dengan kata kunci "{searchQuery}" tidak ditemukan
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-[10px] font-bold text-slate-500 px-1">
+                      Hasil ({filteredFemaleStudents.length} santriwati):
+                    </div>
+                    {filteredFemaleStudents.slice(0, 8).map((s) => {
+                      const status = studentStatusMap.get(s.id);
+                      const isSelected = selectedStudent?.id === s.id;
+                      const isCurrentlyHaid = status?.isCurrentlyHaid || false;
+                      const suciInfo = status?.suciInfo;
 
-                  return (
-                    <StudentRowItem
-                      key={s.id}
-                      student={s}
-                      isSelected={isSelected}
-                      isCurrentlyHaid={isCurrentlyHaid}
-                      suciDays={suciInfo?.days || 30}
-                      isUnder15Days={suciInfo?.isUnder15Days || false}
-                      hasPreviousRecord={suciInfo?.hasPreviousRecord || false}
-                      onSelect={handleSelectStudent}
-                    />
-                  );
-                })
-              )}
-            </div>
+                      return (
+                        <StudentRowItem
+                          key={s.id}
+                          student={s}
+                          isSelected={isSelected}
+                          isCurrentlyHaid={isCurrentlyHaid}
+                          suciDays={suciInfo?.days || 30}
+                          isUnder15Days={suciInfo?.isUnder15Days || false}
+                          hasPreviousRecord={suciInfo?.hasPreviousRecord || false}
+                          onSelect={(student) => {
+                            handleSelectStudent(student);
+                          }}
+                        />
+                      );
+                    })}
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="p-3.5 rounded-xl bg-pink-50/40 border border-dashed border-pink-200 text-center space-y-1">
+                <p className="text-xs text-pink-900 font-medium">
+                  🔍 Ketik nama atau NIK di atas untuk mencari santriwati
+                </p>
+                <p className="text-[10px] text-slate-400">
+                  Gunakan kamera scan di atas atau ketik pencarian untuk input super cepat & ringan.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -916,99 +957,89 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
         </div>
       </div>
 
-      {/* Barcode Camera Scanner Modal */}
-      <BarcodeCameraScannerModal
-        isOpen={isCameraScannerOpen}
-        onClose={() => setIsCameraScannerOpen(false)}
-        onScanSuccess={(code) => {
-          setIsCameraScannerOpen(false);
-          handleScanCode(code);
-        }}
-      />
-
       {/* POPUP MODAL: PERINGATAN FIQIH TERINDIKASI ALASAN TIDAK VALID / BERBOHONG */}
       {isFiqhWarningModalOpen && selectedStudent && suciInfo && suciInfo.hasPreviousRecord && suciInfo.isUnder15Days && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-4 sm:p-5 shadow-2xl border-2 border-rose-500 space-y-3.5 max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/75 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl max-w-lg w-full p-4 sm:p-5 shadow-2xl border-t-4 sm:border-2 border-rose-500 space-y-3 max-h-[92vh] overflow-y-auto">
             {/* Header with Red Warning Badge */}
-            <div className="flex items-start gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md">
-                <ShieldAlert className="w-6 h-6 animate-pulse" />
+            <div className="flex items-start gap-2.5">
+              <div className="w-10 h-10 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md">
+                <ShieldAlert className="w-5 h-5 animate-pulse" />
               </div>
-              <div className="space-y-1 flex-1">
+              <div className="space-y-0.5 flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-300">
+                  <span className="px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-300">
                     Peringatan Fiqih Syar'i
                   </span>
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950">
-                    Masa Suci Hari ke-{suciInfo.days}
+                  <span className="px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950">
+                    Suci Hari ke-{suciInfo.days}
                   </span>
                 </div>
-                <h3 className="text-base sm:text-lg font-black text-rose-950 leading-tight">
+                <h3 className="text-sm sm:text-base font-black text-rose-950 leading-tight">
                   ⚠️ Terindikasi Alasan Tidak Valid / Berbohong
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsFiqhWarningModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 touch-manipulation cursor-pointer shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Student Identification from Scanned Card (NIK / Barcode ID) */}
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+            <div className="p-2.5 sm:p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-2.5">
               {selectedStudent.foto ? (
                 <img
                   src={selectedStudent.foto}
                   alt={selectedStudent.nama}
-                  className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover border border-slate-200 shrink-0"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-xl bg-rose-100 text-rose-800 font-black text-base flex items-center justify-center shrink-0 border border-rose-200">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-rose-100 text-rose-800 font-black text-sm sm:text-base flex items-center justify-center shrink-0 border border-rose-200">
                   {selectedStudent.nama.charAt(0)}
                 </div>
               )}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-1">
-                  <h4 className="text-sm font-black text-slate-900 truncate">
+                  <h4 className="text-xs sm:text-sm font-black text-slate-900 truncate">
                     {selectedStudent.nama}
                   </h4>
-                  <span className="text-[10px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200 shrink-0">
+                  <span className="text-[9px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200 shrink-0">
                     {selectedStudent.kelas}
                   </span>
                 </div>
-                <p className="text-xs text-slate-600">
-                  NIK / ID Kartu: <strong className="text-slate-900 font-mono">{selectedStudent.nik || '-'}</strong>
+                <p className="text-[11px] text-slate-600">
+                  NIK: <strong className="text-slate-900 font-mono">{selectedStudent.nik || '-'}</strong>
                 </p>
               </div>
             </div>
 
             {/* Realtime Purity Status Box */}
-            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 space-y-2 text-xs text-rose-950">
+            <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 space-y-1.5 text-xs text-rose-950">
               <div className="flex items-center justify-between">
-                <span className="text-slate-600 font-semibold">Status Masa Suci:</span>
-                <span className="px-2 py-0.5 rounded font-black bg-rose-600 text-white text-[11px]">
+                <span className="text-slate-600 font-semibold text-[11px]">Status Masa Suci:</span>
+                <span className="px-2 py-0.5 rounded font-black bg-rose-600 text-white text-[10px] sm:text-[11px]">
                   Baru {suciInfo.days} Hari Suci
                 </span>
               </div>
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="text-slate-600">Tanggal Selesai Mandi Terakhir:</span>
+              <div className="flex items-center justify-between text-[10px] sm:text-[11px]">
+                <span className="text-slate-600">Selesai Mandi Terakhir:</span>
                 <strong className="text-slate-900">{suciInfo.lastEndDate || '-'}</strong>
               </div>
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="text-slate-600">Sisa Minimal Masa Suci:</span>
-                <strong className="text-rose-700 font-black">{suciInfo.remainingSuciDays} hari lagi (hingga genap 15 hari)</strong>
+              <div className="flex items-center justify-between text-[10px] sm:text-[11px]">
+                <span className="text-slate-600">Sisa Minimal Suci:</span>
+                <strong className="text-rose-700 font-black">{suciInfo.remainingSuciDays} hari lagi</strong>
               </div>
 
               {/* Visual progress */}
               <div className="space-y-1 pt-1">
-                <div className="flex justify-between text-[10px] text-rose-900 font-medium">
-                  <span>Progres Masa Suci Sah:</span>
+                <div className="flex justify-between text-[9px] sm:text-[10px] text-rose-900 font-medium">
+                  <span>Progres Menuju Sah 15 Hari:</span>
                   <span>{Math.min(15, suciInfo.days)} / 15 Hari</span>
                 </div>
-                <div className="w-full h-2 bg-rose-200 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-rose-200 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-rose-600 rounded-full transition-all"
                     style={{ width: `${Math.min(100, (suciInfo.days / 15) * 100)}%` }}
@@ -1018,16 +1049,16 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
             </div>
 
             {/* Fiqh Explanation */}
-            <div className="p-3 rounded-xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 space-y-1.5 leading-snug">
-              <div className="font-black text-amber-900 flex items-center gap-1.5 text-xs">
-                <BookOpen className="w-4 h-4 text-amber-800" />
-                <span>Kaidah Fiqih Madzhab Syafi'i (Aqallu ath-Thuhr):</span>
+            <div className="p-2.5 sm:p-3 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 space-y-1 leading-snug">
+              <div className="font-black text-amber-900 flex items-center gap-1.5 text-[11px] sm:text-xs">
+                <BookOpen className="w-3.5 h-3.5 text-amber-800 shrink-0" />
+                <span>Kaidah Fiqih Madzhab Syafi'i:</span>
               </div>
-              <p className="text-[11px] text-amber-900">
-                Jarak minimal masa suci antara dua siklus haid adalah <strong>15 hari 15 malam</strong>. Karena santriwati baru suci <strong>{suciInfo.days} hari</strong>, maka secara syar'i darah yang keluar <strong>BUKAN DARAH HAID</strong>, melainkan <strong>Darah Istihadhah (Penyakit)</strong> atau <strong>Terindikasi Alasan Palsu</strong>.
+              <p className="text-[10px] sm:text-[11px] text-amber-900">
+                Jarak suci minimal adalah <strong>15 hari 15 malam</strong>. Karena baru <strong>{suciInfo.days} hari</strong>, darah yang keluar <strong>BUKAN HAID</strong> melainkan <strong>Istihadhah / Alasan Tidak Valid</strong>.
               </p>
-              <div className="p-2 rounded-lg bg-white/80 border border-amber-300 font-bold text-rose-800 text-[11px]">
-                👉 Ketetapan Hukum Syar'i: Santriwati <u>WAJIB TETAP SHOLAT & WAJIB TETAP BERPUASA</u>!
+              <div className="p-1.5 rounded-xl bg-white/90 border border-amber-300 font-bold text-rose-800 text-[10px] sm:text-[11px]">
+                👉 Santriwati <u>WAJIB TETAP SHOLAT & PUASA</u>!
               </div>
             </div>
 
@@ -1044,20 +1075,20 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                     isError: true,
                   });
                 }}
-                className="w-full py-2.5 px-3 rounded-xl text-xs font-black bg-rose-600 hover:bg-rose-700 active:scale-98 text-white transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-2.5 px-3 rounded-xl text-xs font-black bg-rose-600 hover:bg-rose-700 active:scale-98 text-white transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer touch-manipulation"
               >
                 <X className="w-4 h-4" />
                 <span>Tolak Input (Wajib Tetap Sholat & Puasa)</span>
               </button>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
                 <button
                   type="button"
                   onClick={() => {
                     setIsFiqhWarningModalOpen(false);
                     setNotes((prev) => `[ISTIHADHAH / PENYAKIT]: Darah keluar di masa suci hari ke-${suciInfo.days}. Menurut fiqih wajib tetap sholat & puasa. ${prev}`.trim());
                   }}
-                  className="py-2 px-3 rounded-xl text-xs font-bold bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center"
+                  className="py-2 px-3 rounded-xl text-xs font-bold bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation"
                 >
                   <AlertTriangle className="w-3.5 h-3.5 text-amber-700 shrink-0" />
                   <span className="truncate">Catat Istihadhah (Sakit)</span>
@@ -1066,7 +1097,7 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsFiqhWarningModalOpen(false)}
-                  className="py-2 px-3 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 transition-all text-center cursor-pointer"
+                  className="py-2 px-3 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 transition-all cursor-pointer touch-manipulation text-center"
                 >
                   Lihat Detail Form
                 </button>
@@ -1078,21 +1109,21 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
 
       {/* Success Confirmation Modal */}
       {isSuccessModalOpen && savedRecordSummary && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-2xl max-w-md w-full p-4 sm:p-5 shadow-xl border border-slate-200 space-y-3.5">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-4 sm:p-5 shadow-2xl border border-slate-200 space-y-3">
             <div className="text-center space-y-1">
-              <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-700 mx-auto flex items-center justify-center border border-rose-200">
-                <CheckCircle2 className="w-6 h-6" />
+              <div className="w-11 h-11 rounded-full bg-rose-100 text-rose-700 mx-auto flex items-center justify-center border border-rose-200">
+                <CheckCircle2 className="w-5 h-5" />
               </div>
-              <h3 className="text-base font-black text-slate-900">
+              <h3 className="text-sm sm:text-base font-black text-slate-900">
                 Catatan Haid Berhasil Disimpan!
               </h3>
-              <p className="text-xs text-slate-500">
-                Data masa haid santriwati telah tercatat dalam sistem asrama putri.
+              <p className="text-[11px] sm:text-xs text-slate-500">
+                Data masa haid santriwati telah tercatat dalam sistem.
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs text-slate-700">
+            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs text-slate-700">
               <div className="flex justify-between">
                 <span className="text-slate-500">Santriwati:</span>
                 <strong className="font-bold text-slate-900">{savedRecordSummary.studentName}</strong>
@@ -1124,9 +1155,9 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                   setReportedDay(1);
                   setStartDate(getTodayDateStr());
                 }}
-                className="w-full py-2 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 transition-all cursor-pointer"
+                className="w-full py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 transition-all cursor-pointer touch-manipulation"
               >
-                + Catat Santri Lain
+                + Catat Lain
               </button>
 
               <button
@@ -1135,9 +1166,9 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                   setIsSuccessModalOpen(false);
                   onNavigateToDaftarHaid();
                 }}
-                className="w-full py-2 rounded-lg text-xs font-black bg-rose-600 hover:bg-rose-700 text-white transition-all cursor-pointer flex items-center justify-center gap-1 shadow-xs"
+                className="w-full py-2.5 rounded-xl text-xs font-black bg-rose-600 hover:bg-rose-700 text-white transition-all cursor-pointer flex items-center justify-center gap-1 shadow-xs touch-manipulation"
               >
-                <span>Lihat Daftar Haid</span>
+                <span>Daftar Haid</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
