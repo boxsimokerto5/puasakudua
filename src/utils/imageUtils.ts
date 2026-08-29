@@ -235,8 +235,16 @@ export async function processAndCompressImage(
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Export as JPEG
-        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        // Export as WebP if supported (much lighter), fallback to JPEG
+        let dataUrl = '';
+        try {
+          dataUrl = canvas.toDataURL('image/webp', quality);
+          if (!dataUrl.startsWith('data:image/webp')) {
+            dataUrl = canvas.toDataURL('image/jpeg', quality);
+          }
+        } catch {
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+        }
         resolve(dataUrl);
       };
       img.onerror = () => reject(new Error('Gagal memproses file gambar'));

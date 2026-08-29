@@ -1,4 +1,4 @@
-const CACHE_NAME = 'puasaku-cache-v2';
+const CACHE_NAME = 'puasaku-cache-v3';
 const STATIC_ASSETS = [
   '/manifest.json',
   '/assets/logo.svg',
@@ -55,11 +55,11 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
   // Exclude external APIs, Supabase, and dynamic API endpoints from caching
-  if (url.pathname.startsWith('/api') || url.hostname.includes('supabase.co') || url.hostname.includes('googleapis.com')) {
+  if (url.pathname.startsWith('/api') || url.hostname.includes('supabase.co')) {
     return;
   }
 
-  // ALWAYS Network-First for HTML/Navigation, sw.js, and version.json
+  // 1. ALWAYS Network-First for HTML/Navigation, sw.js, and version.json (Guarantees zero stale app updates)
   const isNavigation = event.request.mode === 'navigate';
   const isHtml = event.request.headers.get('accept')?.includes('text/html');
   const isVersionCheck = url.pathname.includes('version.json') || url.pathname.includes('sw.js');
@@ -86,12 +86,36 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Stale-While-Revalidate for other static assets (images, icons, etc.)
+  // 2. Cache-First for Immutable Hashed Assets (/assets/.*-*.js, /assets/.*-*.css, web fonts)
+  const isHashedAsset = url.pathname.startsWith('/assets/') && (url.pathname.endsWith('.js') || url.pathname.endsWith('.css'));
+  const isFontAsset = url.hostname.includes('fonts.gstatic.com') || url.pathname.endsWith('.woff2') || url.pathname.endsWith('.woff') || url.pathname.endsWith('.ttf');
+
+  if (isHashedAsset || isFontAsset) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        return fetch(event.request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+          }
+          return networkResponse;
+        });
+      })
+    );
+    return;
+  }
+
+  // 3. Stale-While-Revalidate for other static assets (images, icons, etc.)
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request)
         .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          if (networkResponse && networkResponse.status === 200 && (networkResponse.type === 'basic' || networkResponse.type === 'cors')) {
             const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, responseClone);

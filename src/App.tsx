@@ -793,10 +793,10 @@ export default function App() {
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeAdminTab}
-                    initial={{ opacity: 0, y: 10, scale: 0.995, filter: 'drop-shadow(0 0 16px rgba(244,114,182,0.4))' }}
-                    animate={{ opacity: 1, y: 0, scale: 1, filter: 'drop-shadow(0 0 0px transparent)' }}
-                    exit={{ opacity: 0, y: -8, scale: 0.995, filter: 'drop-shadow(0 0 10px rgba(244,114,182,0.25))' }}
-                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
                     className="w-full relative"
                   >
                     {activeAdminTab === 'catat_haid' ? (

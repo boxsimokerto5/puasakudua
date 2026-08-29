@@ -1,9 +1,10 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Student, HaidRecord, HaidBloodColor, FastingSession } from '../types';
 import {
   calculateStartDateFromReportedDay,
   analyzeFiqhHaid,
   getTodayDateStr,
+  calculateDaysBetween,
   FIQH_CONSTANTS,
   calculateSuciDaysForStudent,
 } from '../utils/fiqhHaid';
@@ -50,6 +51,75 @@ interface CatatHaidViewProps {
   onNavigateToDaftarSuci: () => void;
 }
 
+// Memoized, high-performance Student Row item
+const StudentRowItem = React.memo(({
+  student,
+  isSelected,
+  isCurrentlyHaid,
+  suciDays,
+  isUnder15Days,
+  hasPreviousRecord,
+  onSelect,
+}: {
+  student: Student;
+  isSelected: boolean;
+  isCurrentlyHaid: boolean;
+  suciDays: number;
+  isUnder15Days: boolean;
+  hasPreviousRecord: boolean;
+  onSelect: (s: Student) => void;
+}) => {
+  return (
+    <div
+      onClick={() => onSelect(student)}
+      className={`p-2.5 rounded-xl border transition-colors cursor-pointer flex items-center justify-between gap-2 select-none ${
+        isSelected
+          ? 'bg-pink-50 border-pink-400 ring-2 ring-pink-300'
+          : 'bg-white hover:bg-pink-50/50 border-pink-100'
+      }`}
+    >
+      <div className="flex items-center gap-2 min-w-0">
+        {student.foto ? (
+          <img
+            src={student.foto}
+            alt={student.nama}
+            loading="lazy"
+            className="w-7 h-7 rounded-full object-cover border border-pink-200 shrink-0"
+          />
+        ) : (
+          <div className="w-7 h-7 rounded-full bg-pink-100 text-pink-700 font-bold text-[10px] flex items-center justify-center shrink-0">
+            {student.nama.charAt(0)}
+          </div>
+        )}
+        <div className="min-w-0">
+          <p className="text-xs font-bold text-slate-900 truncate leading-tight">
+            {student.nama}
+          </p>
+          <p className="text-[10px] text-slate-500 leading-tight">
+            {student.kelas} • NIK: {student.nik || '-'}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-1 shrink-0">
+        {isCurrentlyHaid ? (
+          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-100 text-rose-700 border border-rose-200">
+            Sedang Haid
+          </span>
+        ) : hasPreviousRecord && isUnder15Days ? (
+          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+            Suci Hari {suciDays}
+          </span>
+        ) : (
+          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+            Suci
+          </span>
+        )}
+      </div>
+    </div>
+  );
+});
+
 export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
   students = [],
   haidRecords = [],
@@ -68,6 +138,64 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
   // Selected student state
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(preselectedStudent || null);
   const [isFiqhWarningModalOpen, setIsFiqhWarningModalOpen] = useState<boolean>(false);
+
+  // Pre-calculated O(1) status lookup map for all students to prevent repeated date calculations
+  const studentStatusMap = useMemo(() => {
+    const map = new Map<number, { isCurrentlyHaid: boolean; suciInfo: ReturnType<typeof calculateSuciDaysForStudent> }>();
+    
+    // Fast sets and completed records map
+    const activeHaidSet = new Set<number>();
+    const latestCompletedMap = new Map<number, HaidRecord>();
+
+    haidRecords.forEach((r) => {
+      if (r.status === 'haid_aktif') {
+        activeHaidSet.add(r.studentId);
+      } else if (r.status === 'selesai_mandi' && r.endDate) {
+        const existing = latestCompletedMap.get(r.studentId);
+        if (!existing || !existing.endDate || new Date(r.endDate).getTime() > new Date(existing.endDate).getTime()) {
+          latestCompletedMap.set(r.studentId, r);
+        }
+      }
+    });
+
+    const todayStr = getTodayDateStr();
+
+    femaleStudents.forEach((s) => {
+      const isCurrentlyHaid = activeHaidSet.has(s.id);
+      const latestCompleted = latestCompletedMap.get(s.id);
+
+      let suciInfo: ReturnType<typeof calculateSuciDaysForStudent>;
+      if (!latestCompleted || !latestCompleted.endDate) {
+        suciInfo = {
+          days: 30,
+          hasPreviousRecord: false,
+          isEligibleNewHaid: true,
+          isUnder15Days: false,
+          remainingSuciDays: 0,
+        };
+      } else {
+        const days = calculateDaysBetween(latestCompleted.endDate, todayStr);
+        const safeDays = Math.max(1, days);
+        const isEligibleNewHaid = safeDays >= FIQH_CONSTANTS.MIN_SUCI_DAYS;
+        const isUnder15Days = !isEligibleNewHaid;
+        const remainingSuciDays = Math.max(0, FIQH_CONSTANTS.MIN_SUCI_DAYS - safeDays);
+        suciInfo = {
+          days: safeDays,
+          lastEndDate: latestCompleted.endDate,
+          lastEndTime: latestCompleted.endTime,
+          hasPreviousRecord: true,
+          isEligibleNewHaid,
+          isUnder15Days,
+          remainingSuciDays,
+          lastRecord: latestCompleted,
+        };
+      }
+
+      map.set(s.id, { isCurrentlyHaid, suciInfo });
+    });
+
+    return map;
+  }, [femaleStudents, haidRecords]);
 
   useEffect(() => {
     if (preselectedStudent) {
@@ -240,10 +368,20 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
     return analyzeFiqhHaid(startDate);
   }, [startDate]);
 
+  const handleSelectStudent = useCallback((s: Student) => {
+    setSelectedStudent(s);
+    setScanFeedback(null);
+    const status = studentStatusMap.get(s.id);
+    if (status?.suciInfo.hasPreviousRecord && status.suciInfo.isUnder15Days) {
+      playScanErrorSound();
+      setIsFiqhWarningModalOpen(true);
+    }
+  }, [studentStatusMap]);
+
   return (
-    <div className="relative max-w-6xl mx-auto space-y-3.5 sm:space-y-4 animate-pink-fade-in animate-pink-aura p-2 sm:p-3 rounded-3xl bg-gradient-to-b from-[#fff5f8]/90 via-[#fef2f6]/80 to-[#fce7f3]/50 border border-pink-100/80 shadow-[0_10px_35px_rgba(244,114,182,0.12)]">
-      {/* Salju Kristal Bertebaran */}
-      <CrystalSnowEffect density={30} />
+    <div className="relative max-w-6xl mx-auto space-y-3.5 sm:space-y-4 animate-pink-fade-in p-2 sm:p-3 rounded-3xl bg-gradient-to-b from-[#fff5f8]/90 via-[#fef2f6]/80 to-[#fce7f3]/50 border border-pink-100/80 shadow-[0_10px_35px_rgba(244,114,182,0.12)]">
+      {/* Salju Kristal Bertebaran (Ringan & Cepat) */}
+      <CrystalSnowEffect density={12} />
 
       {/* Header Banner - Soft Rose Pink with Crystal Shimmer */}
       <div className="relative z-10 bg-gradient-to-r from-pink-500 via-rose-400 to-pink-600 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-[0_6px_25px_rgba(244,114,182,0.35)] border border-pink-200/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 overflow-hidden">
@@ -387,67 +525,22 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
                 </div>
               ) : (
                 filteredFemaleStudents.map((s) => {
+                  const status = studentStatusMap.get(s.id);
                   const isSelected = selectedStudent?.id === s.id;
-                  const isCurrentlyHaid = haidRecords.some(
-                    (r) => r.studentId === s.id && r.status === 'haid_aktif'
-                  );
-                  const itemSuci = calculateSuciDaysForStudent(s.id, haidRecords);
+                  const isCurrentlyHaid = status?.isCurrentlyHaid || false;
+                  const suciInfo = status?.suciInfo;
 
                   return (
-                    <div
+                    <StudentRowItem
                       key={s.id}
-                      onClick={() => {
-                        setSelectedStudent(s);
-                        setScanFeedback(null);
-                        if (itemSuci.hasPreviousRecord && itemSuci.isUnder15Days) {
-                          playScanErrorSound();
-                          setIsFiqhWarningModalOpen(true);
-                        }
-                      }}
-                      className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 select-none ${
-                        isSelected
-                          ? 'bg-pink-50 border-pink-400 ring-2 ring-pink-300 shadow-xs'
-                          : 'bg-white hover:bg-pink-50/40 border-pink-100'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        {s.foto ? (
-                          <img
-                            src={s.foto}
-                            alt={s.nama}
-                            className="w-7 h-7 rounded-full object-cover border border-pink-200 shrink-0"
-                          />
-                        ) : (
-                          <div className="w-7 h-7 rounded-full bg-pink-100 text-pink-700 font-bold text-[10px] flex items-center justify-center shrink-0">
-                            {s.nama.charAt(0)}
-                          </div>
-                        )}
-                        <div className="min-w-0">
-                          <p className="text-xs font-bold text-slate-900 truncate leading-tight">
-                            {s.nama}
-                          </p>
-                          <p className="text-[10px] text-slate-500 leading-tight">
-                            {s.kelas} • NIK: {s.nik || '-'}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-1 shrink-0">
-                        {isCurrentlyHaid ? (
-                          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-100 text-rose-700 border border-rose-200">
-                            Sedang Haid
-                          </span>
-                        ) : itemSuci.hasPreviousRecord && itemSuci.isUnder15Days ? (
-                          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
-                            Suci Hari {itemSuci.days}
-                          </span>
-                        ) : (
-                          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                            Suci
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                      student={s}
+                      isSelected={isSelected}
+                      isCurrentlyHaid={isCurrentlyHaid}
+                      suciDays={suciInfo?.days || 30}
+                      isUnder15Days={suciInfo?.isUnder15Days || false}
+                      hasPreviousRecord={suciInfo?.hasPreviousRecord || false}
+                      onSelect={handleSelectStudent}
+                    />
                   );
                 })
               )}
