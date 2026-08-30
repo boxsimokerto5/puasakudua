@@ -515,8 +515,8 @@ export const DaftarHaidView: React.FC<DaftarHaidViewProps> = ({
       ) : (
         /* TABLE VIEW: Compact, Slim rows */
         <div className="relative z-10 bg-white/95 backdrop-blur-xs border border-pink-100 rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(244,114,182,0.06)]">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-700">
+          <div className="overflow-x-auto touch-pan-x overscroll-x-contain scrollbar-thin">
+            <table className="w-full min-w-[700px] text-left text-xs text-slate-700">
               <thead className="bg-pink-50/60 text-[11px] uppercase tracking-wider text-slate-600 border-b border-pink-100">
                 <tr>
                   <th className="py-3 px-3.5">Santriwati</th>

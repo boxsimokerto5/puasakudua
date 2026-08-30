@@ -313,7 +313,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         </div>
 
         {/* Calendar Grid Matrix (Compact & Tight) */}
-        <div className="p-2 sm:p-3">
+        <div className="p-2 sm:p-3 overflow-x-auto touch-pan-x overscroll-x-contain scrollbar-thin">
+          <div className="min-w-[320px]">
           {/* Day of Week Headers */}
           <div className="grid grid-cols-7 gap-1 sm:gap-1.5 mb-1 sm:mb-1.5">
             {DAY_NAMES_ID.map((name, idx) => {
@@ -453,6 +454,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 </div>
               );
             })}
+          </div>
           </div>
         </div>
       </div>

@@ -9,11 +9,24 @@ html, body {
 }
 
 /* Ensure smooth 60-120fps hardware acceleration on scrollable containers */
-.smooth-scroll, [class*="overflow-y-auto"], [class*="overflow-x-auto"] {
+.smooth-scroll {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  touch-action: pan-y;
   will-change: scroll-position;
+}
+
+[class*="overflow-x-auto"] {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y pinch-zoom !important;
+  scrollbar-width: thin;
+}
+
+[class*="overflow-y-auto"] {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y pinch-zoom;
+  scrollbar-width: thin;
 }
 
 @layer utilities {

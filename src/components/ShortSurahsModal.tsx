@@ -628,7 +628,7 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
             </div>
 
             {/* Navigation Tabs Pill (Small Icons, Compact Spacing) */}
-            <div className="flex items-center bg-slate-950/80 p-0.5 rounded-xl border border-emerald-600/40 overflow-x-auto max-w-[calc(100vw-80px)] sm:max-w-none shadow-md backdrop-blur-xs">
+            <div className="flex items-center bg-slate-950/80 p-0.5 rounded-xl border border-emerald-600/40 overflow-x-auto touch-pan-x overscroll-x-contain max-w-[calc(100vw-70px)] sm:max-w-none shadow-md backdrop-blur-xs scrollbar-thin scroll-smooth select-none">
               <button
                 type="button"
                 onClick={() => handleTabChange('juz_amma')}
@@ -2241,7 +2241,7 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
 
               {/* Category Filter Chips & Search Bar */}
               <div className="space-y-2.5">
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                <div className="flex items-center gap-1.5 overflow-x-auto touch-pan-x overscroll-x-contain pb-1 scrollbar-thin scroll-smooth select-none">
                   {SHOLAT_GUIDE_CATEGORIES.map((cat) => (
                     <button
                       key={cat.id}

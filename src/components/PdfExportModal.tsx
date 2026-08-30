@@ -127,8 +127,8 @@ export const PdfExportModal: React.FC<PdfExportModalProps> = ({
               <p className="text-xs font-bold text-emerald-950 uppercase tracking-wide">
                 Rekapitulasi Jumlah Berpuasa Per Jenjang
               </p>
-              <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-2xs">
-                <table className="w-full text-xs text-center border-collapse">
+              <div className="overflow-x-auto touch-pan-x overscroll-x-contain scrollbar-thin border border-gray-200 rounded-lg shadow-2xs">
+                <table className="w-full min-w-[580px] text-xs text-center border-collapse">
                   <thead>
                     <tr className="bg-emerald-900 text-white font-bold text-[11px]">
                       <th colSpan={3} className="py-1.5 px-2 border-r border-emerald-800">SD</th>
@@ -192,8 +192,8 @@ export const PdfExportModal: React.FC<PdfExportModalProps> = ({
                     </span>
                   </div>
 
-                  <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-2xs">
-                    <table className="w-full text-xs text-left border-collapse">
+                  <div className="overflow-x-auto touch-pan-x overscroll-x-contain scrollbar-thin border border-gray-200 rounded-lg shadow-2xs">
+                    <table className="w-full min-w-[620px] text-xs text-left border-collapse">
                       <thead className="bg-emerald-900 text-white font-bold text-[10.5px]">
                         <tr className="divide-x divide-emerald-800">
                           <th className="py-1 px-2 text-center w-7">No</th>

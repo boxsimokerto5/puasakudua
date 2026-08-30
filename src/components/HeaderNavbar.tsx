@@ -84,21 +84,79 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
 
   // Navigation slider scroll management
   const navSliderRef = useRef<HTMLDivElement>(null);
+  const quickToolsRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
   const checkScrollability = () => {
     if (navSliderRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = navSliderRef.current;
-      setCanScrollLeft(scrollLeft > 4);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 4);
+      setCanScrollLeft(scrollLeft > 6);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 6);
     }
   };
 
   useEffect(() => {
     checkScrollability();
+    const timer1 = setTimeout(checkScrollability, 100);
+    const timer2 = setTimeout(checkScrollability, 400);
+    const timer3 = setTimeout(checkScrollability, 1000);
     window.addEventListener('resize', checkScrollability);
-    return () => window.removeEventListener('resize', checkScrollability);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      window.removeEventListener('resize', checkScrollability);
+    };
+  }, []);
+
+  // Mouse drag-to-scroll helper for nav tabs
+  useEffect(() => {
+    const slider = navSliderRef.current;
+    if (!slider) return;
+
+    let isDown = false;
+    let startX = 0;
+    let scrollLeft = 0;
+
+    const handleMouseDown = (e: MouseEvent) => {
+      isDown = true;
+      slider.classList.add('cursor-grabbing');
+      startX = e.pageX - slider.offsetLeft;
+      scrollLeft = slider.scrollLeft;
+    };
+
+    const handleMouseLeave = () => {
+      isDown = false;
+      slider.classList.remove('cursor-grabbing');
+    };
+
+    const handleMouseUp = () => {
+      isDown = false;
+      slider.classList.remove('cursor-grabbing');
+      checkScrollability();
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - slider.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      slider.scrollLeft = scrollLeft - walk;
+      checkScrollability();
+    };
+
+    slider.addEventListener('mousedown', handleMouseDown);
+    slider.addEventListener('mouseleave', handleMouseLeave);
+    slider.addEventListener('mouseup', handleMouseUp);
+    slider.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      slider.removeEventListener('mousedown', handleMouseDown);
+      slider.removeEventListener('mouseleave', handleMouseLeave);
+      slider.removeEventListener('mouseup', handleMouseUp);
+      slider.removeEventListener('mousemove', handleMouseMove);
+    };
   }, []);
 
   // Ensure active tab is smoothly visible in the slider
@@ -560,7 +618,10 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
           )}
 
           {/* Quick Islamic Tools & Desktop Actions Bar */}
-          <div className="flex items-center justify-between sm:justify-end gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5">
+          <div
+            ref={quickToolsRef}
+            className="flex items-center justify-start sm:justify-end gap-1.5 sm:gap-2 overflow-x-auto touch-pan-x overscroll-x-contain no-scrollbar scroll-smooth py-0.5 w-full sm:w-auto"
+          >
             {/* Live Prayer Times Pill */}
             {onOpenPrayerModal && (
               <PrayerTimeHeaderPill onOpenModal={onOpenPrayerModal} city={selectedCity} />
