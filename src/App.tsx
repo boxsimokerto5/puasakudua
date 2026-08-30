@@ -232,37 +232,39 @@ export default function App() {
   useEffect(() => {
     loadCloudData();
 
-    // Subscribe to Realtime Postgres Changes
+    // Subscribe to Realtime Postgres Changes with smart diffing
     const unsubscribe = setupSupabaseRealtime(
       (updatedSession) => {
         setSessions((prev) => {
+          const existing = prev[updatedSession.id];
+          // Skip redundant re-renders if updatedAt is identical or older
+          if (existing && existing.updatedAt && updatedSession.updatedAt && existing.updatedAt >= updatedSession.updatedAt) {
+            return prev;
+          }
           const next = { ...prev, [updatedSession.id]: updatedSession };
           saveAllStoredSessions(next);
           return next;
         });
-        showToast(`⚡ Realtime: Sesi "${updatedSession.title}" diperbarui.`);
       },
       (deletedId) => {
         setSessions((prev) => {
+          if (!prev[deletedId]) return prev;
           const next = { ...prev };
           delete next[deletedId];
           saveAllStoredSessions(next);
           return next;
         });
-        showToast('⚡ Realtime: Sesi puasa dihapus.');
       },
       async () => {
         const cloudStudents = await fetchStudentsFromSupabase();
         if (cloudStudents && cloudStudents.length > 0) {
           setStudents(cloudStudents);
           saveStoredStudents(cloudStudents);
-          showToast('⚡ Realtime: Data master siswa diperbarui.');
         }
       },
       (newSettings) => {
         setAdminSettings(newSettings);
         saveStoredAdminSettings(newSettings);
-        showToast('⚡ Realtime: Pengaturan admin diperbarui.');
       }
     );
 

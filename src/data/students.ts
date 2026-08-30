@@ -16,29 +16,51 @@ export const DEFAULT_STUDENTS: Student[] = [
 const STUDENTS_STORAGE_KEY = 'sr_kediri_students_v1';
 const SESSIONS_STORAGE_KEY = 'sr_kediri_fasting_sessions_v1';
 
+// In-Memory Fast Cache Layers (Zero Latency)
+let memoryStudentsCache: Student[] | null = null;
+let memorySessionsCache: Record<string, FastingSession> | null = null;
+let memoryAdminSettingsCache: AdminSettings | null = null;
+
+let saveStudentsTimeout: any = null;
+let saveSessionsTimeout: any = null;
+
 export function getStoredStudents(): Student[] {
+  if (memoryStudentsCache) {
+    return memoryStudentsCache;
+  }
   try {
     const raw = localStorage.getItem(STUDENTS_STORAGE_KEY);
-    if (!raw) return DEFAULT_STUDENTS;
+    if (!raw) {
+      memoryStudentsCache = DEFAULT_STUDENTS;
+      return DEFAULT_STUDENTS;
+    }
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
+      memoryStudentsCache = parsed;
       return parsed;
     }
   } catch (e) {
     console.error('Error reading stored students:', e);
   }
+  memoryStudentsCache = DEFAULT_STUDENTS;
   return DEFAULT_STUDENTS;
 }
 
 export function saveStoredStudents(students: Student[]): void {
-  try {
-    localStorage.setItem(STUDENTS_STORAGE_KEY, JSON.stringify(students));
-  } catch (e) {
-    console.error('Error saving students:', e);
-  }
+  memoryStudentsCache = students;
+  // Non-blocking debounced sync to localStorage
+  if (saveStudentsTimeout) clearTimeout(saveStudentsTimeout);
+  saveStudentsTimeout = setTimeout(() => {
+    try {
+      localStorage.setItem(STUDENTS_STORAGE_KEY, JSON.stringify(students));
+    } catch (e) {
+      console.error('Error saving students:', e);
+    }
+  }, 100);
 }
 
 export function resetStoredStudents(): Student[] {
+  memoryStudentsCache = DEFAULT_STUDENTS;
   saveStoredStudents(DEFAULT_STUDENTS);
   return DEFAULT_STUDENTS;
 }
@@ -207,6 +229,10 @@ export function build101FastingRecords(studentList: Student[]) {
 }
 
 export function getStoredSessions(): Record<string, FastingSession> {
+  if (memorySessionsCache) {
+    return memorySessionsCache;
+  }
+
   const defaultSessionId = '2026-08-27_Puasa_Sunnah_Kamis';
   const records101 = build101FastingRecords(DEFAULT_STUDENTS);
 
@@ -228,6 +254,7 @@ export function getStoredSessions(): Record<string, FastingSession> {
           };
           saveAllStoredSessions(parsed);
         }
+        memorySessionsCache = parsed;
         return parsed;
       }
     }
@@ -247,55 +274,73 @@ export function getStoredSessions(): Record<string, FastingSession> {
   };
 
   const initialSessions = { [defaultSessionId]: sampleSession };
+  memorySessionsCache = initialSessions;
   saveAllStoredSessions(initialSessions);
   return initialSessions;
 }
 
 export function saveAllStoredSessions(sessions: Record<string, FastingSession>): void {
-  try {
-    localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
-  } catch (e) {
-    console.error('Error saving sessions:', e);
-  }
+  memorySessionsCache = sessions;
+  // Non-blocking debounced sync to localStorage
+  if (saveSessionsTimeout) clearTimeout(saveSessionsTimeout);
+  saveSessionsTimeout = setTimeout(() => {
+    try {
+      localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
+    } catch (e) {
+      console.error('Error saving sessions:', e);
+    }
+  }, 100);
 }
 
 export function saveSession(session: FastingSession): void {
-  const sessions = getStoredSessions();
-  sessions[session.id] = {
-    ...session,
-    updatedAt: new Date().toISOString(),
+  const currentSessions = getStoredSessions();
+  const nextSessions = {
+    ...currentSessions,
+    [session.id]: {
+      ...session,
+      updatedAt: new Date().toISOString(),
+    },
   };
-  saveAllStoredSessions(sessions);
+  saveAllStoredSessions(nextSessions);
 }
 
 export function deleteSession(sessionId: string): void {
-  const sessions = getStoredSessions();
-  delete sessions[sessionId];
-  saveAllStoredSessions(sessions);
+  const currentSessions = getStoredSessions();
+  const nextSessions = { ...currentSessions };
+  delete nextSessions[sessionId];
+  saveAllStoredSessions(nextSessions);
 }
 
 const ADMIN_SETTINGS_KEY = 'sr_kediri_admin_settings_v1';
 
 export function getStoredAdminSettings(): AdminSettings {
+  if (memoryAdminSettingsCache) {
+    return memoryAdminSettingsCache;
+  }
   try {
     const raw = localStorage.getItem(ADMIN_SETTINGS_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      return {
+      const settings = {
         ...parsed,
         allowPenginputCreateSession: Boolean(parsed.allowPenginputCreateSession),
       };
+      memoryAdminSettingsCache = settings;
+      return settings;
     }
   } catch (e) {
     console.error('Error reading admin settings:', e);
   }
-  return {
+  const defaultSettings: AdminSettings = {
     allowPenginputCreateSession: false,
     defaultDeadlineTime: '15:00',
   };
+  memoryAdminSettingsCache = defaultSettings;
+  return defaultSettings;
 }
 
 export function saveStoredAdminSettings(settings: AdminSettings): void {
+  memoryAdminSettingsCache = settings;
   try {
     localStorage.setItem(ADMIN_SETTINGS_KEY, JSON.stringify(settings));
   } catch (e) {

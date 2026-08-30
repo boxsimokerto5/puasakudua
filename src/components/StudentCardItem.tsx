@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import QRCode from 'qrcode';
 import { Student } from '../types';
 import { Camera, User, ShieldAlert, AlertTriangle } from 'lucide-react';
 import { getOptimizedPhotoUrl } from '../utils/imageUtils';
 import { buildCardQrValue, getEffectiveCardVersion } from '../utils/cardSecurity';
+
+// Global In-Memory Cache for QR Code Data URLs (Avoids costly re-computations)
+const qrCodeDataUrlCache = new Map<string, string>();
 
 interface StudentCardItemProps {
   student: Student;
@@ -11,13 +14,15 @@ interface StudentCardItemProps {
   onUploadClick?: (student: Student, e: React.MouseEvent) => void;
 }
 
-export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level, onUploadClick }) => {
-  const [qrDataUrl, setQrDataUrl] = useState<string>('');
-  const [imgError, setImgError] = useState<boolean>(false);
-  const [isUsingDirectFallback, setIsUsingDirectFallback] = useState<boolean>(false);
-
+export const StudentCardItem: React.FC<StudentCardItemProps> = memo(({ student, level, onUploadClick }) => {
   const cardVersion = getEffectiveCardVersion(student);
   const isDuplicate = cardVersion > 1;
+
+  // Generate QR Code with version payload: e.g. "3506010203040002#V2"
+  const qrValue = buildCardQrValue(student);
+  const [qrDataUrl, setQrDataUrl] = useState<string>(() => qrCodeDataUrlCache.get(qrValue) || '');
+  const [imgError, setImgError] = useState<boolean>(false);
+  const [isUsingDirectFallback, setIsUsingDirectFallback] = useState<boolean>(false);
 
   // Reset imgError & fallback if student foto changes
   useEffect(() => {
@@ -25,11 +30,14 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
     setIsUsingDirectFallback(false);
   }, [student.foto]);
 
-  // Generate QR Code with version payload: e.g. "3506010203040002#V2"
-  const qrValue = buildCardQrValue(student);
   const baseCodeDisplay = student.nik && student.nik.trim() ? student.nik.trim() : `SRT-${student.no.toString().padStart(4, '0')}`;
 
   useEffect(() => {
+    if (qrCodeDataUrlCache.has(qrValue)) {
+      setQrDataUrl(qrCodeDataUrlCache.get(qrValue)!);
+      return;
+    }
+
     let isMounted = true;
     QRCode.toDataURL(qrValue, {
       errorCorrectionLevel: 'M',
@@ -41,6 +49,7 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
       },
     })
       .then((url) => {
+        qrCodeDataUrlCache.set(qrValue, url);
         if (isMounted) setQrDataUrl(url);
       })
       .catch((err) => {
@@ -290,4 +299,4 @@ export const StudentCardItem: React.FC<StudentCardItemProps> = ({ student, level
       </div>
     </div>
   );
-};
+});
