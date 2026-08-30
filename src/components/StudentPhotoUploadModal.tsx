@@ -470,50 +470,50 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-gray-200 overflow-hidden my-auto">
-        {/* Header Modal */}
-        <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 text-white px-6 py-4 flex items-center justify-between shrink-0 shadow-md">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-400 text-emerald-950 flex items-center justify-center font-bold shadow-inner">
-              <Camera className="w-5 h-5" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-3 bg-black/65 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150">
+      <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[94vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden my-auto">
+        {/* Header Modal - Compact & Clean */}
+        <div className="bg-gradient-to-r from-emerald-950 via-emerald-900 to-teal-950 text-white px-4 sm:px-5 py-3 flex items-center justify-between shrink-0 shadow-xs">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-amber-400 text-emerald-950 flex items-center justify-center font-bold shadow-xs shrink-0">
+              <Camera className="w-4 h-4" />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-base sm:text-lg font-bold tracking-tight">
+                <h2 className="text-sm sm:text-base font-bold tracking-tight text-white leading-tight">
                   Kelola & Upload Foto Santri
                 </h2>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-emerald-950 uppercase tracking-wider">
-                  {photoStats.hasPhoto}/{photoStats.total} Terpasang ({photoStats.pct}%)
+                <span className="px-2 py-0.5 rounded-md text-[9.5px] font-black bg-amber-400 text-emerald-950 uppercase tracking-wider">
+                  {photoStats.hasPhoto}/{photoStats.total} ({photoStats.pct}%)
                 </span>
                 {imgBbApiKey ? (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-400 text-teal-950 flex items-center gap-1">
+                  <span className="px-2 py-0.5 rounded-md text-[9.5px] font-bold bg-teal-500/30 text-teal-200 border border-teal-400/30 flex items-center gap-1">
                     <Cloud className="w-3 h-3" /> Cloud ImgBB Aktif
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-white/20 text-emerald-100 flex items-center gap-1">
+                  <span className="px-2 py-0.5 rounded-md text-[9.5px] font-bold bg-white/10 text-emerald-200 border border-emerald-700/50 flex items-center gap-1">
                     <HardDrive className="w-3 h-3" /> Mode Lokal
                   </span>
                 )}
               </div>
-              <p className="text-xs text-emerald-200">
-                Unggah foto per santri, jepret dari kamera langsung, atau impor massal ke Cloud ImgBB
+              <p className="text-[11px] text-emerald-200/90 leading-tight mt-0.5">
+                Unggah foto per santri, foto via kamera HP/laptop, atau impor massal ke Cloud ImgBB
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => setIsImgBbConfigOpen(!isImgBbConfigOpen)}
-              className={`p-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                 isImgBbConfigOpen
-                  ? 'bg-amber-400 text-emerald-950 shadow-sm'
+                  ? 'bg-amber-400 text-emerald-950 shadow-xs'
                   : 'bg-white/10 hover:bg-white/20 text-white'
               }`}
               title="Pengaturan API Key ImgBB"
             >
-              <Key className="w-4 h-4 text-amber-300" />
-              <span className="hidden sm:inline">API Key ImgBB</span>
+              <Key className="w-3.5 h-3.5 text-amber-300" />
+              <span className="hidden sm:inline text-xs">API Key ImgBB</span>
             </button>
 
             <button
@@ -521,7 +521,7 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                 stopCamera();
                 onClose();
               }}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
+              className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
               title="Tutup Modal"
             >
               <X className="w-5 h-5" />
@@ -531,54 +531,54 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
 
         {/* ImgBB Cloud Config Drawer / Banner */}
         {isImgBbConfigOpen && (
-          <div className="bg-gradient-to-r from-teal-950 to-emerald-950 text-white p-5 border-b border-teal-800/60 animate-in slide-in-from-top-2 duration-200">
-            <div className="max-w-3xl mx-auto space-y-3">
-              <div className="flex items-start justify-between gap-3">
+          <div className="bg-gradient-to-r from-teal-950 to-emerald-950 text-white p-3.5 sm:p-4 border-b border-teal-800/60 animate-in slide-in-from-top-2 duration-150">
+            <div className="max-w-3xl mx-auto space-y-2.5">
+              <div className="flex items-start justify-between gap-2.5">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-teal-800 text-amber-300">
-                    <Cloud className="w-5 h-5" />
+                  <div className="p-1.5 rounded-lg bg-teal-800 text-amber-300 shrink-0">
+                    <Cloud className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                      <span>Integrasi ImgBB Cloud Image Hosting</span>
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-teal-500/30 text-teal-200 border border-teal-400/40">
-                        Gratis & Hemat Database
+                    <h3 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+                      <span>Integrasi ImgBB Cloud Hosting</span>
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-teal-500/30 text-teal-200 border border-teal-400/40">
+                        Gratis & Ringan
                       </span>
                     </h3>
-                    <p className="text-xs text-teal-200/90 mt-0.5">
-                      Foto santri akan otomatis di-host permanen di cloud ImgBB, sehingga database (Supabase/LocalStorage) hanya menyimpan URL teks pendek (menghemat kuota penyimpanan hingga 99%).
+                    <p className="text-[11px] text-teal-200/90 mt-0.5 leading-relaxed">
+                      Foto santri tersimpan di cloud permanen ImgBB, database hanya menyimpan URL teks pendek (menghemat memori hingga 99%).
                     </p>
                   </div>
                 </div>
 
                 <button
                   onClick={() => setIsImgBbConfigOpen(false)}
-                  className="text-teal-400 hover:text-white text-xs cursor-pointer p-1"
+                  className="text-teal-300 hover:text-white text-xs cursor-pointer p-1 rounded-md hover:bg-white/10"
                 >
                   ✕
                 </button>
               </div>
 
               {/* API Key Input & Action */}
-              <div className="bg-teal-900/50 p-3.5 rounded-2xl border border-teal-700/50 space-y-2.5">
+              <div className="bg-teal-900/40 p-2.5 rounded-xl border border-teal-700/50 space-y-2">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <div className="relative flex-1">
-                    <Key className="w-4 h-4 text-teal-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Key className="w-3.5 h-3.5 text-teal-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="password"
                       value={tempApiKeyInput}
                       onChange={(e) => setTempApiKeyInput(e.target.value)}
-                      placeholder="Tempel API Key ImgBB di sini (contoh: 8e5f1b2c4d...)"
-                      className="w-full pl-9 pr-3 py-2 text-xs bg-teal-950/80 border border-teal-600 rounded-xl text-white placeholder-teal-400 focus:outline-none focus:ring-2 focus:ring-amber-400 font-mono"
+                      placeholder="Tempel API Key ImgBB di sini..."
+                      className="w-full pl-8 pr-3 py-1.5 text-xs bg-teal-950/80 border border-teal-600 rounded-lg text-white placeholder-teal-400 focus:outline-none focus:ring-2 focus:ring-amber-400 font-mono"
                     />
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <button
                       type="button"
                       onClick={handleSaveApiKey}
                       disabled={isTestingKey}
-                      className="px-4 py-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-emerald-950 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md disabled:opacity-50"
+                      className="px-3.5 py-1.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-emerald-950 rounded-lg text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50"
                     >
                       {isTestingKey ? (
                         <>
@@ -588,7 +588,7 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                       ) : (
                         <>
                           <Check className="w-3.5 h-3.5" />
-                          <span>Uji & Simpan Key</span>
+                          <span>Uji & Simpan</span>
                         </>
                       )}
                     </button>
@@ -597,18 +597,18 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                       href="https://api.imgbb.com/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-3.5 py-2 bg-teal-800 hover:bg-teal-700 text-teal-100 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all border border-teal-600"
+                      className="px-3 py-1.5 bg-teal-800 hover:bg-teal-700 text-teal-100 rounded-lg text-xs font-bold flex items-center gap-1 transition-all border border-teal-600"
                       title="Dapatkan API Key ImgBB Gratis"
                     >
-                      <span>Dapatkan API Key Gratis</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Dapatkan Key</span>
+                      <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
                 </div>
 
                 {keyTestFeedback && (
                   <p
-                    className={`text-xs font-bold flex items-center gap-1.5 ${
+                    className={`text-[11px] font-bold flex items-center gap-1.5 ${
                       keyTestFeedback.success ? 'text-teal-300' : 'text-rose-300'
                     }`}
                   >
@@ -622,16 +622,16 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
 
         {/* ImgBB Connected Status Strip */}
         {!isImgBbConfigOpen && (
-          <div className="bg-teal-50 border-b border-teal-100 px-6 py-2 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2">
-              <Cloud className="w-4 h-4 text-teal-700" />
+          <div className="bg-teal-50/90 border-b border-teal-100 px-4 sm:px-5 py-1.5 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-1.5 truncate">
+              <Cloud className="w-3.5 h-3.5 text-teal-700 shrink-0" />
               {imgBbApiKey ? (
-                <span className="text-teal-900 font-medium">
-                  <strong>ImgBB Cloud Aktif:</strong> Foto santri langsung diunggah ke cloud gratis ImgBB (Database 100% aman & ringan).
+                <span className="text-teal-950 font-medium text-[11px] truncate">
+                  <strong>ImgBB Cloud Aktif:</strong> Foto otomatis diunggah ke cloud (database aman & ringan).
                 </span>
               ) : (
-                <span className="text-slate-600">
-                  <strong>Penyimpanan Foto:</strong> Mode Lokal (Base64). Sambungkan ImgBB API Key untuk menghemat kapasitas database.
+                <span className="text-slate-600 text-[11px] truncate">
+                  <strong>Penyimpanan Foto:</strong> Mode Lokal. Hubungkan API Key ImgBB untuk performa maksimal.
                 </span>
               )}
             </div>
@@ -639,29 +639,29 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
             <button
               type="button"
               onClick={() => setIsImgBbConfigOpen(true)}
-              className="text-[11px] font-bold text-teal-800 hover:text-teal-950 underline cursor-pointer"
+              className="text-[10.5px] font-bold text-teal-800 hover:text-teal-950 underline shrink-0 cursor-pointer ml-2"
             >
-              {imgBbApiKey ? 'Kelola API Key' : '+ Hubungkan API Key ImgBB'}
+              {imgBbApiKey ? 'Kelola Key' : '+ Hubungkan Key'}
             </button>
           </div>
         )}
 
-        {/* Tab Navigation */}
-        <div className="bg-gray-50 border-b border-gray-200 px-6 py-2 flex items-center justify-between flex-wrap gap-2 shrink-0">
-          <div className="flex items-center gap-1.5">
+        {/* Tab Navigation - Rapat & Rapi */}
+        <div className="bg-slate-50 border-b border-slate-200 px-4 sm:px-5 py-1.5 flex items-center justify-between flex-wrap gap-2 shrink-0">
+          <div className="flex items-center gap-1">
             <button
               onClick={() => {
                 stopCamera();
                 setActiveTab('single');
               }}
-              className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'single'
-                  ? 'bg-emerald-700 text-white shadow-xs'
-                  : 'text-gray-600 hover:bg-gray-200'
+                  ? 'bg-emerald-800 text-white shadow-xs'
+                  : 'text-slate-600 hover:bg-slate-200'
               }`}
             >
-              <User className="w-4 h-4" />
-              <span>Upload / Foto Satuan</span>
+              <User className="w-3.5 h-3.5" />
+              <span>Foto Satuan</span>
             </button>
 
             <button
@@ -669,14 +669,14 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                 stopCamera();
                 setActiveTab('batch');
               }}
-              className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'batch'
-                  ? 'bg-emerald-700 text-white shadow-xs'
-                  : 'text-gray-600 hover:bg-gray-200'
+                  ? 'bg-emerald-800 text-white shadow-xs'
+                  : 'text-slate-600 hover:bg-slate-200'
               }`}
             >
-              <Sparkles className="w-4 h-4 text-amber-300" />
-              <span>Upload Massal (Batch Match)</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <span>Upload Massal (Batch)</span>
             </button>
 
             <button
@@ -684,24 +684,24 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                 stopCamera();
                 setActiveTab('gallery');
               }}
-              className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'gallery'
-                  ? 'bg-emerald-700 text-white shadow-xs'
-                  : 'text-gray-600 hover:bg-gray-200'
+                  ? 'bg-emerald-800 text-white shadow-xs'
+                  : 'text-slate-600 hover:bg-slate-200'
               }`}
             >
-              <ImageIcon className="w-4 h-4" />
-              <span>Galeri Seluruh Foto ({photoStats.hasPhoto})</span>
+              <ImageIcon className="w-3.5 h-3.5" />
+              <span>Galeri Foto ({photoStats.hasPhoto})</span>
             </button>
           </div>
 
           {/* Quick Stats Pill */}
-          <div className="flex items-center gap-3 text-xs font-semibold">
-            <span className="text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
-              Ada Foto: <strong>{photoStats.hasPhoto}</strong> ({photoStats.cloudPhoto} di Cloud)
+          <div className="flex items-center gap-2 text-[11px] font-semibold">
+            <span className="text-emerald-900 bg-emerald-100/80 px-2 py-0.5 rounded-md border border-emerald-200">
+              Ada: <strong>{photoStats.hasPhoto}</strong>
             </span>
-            <span className="text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
-              Belum Ada: <strong>{photoStats.noPhoto}</strong>
+            <span className="text-amber-900 bg-amber-100/80 px-2 py-0.5 rounded-md border border-amber-200">
+              Belum: <strong>{photoStats.noPhoto}</strong>
             </span>
           </div>
         </div>
@@ -709,7 +709,7 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
         {/* Feedback Message */}
         {message && (
           <div
-            className={`mx-6 mt-4 p-3 rounded-xl text-xs font-semibold flex items-center justify-between shrink-0 ${
+            className={`mx-4 sm:mx-5 mt-2 p-2.5 rounded-lg text-xs font-semibold flex items-center justify-between shrink-0 ${
               message.type === 'success'
                 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                 : 'bg-rose-50 text-rose-800 border border-rose-200'
@@ -725,7 +725,7 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
             </div>
             <button
               onClick={() => setMessage(null)}
-              className="text-gray-400 hover:text-gray-600 text-xs font-bold ml-2 cursor-pointer"
+              className="text-slate-400 hover:text-slate-600 text-xs font-bold ml-2 cursor-pointer"
             >
               ✕
             </button>
@@ -734,22 +734,22 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
 
         {/* Upload in Progress Alert */}
         {(isProcessing || isBatchProcessing) && uploadProgressStatus && (
-          <div className="mx-6 mt-3 p-3 bg-teal-50 border border-teal-200 rounded-xl text-xs font-bold text-teal-900 flex items-center gap-2 animate-pulse">
-            <Loader2 className="w-4 h-4 text-teal-700 animate-spin" />
+          <div className="mx-4 sm:mx-5 mt-2 p-2 bg-teal-50 border border-teal-200 rounded-lg text-xs font-bold text-teal-900 flex items-center gap-2 animate-pulse">
+            <Loader2 className="w-3.5 h-3.5 text-teal-700 animate-spin" />
             <span>{uploadProgressStatus || batchProgressText}</span>
           </div>
         )}
 
-        {/* Modal Main Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        {/* Modal Main Body - Optimized Padding & Margins */}
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3.5 bg-slate-50/50">
           {/* TAB 1: SINGLE SANTRI PHOTO UPLOADER */}
           {activeTab === 'single' && currentStudent && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
               {/* Left Column: Student Selector & Info (5 cols) */}
-              <div className="lg:col-span-5 bg-gray-50 p-5 rounded-2xl border border-gray-200 space-y-4">
+              <div className="lg:col-span-5 bg-white p-3.5 rounded-xl border border-slate-200 space-y-3 shadow-2xs">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-                    Pilih Santri yang Ingin Diberi Foto:
+                  <label className="block text-[10.5px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Pilih Santri:
                   </label>
                   <select
                     value={selectedStudentId}
@@ -757,7 +757,7 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                       setSelectedStudentId(Number(e.target.value));
                       stopCamera();
                     }}
-                    className="w-full p-2.5 text-xs font-bold bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:outline-none cursor-pointer"
+                    className="w-full p-2 text-xs font-bold bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:outline-none cursor-pointer"
                   >
                     {students.map((s) => (
                       <option key={s.id} value={s.id}>
@@ -767,14 +767,14 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                   </select>
                 </div>
 
-                {/* Student Card Summary Mini */}
-                <div className="bg-white p-4 rounded-xl border border-gray-200 space-y-3 shadow-xs">
-                  <div className="flex items-center gap-3">
+                {/* Student Card Summary Mini - Clean & Tight */}
+                <div className="bg-slate-50/80 p-3 rounded-lg border border-slate-200 space-y-2.5">
+                  <div className="flex items-center gap-2.5">
                     {/* Avatar Preview */}
-                    <div className="w-14 h-18 rounded-xl bg-slate-100 border border-gray-300 flex items-center justify-center shrink-0 overflow-hidden relative shadow-xs">
+                    <div className="w-13 h-16 rounded-lg bg-white border border-slate-300 flex items-center justify-center shrink-0 overflow-hidden relative shadow-2xs">
                       {currentStudent.foto ? (
                         <img
-                          src={getOptimizedPhotoUrl(currentStudent.foto, { width: 140, height: 180 })}
+                          src={getOptimizedPhotoUrl(currentStudent.foto, { width: 130, height: 160 })}
                           alt={currentStudent.nama}
                           referrerPolicy="no-referrer"
                           crossOrigin="anonymous"
@@ -782,10 +782,10 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                         />
                       ) : (
                         <div className="text-center">
-                          <span className="text-xl">
+                          <span className="text-lg">
                             {currentStudent.jenisKelamin === 'Perempuan' ? '🧕' : '👳'}
                           </span>
-                          <p className="text-[7px] text-gray-400 font-bold uppercase mt-0.5">
+                          <p className="text-[7px] text-slate-400 font-bold uppercase mt-0.5">
                             Avatar
                           </p>
                         </div>
@@ -793,20 +793,20 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                     </div>
 
                     <div className="min-w-0 flex-1 space-y-0.5">
-                      <span className="inline-block px-2 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 uppercase">
+                      <span className="inline-block px-1.5 py-0.5 rounded text-[8.5px] font-black bg-emerald-100 text-emerald-800 uppercase">
                         Kelas {currentStudent.kelas}
                       </span>
-                      <h4 className="text-xs font-extrabold text-gray-900 truncate">
+                      <h4 className="text-xs font-extrabold text-slate-900 truncate">
                         {currentStudent.nama}
                       </h4>
-                      <p className="text-[10px] text-gray-500 font-mono">
-                        NIK: {currentStudent.nik || '-'} | No. #{currentStudent.no}
+                      <p className="text-[9.5px] text-slate-500 font-mono truncate">
+                        NIK: {currentStudent.nik || '-'} • #{currentStudent.no}
                       </p>
-                      <p className="text-[10px] text-gray-500">
+                      <p className="text-[9.5px] text-slate-500">
                         {currentStudent.jenisKelamin}
                       </p>
                       {currentStudent.foto && (currentStudent.foto.startsWith('http://') || currentStudent.foto.startsWith('https://')) && (
-                        <span className="inline-flex items-center gap-1 text-[9px] text-teal-700 font-bold bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">
+                        <span className="inline-flex items-center gap-1 text-[8.5px] text-teal-700 font-bold bg-teal-50 px-1 py-0.5 rounded border border-teal-200">
                           <Cloud className="w-2.5 h-2.5" /> Ter-host di Cloud
                         </span>
                       )}
@@ -814,13 +814,13 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                   </div>
 
                   {currentStudent.foto && (
-                    <div className="pt-2 border-t border-gray-100 flex items-center justify-between">
-                      <span className="text-[11px] text-emerald-700 font-bold flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Foto telah terpasang
+                    <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                      <span className="text-[10.5px] text-emerald-700 font-bold flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3" /> Foto aktif
                       </span>
                       <button
                         onClick={() => handleRemovePhoto(currentStudent.id)}
-                        className="text-[11px] text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1 hover:underline cursor-pointer"
+                        className="text-[10.5px] text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1 hover:underline cursor-pointer"
                       >
                         <Trash2 className="w-3 h-3" /> Hapus Foto
                       </button>
@@ -829,7 +829,7 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                 </div>
 
                 {/* Quick Navigation Previous / Next Student */}
-                <div className="flex items-center justify-between gap-2 pt-1">
+                <div className="flex items-center justify-between gap-1.5 pt-0.5">
                   <button
                     onClick={() => {
                       const idx = students.findIndex((s) => s.id === selectedStudentId);
@@ -839,9 +839,9 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                       }
                     }}
                     disabled={students.findIndex((s) => s.id === selectedStudentId) === 0}
-                    className="px-3 py-1.5 text-xs font-bold rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex-1"
+                    className="px-2.5 py-1.5 text-xs font-bold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex-1 border border-slate-200 text-center"
                   >
-                    ← Santri Sebelumnya
+                    ← Sebelumnya
                   </button>
                   <button
                     onClick={() => {
@@ -855,51 +855,51 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                       students.findIndex((s) => s.id === selectedStudentId) ===
                       students.length - 1
                     }
-                    className="px-3 py-1.5 text-xs font-bold rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex-1"
+                    className="px-2.5 py-1.5 text-xs font-bold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex-1 border border-slate-200 text-center"
                   >
-                    Santri Berikutnya →
+                    Berikutnya →
                   </button>
                 </div>
               </div>
 
               {/* Right Column: Upload Actions (Gallery, Camera, URL) (7 cols) */}
-              <div className="lg:col-span-7 space-y-4">
+              <div className="lg:col-span-7 space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-amber-500" />
-                    Pilih Metode Unggah Foto Santri:
+                  <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    Pilih Metode Pasang Foto:
                   </h3>
                   {imgBbApiKey ? (
-                    <span className="text-[11px] font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200 flex items-center gap-1">
-                      <Cloud className="w-3 h-3" /> Auto-upload ke Cloud ImgBB
+                    <span className="text-[10px] font-bold text-teal-800 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200 flex items-center gap-1">
+                      <Cloud className="w-2.5 h-2.5" /> Auto Cloud ImgBB
                     </span>
                   ) : null}
                 </div>
 
                 {/* Action Method 1: Upload from Gallery / Laptop */}
-                <div className="border-2 border-dashed border-emerald-300 rounded-2xl p-5 bg-emerald-50/40 text-center space-y-3">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto shadow-xs">
-                    <Upload className="w-6 h-6" />
+                <div className="border-2 border-dashed border-emerald-300 rounded-xl p-3.5 bg-emerald-50/50 text-center space-y-2">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto shadow-2xs">
+                    <Upload className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-gray-900">
+                    <h4 className="text-xs font-bold text-slate-900">
                       Pilih Foto dari Galeri HP / Komputer
                     </h4>
-                    <p className="text-[11px] text-gray-500 mt-0.5">
+                    <p className="text-[10.5px] text-slate-500 mt-0.5">
                       {imgBbApiKey
-                        ? 'Foto akan otomatis di-host permanen di ImgBB Cloud & disimpan sebagai link URL.'
-                        : 'Mendukung JPG, PNG, atau WebP. Gambar akan otomatis dioptimasi.'}
+                        ? 'Foto otomatis di-host ke ImgBB Cloud & disimpan sebagai link URL permanen.'
+                        : 'Mendukung JPG, PNG, atau WebP. Gambar akan dikompresi otomatis.'}
                     </p>
                   </div>
-                  <label className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold cursor-pointer transition-all shadow-sm active:scale-95">
+                  <label className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-xs font-bold cursor-pointer transition-all shadow-xs active:scale-95">
                     {isProcessing ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>{uploadProgressStatus || 'Memproses Foto...'}</span>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>{uploadProgressStatus || 'Memproses...'}</span>
                       </>
                     ) : (
                       <>
-                        <ImageIcon className="w-4 h-4" />
+                        <ImageIcon className="w-3.5 h-3.5" />
                         <span>Pilih File Gambar</span>
                       </>
                     )}
@@ -915,18 +915,18 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                 </div>
 
                 {/* Action Method 2: Live Camera Snapshot */}
-                <div className="border border-gray-200 rounded-2xl p-4 bg-white space-y-3 shadow-xs">
+                <div className="border border-slate-200 rounded-xl p-3 bg-white space-y-2 shadow-2xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="p-1.5 bg-amber-100 text-amber-800 rounded-lg">
-                        <Camera className="w-4 h-4" />
+                      <div className="p-1.5 bg-amber-100 text-amber-900 rounded-lg">
+                        <Camera className="w-3.5 h-3.5" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-gray-900">
-                          Ambil Foto Langsung dari Kamera
+                        <h4 className="text-xs font-bold text-slate-900">
+                          Ambil Foto dari Kamera
                         </h4>
-                        <p className="text-[10px] text-gray-500">
-                          Gunakan webcam laptop atau kamera HP untuk potret santri langsung
+                        <p className="text-[10px] text-slate-500">
+                          Gunakan webcam atau kamera HP untuk potret santri langsung
                         </p>
                       </div>
                     </div>
@@ -935,7 +935,7 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                       <button
                         type="button"
                         onClick={handleStartCamera}
-                        className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                        className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-lg text-xs font-black flex items-center gap-1 transition-all shadow-2xs cursor-pointer"
                       >
                         <Camera className="w-3.5 h-3.5" />
                         <span>Buka Kamera</span>
@@ -944,7 +944,7 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                       <button
                         type="button"
                         onClick={stopCamera}
-                        className="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl text-xs font-bold cursor-pointer"
+                        className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold cursor-pointer"
                       >
                         Tutup Kamera
                       </button>
@@ -953,8 +953,8 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
 
                   {/* Video viewfinder */}
                   {isCameraActive && (
-                    <div className="space-y-3 pt-2">
-                      <div className="relative rounded-2xl overflow-hidden bg-black max-w-sm mx-auto aspect-3/4 border-2 border-amber-400 shadow-md flex items-center justify-center">
+                    <div className="space-y-2 pt-1">
+                      <div className="relative rounded-xl overflow-hidden bg-black max-w-xs mx-auto aspect-3/4 border-2 border-amber-400 shadow-md flex items-center justify-center">
                         <video
                           ref={videoRef}
                           autoPlay
@@ -962,7 +962,7 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                           muted
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 border-2 border-dashed border-white/50 rounded-2xl pointer-events-none m-4" />
+                        <div className="absolute inset-0 border-2 border-dashed border-white/50 rounded-xl pointer-events-none m-3" />
                       </div>
 
                       <div className="text-center">
@@ -970,17 +970,17 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                           type="button"
                           onClick={handleCaptureSnapshot}
                           disabled={isProcessing}
-                          className="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs rounded-xl shadow-lg flex items-center gap-2 mx-auto active:scale-95 cursor-pointer disabled:opacity-50"
+                          className="px-5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-black text-xs rounded-lg shadow-md flex items-center gap-1.5 mx-auto active:scale-95 cursor-pointer disabled:opacity-50"
                         >
                           {isProcessing ? (
                             <>
-                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
                               <span>{uploadProgressStatus || 'Menyimpan...'}</span>
                             </>
                           ) : (
                             <>
-                              <Camera className="w-4 h-4 text-amber-300" />
-                              <span>Ambil Foto Sekarang</span>
+                              <Camera className="w-3.5 h-3.5 text-amber-300" />
+                              <span>Jepret Foto Sekarang</span>
                             </>
                           )}
                         </button>
@@ -990,32 +990,32 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                 </div>
 
                 {/* Action Method 3: Tempel URL Link Foto */}
-                <div className="border border-gray-200 rounded-2xl p-4 bg-white space-y-2 shadow-xs">
+                <div className="border border-slate-200 rounded-xl p-3 bg-white space-y-1.5 shadow-2xs">
                   <div className="flex items-center gap-2">
-                    <div className="p-1.5 bg-teal-100 text-teal-800 rounded-lg">
-                      <LinkIcon className="w-4 h-4" />
+                    <div className="p-1.5 bg-teal-100 text-teal-900 rounded-lg">
+                      <LinkIcon className="w-3.5 h-3.5" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-gray-900">
-                        Tempel URL Foto Langsung (ImgBB, Google Drive, dsb.)
+                      <h4 className="text-xs font-bold text-slate-900">
+                        Tempel URL Foto Langsung
                       </h4>
-                      <p className="text-[10px] text-gray-500">
-                        Jika sudah memiliki link foto online (https://...), tempel langsung di sini
+                      <p className="text-[10px] text-slate-500">
+                        Tempel link online (https://...) jika foto sudah terunggah di web
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5">
                     <input
                       type="url"
                       value={urlInput}
                       onChange={(e) => setUrlInput(e.target.value)}
                       placeholder="https://i.ibb.co/.../santri.jpg"
-                      className="flex-1 px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 font-mono"
+                      className="flex-1 px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 font-mono"
                     />
                     <button
                       onClick={handleApplyUrl}
-                      className="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer"
+                      className="px-3.5 py-1.5 bg-teal-800 hover:bg-teal-900 text-white rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer"
                     >
                       Terapkan Link
                     </button>
@@ -1027,43 +1027,43 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
 
           {/* TAB 2: BATCH AUTO-MATCH UPLOADER */}
           {activeTab === 'batch' && (
-            <div className="space-y-6">
-              <div className="bg-purple-50/60 p-5 rounded-2xl border border-purple-200 space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-purple-100 text-purple-800 flex items-center justify-center shrink-0">
-                    <Sparkles className="w-5 h-5" />
+            <div className="space-y-3.5">
+              <div className="bg-purple-50/80 p-3.5 sm:p-4 rounded-xl border border-purple-200 space-y-2.5">
+                <div className="flex items-start gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-900 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-purple-950 flex items-center gap-2">
+                    <h3 className="text-xs sm:text-sm font-bold text-purple-950 flex items-center gap-2">
                       <span>Import Foto Santri Sekaligus Banyak (Batch Match)</span>
                       {imgBbApiKey && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-200 text-teal-900">
-                          ☁️ Auto-Upload ImgBB
+                        <span className="px-1.5 py-0.5 rounded text-[9.5px] font-black bg-teal-200 text-teal-950">
+                          ☁️ Auto ImgBB
                         </span>
                       )}
                     </h3>
-                    <p className="text-xs text-purple-900/80 mt-1 leading-relaxed">
-                      Sistem akan secara cerdas mencocokkan nama file foto dengan data santri berdasarkan:
+                    <p className="text-[11px] text-purple-900/80 mt-0.5 leading-relaxed">
+                      Sistem akan mencocokkan otomatis nama file foto dengan data santri berdasarkan:
                     </p>
-                    <ul className="text-[11px] text-purple-950 mt-1 list-disc list-inside space-y-0.5">
-                      <li><strong>Nomor NIK Siswa</strong> (contoh: <code className="bg-white/80 px-1 rounded">3506123456789012.jpg</code>)</li>
-                      <li><strong>Nomor Urut</strong> (contoh: <code className="bg-white/80 px-1 rounded">1.jpg</code>, <code className="bg-white/80 px-1 rounded">no_12.png</code>)</li>
-                      <li><strong>Nama Santri</strong> (contoh: <code className="bg-white/80 px-1 rounded">Ahmad_Fauzi.jpg</code>)</li>
+                    <ul className="text-[10.5px] text-purple-950 mt-1 list-disc list-inside space-y-0.5">
+                      <li><strong>Nomor NIK Santri</strong> (contoh: <code className="bg-white/90 px-1 rounded">3506123456789012.jpg</code>)</li>
+                      <li><strong>Nomor Urut</strong> (contoh: <code className="bg-white/90 px-1 rounded">1.jpg</code>, <code className="bg-white/90 px-1 rounded">no_12.png</code>)</li>
+                      <li><strong>Nama Santri</strong> (contoh: <code className="bg-white/90 px-1 rounded">Ahmad_Fauzi.jpg</code>)</li>
                     </ul>
                   </div>
                 </div>
 
-                <div className="pt-2 text-center">
-                  <label className="inline-flex items-center gap-2 px-6 py-3 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-black cursor-pointer shadow-md transition-all active:scale-95">
+                <div className="pt-1 text-center">
+                  <label className="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-800 hover:bg-purple-900 text-white rounded-lg text-xs font-black cursor-pointer shadow-xs transition-all active:scale-95">
                     {isBatchProcessing ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>{batchProgressText || 'Mencocokkan Foto...'}</span>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>{batchProgressText || 'Mencocokkan...'}</span>
                       </>
                     ) : (
                       <>
-                        <Upload className="w-4 h-4 text-amber-300" />
-                        <span>Pilih / Drop Banyak File Foto Sekaligus</span>
+                        <Upload className="w-3.5 h-3.5 text-amber-300" />
+                        <span>Pilih Banyak File Foto Sekaligus</span>
                       </>
                     )}
                     <input
@@ -1081,34 +1081,34 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
 
               {/* Batch Match Results */}
               {batchResults.length > 0 && (
-                <div className="space-y-4">
+                <div className="space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-xs font-extrabold text-gray-900">
+                      <h4 className="text-xs font-extrabold text-slate-900">
                         Hasil Pencocokan ({batchResults.length} Foto Cocok)
                       </h4>
-                      <p className="text-[11px] text-gray-500">
+                      <p className="text-[10.5px] text-slate-500">
                         {imgBbApiKey
-                          ? 'Klik tombol di bawah untuk mengunggah semua foto ke Cloud ImgBB secara otomatis.'
-                          : 'Periksa hasil pencocokan di bawah sebelum menyimpannya ke data santri.'}
+                          ? 'Klik simpan untuk mengunggah otomatis ke Cloud ImgBB.'
+                          : 'Periksa hasil pencocokan di bawah sebelum disimpan.'}
                       </p>
                     </div>
                     <button
                       onClick={handleApplyBatch}
                       disabled={isBatchProcessing}
-                      className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-50"
+                      className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-xs font-black flex items-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-50"
                     >
                       {isBatchProcessing ? (
                         <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>{batchProgressText || 'Menyimpan ke Cloud...'}</span>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>{batchProgressText || 'Menyimpan...'}</span>
                         </>
                       ) : (
                         <>
-                          <Check className="w-4 h-4" />
+                          <Check className="w-3.5 h-3.5" />
                           <span>
                             {imgBbApiKey
-                              ? `Upload ke Cloud ImgBB (${batchResults.length} Foto)`
+                              ? `Upload ke Cloud (${batchResults.length} Foto)`
                               : `Simpan Semua (${batchResults.length} Foto)`}
                           </span>
                         </>
@@ -1116,21 +1116,21 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-h-80 overflow-y-auto p-1">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 max-h-72 overflow-y-auto p-1">
                     {batchResults.map((res, i) => (
                       <div
                         key={i}
-                        className="bg-gray-50 rounded-xl p-2 border border-gray-200 space-y-1.5 text-center text-xs"
+                        className="bg-white rounded-lg p-1.5 border border-slate-200 space-y-1 text-center text-xs shadow-2xs"
                       >
-                        <div className="w-full aspect-3/4 rounded-lg overflow-hidden bg-slate-200 border border-gray-300">
+                        <div className="w-full aspect-3/4 rounded overflow-hidden bg-slate-100 border border-slate-200">
                           <img
                             src={res.previewUrl}
                             alt={res.student.nama}
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <p className="font-extrabold text-gray-900 truncate">{res.student.nama}</p>
-                        <span className="inline-block px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-emerald-100 text-emerald-800">
+                        <p className="font-extrabold text-slate-900 truncate text-[11px]">{res.student.nama}</p>
+                        <span className="inline-block px-1 py-0.5 rounded text-[8px] font-bold bg-emerald-100 text-emerald-800">
                           {res.matchedBy}
                         </span>
                       </div>
@@ -1138,11 +1138,11 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                   </div>
 
                   {unmatchedFiles.length > 0 && (
-                    <div className="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-900">
-                      <p className="font-bold">
-                        ⚠️ Ada {unmatchedFiles.length} file yang tidak cocok dengan nama/NIK santri:
+                    <div className="bg-amber-50 p-2.5 rounded-lg border border-amber-200 text-xs text-amber-900">
+                      <p className="font-bold text-[11px]">
+                        ⚠️ {unmatchedFiles.length} file tidak cocok dengan data santri:
                       </p>
-                      <p className="text-[11px] text-amber-700 font-mono mt-0.5 truncate">
+                      <p className="text-[10px] text-amber-700 font-mono mt-0.5 truncate">
                         {unmatchedFiles.join(', ')}
                       </p>
                     </div>
@@ -1154,18 +1154,18 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
 
           {/* TAB 3: PHOTO GALLERY */}
           {activeTab === 'gallery' && (
-            <div className="space-y-4">
-              {/* Filter Controls Bar */}
-              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div className="space-y-3">
+              {/* Filter Controls Bar - Compact */}
+              <div className="bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs shadow-2xs">
                 {/* Search */}
                 <div className="relative">
-                  <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Cari nama santri / NIK..."
-                    className="w-full pl-9 pr-3 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                    placeholder="Cari nama / NIK..."
+                    className="w-full pl-8 pr-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs"
                   />
                 </div>
 
@@ -1173,9 +1173,9 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                 <select
                   value={filterClass}
                   onChange={(e) => setFilterClass(e.target.value)}
-                  className="py-2 px-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 cursor-pointer font-semibold"
+                  className="py-1.5 px-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600 cursor-pointer font-semibold text-xs"
                 >
-                  <option value="SEMUA">Semua Kelas ({students.length} Siswa)</option>
+                  <option value="SEMUA">Semua Kelas ({students.length})</option>
                   {uniqueClasses.map((cls) => (
                     <option key={cls} value={cls}>
                       Kelas {cls}
@@ -1187,38 +1187,38 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value as any)}
-                  className="py-2 px-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 cursor-pointer font-semibold"
+                  className="py-1.5 px-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600 cursor-pointer font-semibold text-xs"
                 >
                   <option value="ALL">Semua Status ({students.length})</option>
-                  <option value="HAS_PHOTO">Sudah Ada Foto ({photoStats.hasPhoto})</option>
-                  <option value="NO_PHOTO">Belum Ada Foto ({photoStats.noPhoto})</option>
+                  <option value="HAS_PHOTO">Ada Foto ({photoStats.hasPhoto})</option>
+                  <option value="NO_PHOTO">Belum Ada ({photoStats.noPhoto})</option>
                 </select>
               </div>
 
-              {/* Grid of Student Photos */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {/* Grid of Student Photos - Rapat & Rapi */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-2.5">
                 {filteredStudents.map((s) => (
                   <div
                     key={s.id}
-                    className="bg-white rounded-2xl p-3 border border-gray-200 hover:border-emerald-500 transition-all shadow-xs hover:shadow-md space-y-2 flex flex-col justify-between group"
+                    className="bg-white rounded-xl p-2 border border-slate-200 hover:border-emerald-500 transition-all shadow-2xs hover:shadow-xs space-y-1.5 flex flex-col justify-between group"
                   >
                     {/* Photo / Avatar Viewport */}
-                    <div className="w-full aspect-3/4 rounded-xl bg-slate-100 border border-gray-200 overflow-hidden relative flex items-center justify-center">
+                    <div className="w-full aspect-3/4 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden relative flex items-center justify-center">
                       {s.foto ? (
                         <img
-                          src={getOptimizedPhotoUrl(s.foto, { width: 200, height: 260 })}
+                          src={getOptimizedPhotoUrl(s.foto, { width: 180, height: 240 })}
                           alt={s.nama}
                           referrerPolicy="no-referrer"
                           crossOrigin="anonymous"
                           loading="lazy"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-150"
                         />
                       ) : (
-                        <div className="text-center p-2">
-                          <span className="text-2xl">
+                        <div className="text-center p-1.5">
+                          <span className="text-xl">
                             {s.jenisKelamin === 'Perempuan' ? '🧕' : '👳'}
                           </span>
-                          <p className="text-[8px] font-bold text-gray-400 uppercase mt-1">
+                          <p className="text-[7.5px] font-bold text-slate-400 uppercase mt-0.5">
                             Belum Ada Foto
                           </p>
                         </div>
@@ -1226,7 +1226,7 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
 
                       {/* Gender Badge */}
                       <span
-                        className={`absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[8px] font-black text-white ${
+                        className={`absolute top-1 left-1 px-1 py-0.2 rounded text-[7.5px] font-black text-white ${
                           s.jenisKelamin === 'Perempuan' ? 'bg-pink-600' : 'bg-blue-600'
                         }`}
                       >
@@ -1236,23 +1236,23 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                       {/* Cloud Hosting Badge */}
                       {s.foto && (s.foto.startsWith('http://') || s.foto.startsWith('https://')) && (
                         <span
-                          className="absolute bottom-1.5 right-1.5 p-1 rounded-md bg-black/60 text-teal-300 backdrop-blur-xs shadow-xs"
+                          className="absolute bottom-1 right-1 p-0.5 rounded bg-black/60 text-teal-300 backdrop-blur-xs shadow-2xs"
                           title="Tersimpan di Cloud ImgBB"
                         >
-                          <Cloud className="w-3 h-3" />
+                          <Cloud className="w-2.5 h-2.5" />
                         </span>
                       )}
                     </div>
 
                     {/* Student Info */}
-                    <div className="text-center min-w-0">
-                      <p className="text-[10px] font-bold text-emerald-800 uppercase truncate">
+                    <div className="text-center min-w-0 px-0.5">
+                      <p className="text-[9px] font-bold text-emerald-800 uppercase truncate">
                         {s.kelas}
                       </p>
-                      <h5 className="text-xs font-bold text-gray-900 truncate leading-tight mt-0.5">
+                      <h5 className="text-[11px] font-bold text-slate-900 truncate leading-tight mt-0.5">
                         {s.nama}
                       </h5>
-                      <p className="text-[9px] text-gray-400 font-mono">No. #{s.no}</p>
+                      <p className="text-[8.5px] text-slate-400 font-mono">#{s.no}</p>
                     </div>
 
                     {/* Action button */}
@@ -1261,7 +1261,7 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
                         setSelectedStudentId(s.id);
                         setActiveTab('single');
                       }}
-                      className="w-full py-1.5 bg-emerald-50 hover:bg-emerald-700 hover:text-white text-emerald-800 rounded-xl text-[10.5px] font-extrabold transition-all flex items-center justify-center gap-1 cursor-pointer"
+                      className="w-full py-1 bg-emerald-50 hover:bg-emerald-800 hover:text-white text-emerald-800 rounded-lg text-[10px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <Camera className="w-3 h-3" />
                       <span>{s.foto ? 'Ganti Foto' : 'Pasang Foto'}</span>
@@ -1273,17 +1273,17 @@ export const StudentPhotoUploadModal: React.FC<StudentPhotoUploadModalProps> = (
           )}
         </div>
 
-        {/* Modal Footer */}
-        <div className="bg-gray-50 px-6 py-3.5 border-t border-gray-200 flex items-center justify-between shrink-0">
-          <p className="text-xs text-gray-500">
-            Foto yang terpasang akan otomatis tampil di <strong>Kartu Asrama Santri</strong> dan dokumen raport.
+        {/* Modal Footer - Compact */}
+        <div className="bg-slate-50 px-4 sm:px-5 py-2.5 border-t border-slate-200 flex items-center justify-between shrink-0">
+          <p className="text-[11px] text-slate-500">
+            Foto yang terpasang otomatis sinkron ke <strong>Kartu Asrama Santri</strong> dan Raport.
           </p>
           <button
             onClick={() => {
               stopCamera();
               onClose();
             }}
-            className="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold text-xs rounded-xl transition-all cursor-pointer"
+            className="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs rounded-lg transition-all cursor-pointer"
           >
             Tutup
           </button>
