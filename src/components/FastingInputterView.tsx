@@ -47,7 +47,6 @@ interface FastingInputterViewProps {
   onBulkUpdateRecords: (updates: { studentId: number; status: FastingStatus }[]) => void;
   onOpenStudentModal?: () => void;
   onOpenPhotoModal?: () => void;
-  onRestore101Records?: () => void;
   isAdmin?: boolean;
   onToggleLockSession?: (sessionId: string, locked: boolean) => void;
   onLogout?: () => void;
@@ -61,7 +60,6 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
   onBulkUpdateRecords,
   onOpenStudentModal,
   onOpenPhotoModal,
-  onRestore101Records,
   isAdmin = false,
   onToggleLockSession,
   onLogout,
@@ -499,20 +497,7 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
               </button>
             )}
 
-            {/* 5. Quick Restore 101 Records Button */}
-            {onRestore101Records && (
-              <button
-                type="button"
-                onClick={onRestore101Records}
-                className="px-2.5 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
-                title="Pulihkan Data Presensi 101 Santri (27 Agustus 2026)"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-                <span>Pulihkan 101 Siswa</span>
-              </button>
-            )}
-
-            {/* 6. PDF Rekap Button */}
+            {/* 5. PDF Rekap Button */}
             <button
               type="button"
               onClick={() => setIsPdfModalOpen(true)}

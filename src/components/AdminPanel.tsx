@@ -39,7 +39,6 @@ interface AdminPanelProps {
   onCreateSession: (title: string, date: string) => void;
   onOpenStudentModal: () => void;
   onOpenPhotoModal?: (student?: Student) => void;
-  onRestore101Records?: () => void;
   onUpdateStudents?: (newStudents: Student[]) => void;
   onSwitchView: (view: 'input' | 'checker' | 'raport') => void;
   isSupabaseConnected?: boolean;
@@ -59,7 +58,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   onCreateSession,
   onOpenStudentModal,
   onOpenPhotoModal,
-  onRestore101Records,
   onUpdateStudents,
   onSwitchView,
 }) => {
@@ -323,18 +321,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               >
                 <Camera className="w-3.5 h-3.5" />
                 <span>Foto Santri</span>
-              </button>
-            )}
-
-            {onRestore101Records && (
-              <button
-                type="button"
-                onClick={onRestore101Records}
-                className="px-2.5 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-xs font-bold flex items-center gap-1 transition-all shadow-xs cursor-pointer active:scale-95"
-                title="Pulihkan Data Presensi Resmi 101 Santri (27 Agustus 2026)"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                <span>Pulihkan 101 Siswa</span>
               </button>
             )}
 
