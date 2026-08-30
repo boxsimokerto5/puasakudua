@@ -390,8 +390,8 @@ export const RaportImtaqView: React.FC<RaportImtaqViewProps> = ({
       {/* Main Content: Table or Grid of Students (Slim, Rapat & Proporsional) */}
       {viewMode === 'table' ? (
         <div className="bg-white rounded-xl border border-gray-200 shadow-2xs overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto touch-pan-x overscroll-x-contain scrollbar-thin">
+            <table className="w-full min-w-[800px] text-left border-collapse">
               <thead>
                 <tr className="bg-emerald-950 text-white text-[11px] font-bold uppercase tracking-wider">
                   <th className="py-2.5 px-2.5 text-center w-10">No</th>

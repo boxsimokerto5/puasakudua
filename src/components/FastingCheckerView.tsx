@@ -417,8 +417,8 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
 
           {/* Table List Sahur - Slim Dense Rows */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
-            <div className="overflow-x-auto max-h-[60vh]">
-              <table className="w-full text-left border-collapse">
+            <div className="overflow-x-auto touch-pan-x overscroll-x-contain scrollbar-thin max-h-[60vh]">
+              <table className="w-full min-w-[640px] text-left border-collapse">
                 <thead className="sticky top-0 z-10">
                   <tr className="bg-indigo-950 text-white text-[10.5px] font-bold uppercase tracking-wider">
                     <th className="py-2 px-3 text-center w-10">Cek</th>
@@ -615,8 +615,8 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
 
           {/* Table List Berbuka - Slim Dense Rows */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
-            <div className="overflow-x-auto max-h-[60vh]">
-              <table className="w-full text-left border-collapse">
+            <div className="overflow-x-auto touch-pan-x overscroll-x-contain scrollbar-thin max-h-[60vh]">
+              <table className="w-full min-w-[640px] text-left border-collapse">
                 <thead className="sticky top-0 z-10">
                   <tr className="bg-emerald-900 text-white text-[10.5px] font-bold uppercase tracking-wider">
                     <th className="py-2 px-3 text-center w-10">Cek</th>
@@ -813,8 +813,8 @@ export const FastingCheckerView: React.FC<FastingCheckerViewProps> = ({
 
           {/* Table List Makan Siang - Slim Dense Rows */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
-            <div className="overflow-x-auto max-h-[60vh]">
-              <table className="w-full text-left border-collapse">
+            <div className="overflow-x-auto touch-pan-x overscroll-x-contain scrollbar-thin max-h-[60vh]">
+              <table className="w-full min-w-[640px] text-left border-collapse">
                 <thead className="sticky top-0 z-10">
                   <tr className="bg-rose-950 text-white text-[10.5px] font-bold uppercase tracking-wider">
                     <th className="py-2 px-3 text-center w-10">Cek</th>

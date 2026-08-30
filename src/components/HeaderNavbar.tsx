@@ -347,11 +347,11 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                 <button
                   type="button"
                   onClick={() => handleScrollNav('left')}
-                  className="absolute -left-2 z-20 w-6 h-6 rounded-full bg-emerald-900/90 border border-amber-400/60 text-amber-300 flex items-center justify-center shadow-md hover:bg-emerald-800 transition-all cursor-pointer backdrop-blur-xs"
-                  title="Geser ke kiri"
+                  className="absolute -left-1.5 sm:-left-3 z-30 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-950/95 border-2 border-amber-400 text-amber-300 flex items-center justify-center shadow-lg hover:bg-emerald-800 transition-all cursor-pointer backdrop-blur-md active:scale-90"
+                  title="Geser tab ke kiri"
                   aria-label="Geser tab ke kiri"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
                 </button>
               )}
 
@@ -359,7 +359,7 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                 <div
                   ref={navSliderRef}
                   onScroll={checkScrollability}
-                  className="flex items-center gap-1 overflow-x-auto no-scrollbar scroll-smooth py-0.5 px-0.5"
+                  className="flex items-center gap-1 overflow-x-auto touch-pan-x overscroll-x-contain no-scrollbar scroll-smooth py-0.5 px-0.5 select-none"
                 >
                   {/* Dedicated Petugas Haid View (Only the 3 Haid & Suci tabs) */}
                   {isHaidRole ? (
@@ -549,11 +549,11 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                 <button
                   type="button"
                   onClick={() => handleScrollNav('right')}
-                  className="absolute -right-2 z-20 w-6 h-6 rounded-full bg-emerald-900/90 border border-amber-400/60 text-amber-300 flex items-center justify-center shadow-md hover:bg-emerald-800 transition-all cursor-pointer backdrop-blur-xs"
-                  title="Geser ke kanan"
+                  className="absolute -right-1.5 sm:-right-3 z-30 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-950/95 border-2 border-amber-400 text-amber-300 flex items-center justify-center shadow-lg hover:bg-emerald-800 transition-all cursor-pointer backdrop-blur-md active:scale-90"
+                  title="Geser tab ke kanan"
                   aria-label="Geser tab ke kanan"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
                 </button>
               )}
             </div>

@@ -418,15 +418,18 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
         </div>
 
         {/* Filter Controls Bar & Actions */}
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2 pt-2 border-t border-gray-100">
-          {/* Class Select Pills */}
-          <div className="flex items-center gap-1 overflow-x-auto pb-0.5 no-scrollbar shrink-0">
+        <div className="flex flex-col gap-2.5 pt-2 border-t border-gray-100">
+          {/* Class Select Pills with Smooth Touch Scroll */}
+          <div className="flex items-center gap-1.5 overflow-x-auto touch-pan-x overscroll-x-contain pb-1 scrollbar-thin">
+            <span className="text-[11px] font-bold text-gray-500 uppercase tracking-tight shrink-0 mr-1 hidden sm:inline">
+              Filter Kelas:
+            </span>
             <button
               onClick={() => setSelectedClass('SEMUA')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap cursor-pointer ${
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer shrink-0 active:scale-95 ${
                 selectedClass === 'SEMUA'
-                  ? 'bg-emerald-800 text-white shadow-xs'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-emerald-800 text-white shadow-xs ring-1 ring-emerald-700'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               Semua Kelas
@@ -435,10 +438,10 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
               <button
                 key={cls}
                 onClick={() => setSelectedClass(cls)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer shrink-0 active:scale-95 ${
                   selectedClass === cls
-                    ? 'bg-emerald-800 text-white shadow-xs'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-emerald-800 text-white shadow-xs ring-1 ring-emerald-700'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 {cls}
@@ -446,14 +449,49 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
             ))}
           </div>
 
-          {/* Action Buttons - Compact Row */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 py-0.5">
-            {/* Foto Santri (ImgBB Cloud) Button */}
+          {/* Action Buttons - High-Visibility Responsive Bar (Scan Kamera at #1) */}
+          <div className="flex items-center gap-1.5 overflow-x-auto touch-pan-x overscroll-x-contain py-1 scrollbar-thin flex-wrap sm:flex-nowrap">
+            {/* 1. SCAN WITH CAMERA BUTTON - Top Priority & Impossible to Miss */}
+            {!isReadOnly && (
+              <button
+                type="button"
+                onClick={() => setIsCameraScannerOpen(true)}
+                className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-lg text-xs font-black flex items-center justify-center gap-1.5 transition-all shadow-md ring-2 ring-emerald-400/50 cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
+                title="Buka Kamera HP/Laptop untuk Scan Barcode Kartu Santri"
+              >
+                <Camera className="w-4 h-4 text-amber-300 animate-pulse shrink-0" />
+                <span className="font-extrabold tracking-wide">📷 Scan Kamera</span>
+              </button>
+            )}
+
+            {/* 2. Generate & Print Dorm Cards Button */}
+            <button
+              type="button"
+              onClick={() => setIsDormCardModalOpen(true)}
+              className="px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1 transition-all shadow-xs border border-amber-400 cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
+              title="Buat dan Cetak Kartu Puasa Wali Asuh dengan Barcode NIK"
+            >
+              <CreditCard className="w-3.5 h-3.5 text-slate-900 shrink-0" />
+              <span>Cetak Kartu</span>
+            </button>
+
+            {/* 3. Blacklist Card Menu Button */}
+            <button
+              type="button"
+              onClick={() => setIsBlacklistModalOpen(true)}
+              className="px-2.5 py-1.5 bg-rose-700 hover:bg-rose-800 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-all shadow-xs border border-rose-500 cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
+              title="Lihat Daftar Kartu Blacklist & Cetak Ulang Kartu Hilang/Rusak"
+            >
+              <ShieldAlert className="w-3.5 h-3.5 text-rose-200 shrink-0" />
+              <span>Blacklist Card</span>
+            </button>
+
+            {/* 4. Foto Santri (ImgBB Cloud) Button */}
             {onOpenPhotoModal && (
               <button
                 type="button"
                 onClick={onOpenPhotoModal}
-                className="px-2.5 py-1 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-all shadow-xs border border-emerald-600/60 cursor-pointer active:scale-95 whitespace-nowrap"
+                className="px-2.5 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-all shadow-xs border border-emerald-600/60 cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
                 title="Kelola & Upload Foto Santri ke Cloud ImgBB / Galeri"
               >
                 <Camera className="w-3.5 h-3.5 text-amber-300 shrink-0" />
@@ -461,32 +499,12 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
               </button>
             )}
 
-            {/* Generate & Print Dorm Cards Button */}
-            <button
-              onClick={() => setIsDormCardModalOpen(true)}
-              className="px-2.5 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 rounded-lg text-[11px] font-black flex items-center justify-center gap-1 transition-all shadow-xs border border-amber-400 cursor-pointer active:scale-95 whitespace-nowrap"
-              title="Buat dan Cetak Kartu Puasa Wali Asuh dengan Barcode NIK"
-            >
-              <CreditCard className="w-3.5 h-3.5 text-slate-900 shrink-0" />
-              <span>Cetak Kartu</span>
-            </button>
-
-            {/* Blacklist Card Menu Button */}
-            <button
-              onClick={() => setIsBlacklistModalOpen(true)}
-              className="px-2.5 py-1 bg-rose-700 hover:bg-rose-800 text-white rounded-lg text-[11px] font-black flex items-center justify-center gap-1 transition-all shadow-xs border border-rose-500 cursor-pointer active:scale-95 whitespace-nowrap"
-              title="Lihat Daftar Kartu Blacklist & Cetak Ulang Kartu Hilang/Rusak"
-            >
-              <ShieldAlert className="w-3.5 h-3.5 text-rose-200 shrink-0" />
-              <span>Blacklist Card</span>
-            </button>
-
-            {/* Quick Restore 101 Records Button */}
+            {/* 5. Quick Restore 101 Records Button */}
             {onRestore101Records && (
               <button
                 type="button"
                 onClick={onRestore101Records}
-                className="px-2.5 py-1 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer active:scale-95 whitespace-nowrap"
+                className="px-2.5 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
                 title="Pulihkan Data Presensi 101 Santri (27 Agustus 2026)"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
@@ -494,32 +512,23 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
               </button>
             )}
 
-            {/* Scan with Camera Button */}
-            {!isReadOnly && (
-              <button
-                onClick={() => setIsCameraScannerOpen(true)}
-                className="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer active:scale-95 whitespace-nowrap"
-                title="Buka Kamera untuk Scan Barcode Kartu Santri"
-              >
-                <Camera className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
-                <span>Scan Kamera</span>
-              </button>
-            )}
-
+            {/* 6. PDF Rekap Button */}
             <button
+              type="button"
               onClick={() => setIsPdfModalOpen(true)}
-              className="px-2.5 py-1 bg-emerald-900 hover:bg-emerald-950 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer whitespace-nowrap"
+              className="px-2.5 py-1.5 bg-emerald-900 hover:bg-emerald-950 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer whitespace-nowrap shrink-0"
               title="Cetak/Unduh Laporan Rekapitulasi PDF"
             >
               <FileText className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
               <span>PDF Rekap</span>
             </button>
 
+            {/* 7. Keluar Button */}
             {onLogout && (
               <button
                 type="button"
                 onClick={onLogout}
-                className="px-2.5 py-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer whitespace-nowrap"
+                className="px-2.5 py-1.5 bg-red-600 hover:bg-red-700 active:scale-95 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer whitespace-nowrap shrink-0"
                 title="Keluar dari akun / Halaman Input"
               >
                 <LogOut className="w-3.5 h-3.5 text-white shrink-0" />
@@ -578,154 +587,179 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
           </div>
         )}
 
-        {/* Search Bar with Live Suggestions Dropdown */}
+        {/* Search Bar with Direct Scan Camera Button & Live Suggestions */}
         <div className="pt-1.5 space-y-1.5">
           <div className="flex items-center justify-between">
-            <label className="block text-[11px] font-bold text-gray-700 uppercase tracking-wider">
-              Input Siswa Berpuasa (Cari / Scan Barcode NIK)
+            <label className="block text-[11px] font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
+              <Search className="w-3.5 h-3.5 text-emerald-700" />
+              <span>Input Siswa Berpuasa (Cari / Scan Barcode)</span>
             </label>
-            <span className="text-[10px] text-emerald-700 font-semibold hidden sm:inline">
-              ✨ Scanner USB / Kamera Aktif
-            </span>
+            {!isReadOnly && (
+              <button
+                type="button"
+                onClick={() => setIsCameraScannerOpen(true)}
+                className="text-[11px] text-emerald-800 font-extrabold flex items-center gap-1 hover:text-emerald-950 cursor-pointer bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 active:scale-95 transition-all"
+              >
+                <Camera className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
+                <span>Buka Kamera Scanner</span>
+              </button>
+            )}
           </div>
 
-          <div ref={searchContainerRef} className="relative">
-            <div className="relative">
-              <Search className="w-4 h-4 text-emerald-600 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={searchQuery}
-                onFocus={() => setIsSearchFocused(true)}
-                onKeyDown={handleSearchKeyDown}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setIsSearchFocused(true);
-                }}
-                placeholder="Ketik nama, NIK, atau scan kartu santri di sini..."
-                className="w-full pl-9 pr-20 py-2 text-xs sm:text-sm bg-emerald-50/40 border border-emerald-200 rounded-xl focus:bg-white focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 transition-all shadow-xs"
-              />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                {searchQuery && (
-                  <button
-                    onClick={() => {
-                      setSearchQuery('');
-                      if (searchInputRef.current) searchInputRef.current.focus();
-                    }}
-                    className="text-gray-400 hover:text-gray-600 p-1 cursor-pointer"
-                    title="Hapus pencarian"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setIsCameraScannerOpen(true)}
-                  className="p-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-all cursor-pointer"
-                  title="Scan via Kamera"
-                >
-                  <ScanBarcode className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Auto-Suggest Dropdown */}
-            {isSearchFocused && searchQuery.trim().length > 0 && (
-              <div className="absolute left-0 right-0 top-full mt-1.5 z-40 bg-white border border-emerald-200 rounded-xl shadow-xl overflow-hidden max-h-80 overflow-y-auto divide-y divide-gray-100 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="px-3 py-2 bg-emerald-900 text-white text-[10.5px] font-bold flex justify-between items-center">
-                  <span>Hasil Pencarian ({searchSuggestions.length})</span>
-                  <span className="text-emerald-300 font-normal text-[10px]">
-                    {isReadOnly ? 'Hanya Lihat' : 'Klik untuk tandai puasa'}
-                  </span>
+          <div className="flex items-stretch gap-2">
+            <div ref={searchContainerRef} className="relative flex-1">
+              <div className="relative">
+                <Search className="w-4 h-4 text-emerald-600 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onFocus={() => setIsSearchFocused(true)}
+                  onKeyDown={handleSearchKeyDown}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setIsSearchFocused(true);
+                  }}
+                  placeholder="Ketik nama, NIK, atau arahkan Scanner USB..."
+                  className="w-full pl-9 pr-20 py-2.5 text-xs sm:text-sm bg-emerald-50/40 border border-emerald-300 rounded-xl focus:bg-white focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 transition-all shadow-xs"
+                />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  {searchQuery && (
+                    <button
+                      onClick={() => {
+                        setSearchQuery('');
+                        if (searchInputRef.current) searchInputRef.current.focus();
+                      }}
+                      className="text-gray-400 hover:text-gray-600 p-1 cursor-pointer"
+                      title="Hapus pencarian"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                  {!isReadOnly && (
+                    <button
+                      type="button"
+                      onClick={() => setIsCameraScannerOpen(true)}
+                      className="p-1.5 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-all cursor-pointer flex items-center gap-1"
+                      title="Buka Kamera untuk Scan"
+                    >
+                      <ScanBarcode className="w-3.5 h-3.5 text-emerald-800" />
+                    </button>
+                  )}
                 </div>
+              </div>
 
-                {searchSuggestions.length === 0 ? (
-                  <div className="p-4 text-center text-xs text-gray-500">
-                    Siswa tidak ditemukan dengan kata kunci &quot;{searchQuery}&quot;
+              {/* Auto-Suggest Dropdown */}
+              {isSearchFocused && searchQuery.trim().length > 0 && (
+                <div className="absolute left-0 right-0 top-full mt-1.5 z-40 bg-white border border-emerald-200 rounded-xl shadow-xl overflow-hidden max-h-80 overflow-y-auto divide-y divide-gray-100 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="px-3 py-2 bg-emerald-900 text-white text-[10.5px] font-bold flex justify-between items-center">
+                    <span>Hasil Pencarian ({searchSuggestions.length})</span>
+                    <span className="text-emerald-300 font-normal text-[10px]">
+                      {isReadOnly ? 'Hanya Lihat' : 'Klik untuk tandai puasa'}
+                    </span>
                   </div>
-                ) : (
-                  searchSuggestions.map((s) => {
-                    const record = activeSession.records[s.id];
-                    const status = record?.status || 'belum_diisi';
-                    const isFasting = status === 'berpuasa';
 
-                    return (
-                      <div
-                        key={s.id}
-                        className={`p-2.5 sm:p-3 transition-colors flex items-center justify-between gap-2 ${
-                          isFasting ? 'bg-emerald-50/70 hover:bg-emerald-50' : 'hover:bg-gray-50'
-                        }`}
-                      >
+                  {searchSuggestions.length === 0 ? (
+                    <div className="p-4 text-center text-xs text-gray-500">
+                      Siswa tidak ditemukan dengan kata kunci &quot;{searchQuery}&quot;
+                    </div>
+                  ) : (
+                    searchSuggestions.map((s) => {
+                      const record = activeSession.records[s.id];
+                      const status = record?.status || 'belum_diisi';
+                      const isFasting = status === 'berpuasa';
+
+                      return (
                         <div
-                          onClick={() => {
-                            if (!isFasting) {
-                              handleMarkPuasaFromSuggest(s.id);
-                            }
-                          }}
-                          className={`flex items-center gap-2.5 flex-1 min-w-0 ${
-                            !isReadOnly && !isFasting ? 'cursor-pointer' : ''
+                          key={s.id}
+                          className={`p-2.5 sm:p-3 transition-colors flex items-center justify-between gap-2 ${
+                            isFasting ? 'bg-emerald-50/70 hover:bg-emerald-50' : 'hover:bg-gray-50'
                           }`}
                         >
                           <div
-                            className={`w-6 h-6 rounded-md font-bold text-[11px] flex items-center justify-center shrink-0 ${
-                              isFasting
-                                ? 'bg-emerald-600 text-white'
-                                : 'bg-gray-100 text-gray-700'
+                            onClick={() => {
+                              if (!isFasting) {
+                                handleMarkPuasaFromSuggest(s.id);
+                              }
+                            }}
+                            className={`flex items-center gap-2.5 flex-1 min-w-0 ${
+                              !isReadOnly && !isFasting ? 'cursor-pointer' : ''
                             }`}
                           >
-                            {s.no}
-                          </div>
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <p className="font-bold text-gray-900 text-xs truncate">{s.nama}</p>
-                              {isFasting && (
-                                <span className="px-1.5 py-0.2 rounded text-[9.5px] font-extrabold bg-emerald-600 text-white shrink-0">
-                                  ✓ Puasa
-                                </span>
-                              )}
+                            <div
+                              className={`w-6 h-6 rounded-md font-bold text-[11px] flex items-center justify-center shrink-0 ${
+                                isFasting
+                                  ? 'bg-emerald-600 text-white'
+                                  : 'bg-gray-100 text-gray-700'
+                              }`}
+                            >
+                              {s.no}
                             </div>
-                            <p className="text-[10.5px] text-gray-500">
-                              Kelas: <strong className="text-emerald-800">{s.kelas}</strong>
-                              {s.jenisKelamin && ` • ${s.jenisKelamin}`}
-                              {s.nik && ` • NIK: ${s.nik}`}
-                            </p>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <p className="font-bold text-gray-900 text-xs truncate">{s.nama}</p>
+                                {isFasting && (
+                                  <span className="px-1.5 py-0.2 rounded text-[9.5px] font-extrabold bg-emerald-600 text-white shrink-0">
+                                    ✓ Puasa
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[10.5px] text-gray-500">
+                                Kelas: <strong className="text-emerald-800">{s.kelas}</strong>
+                                {s.jenisKelamin && ` • ${s.jenisKelamin}`}
+                                {s.nik && ` • NIK: ${s.nik}`}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Direct Action Buttons inside Dropdown */}
+                          <div className="flex items-center gap-1 shrink-0">
+                            {isFasting ? (
+                              <button
+                                type="button"
+                                disabled={isReadOnly}
+                                onClick={() => handleToggleStatusFromSuggest(s.id, 'berpuasa')}
+                                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
+                                  isReadOnly ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+                                } bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 shadow-xs`}
+                                title="Batalkan status puasa"
+                              >
+                                <RotateCcw className="w-3 h-3" />
+                                <span>Batal</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                disabled={isReadOnly}
+                                onClick={() => handleMarkPuasaFromSuggest(s.id)}
+                                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
+                                  isReadOnly ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+                                } bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs`}
+                              >
+                                <Plus className="w-3 h-3" />
+                                <span>Tandai</span>
+                              </button>
+                            )}
                           </div>
                         </div>
+                      );
+                    })
+                  )}
+                </div>
+              )}
+            </div>
 
-                        {/* Direct Action Buttons inside Dropdown */}
-                        <div className="flex items-center gap-1 shrink-0">
-                          {isFasting ? (
-                            <button
-                              type="button"
-                              disabled={isReadOnly}
-                              onClick={() => handleToggleStatusFromSuggest(s.id, 'berpuasa')}
-                              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
-                                isReadOnly ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
-                              } bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 shadow-xs`}
-                              title="Batalkan status puasa"
-                            >
-                              <RotateCcw className="w-3 h-3" />
-                              <span>Batal</span>
-                            </button>
-                          ) : (
-                            <button
-                              type="button"
-                              disabled={isReadOnly}
-                              onClick={() => handleMarkPuasaFromSuggest(s.id)}
-                              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
-                                isReadOnly ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
-                              } bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs`}
-                            >
-                              <Plus className="w-3 h-3" />
-                              <span>Tandai</span>
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
+            {/* Direct Big Scan Button next to search input on desktop & mobile */}
+            {!isReadOnly && (
+              <button
+                type="button"
+                onClick={() => setIsCameraScannerOpen(true)}
+                className="px-3 py-2 bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm border border-emerald-600 cursor-pointer shrink-0"
+                title="Buka Kamera Barcode Scanner"
+              >
+                <Camera className="w-4 h-4 text-amber-300 shrink-0" />
+                <span className="hidden xs:inline">Scan</span>
+              </button>
             )}
           </div>
         </div>

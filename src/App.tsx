@@ -695,32 +695,16 @@ export default function App() {
       <PwaInstallPrompt pwaState={pwaState} />
 
       {!user ? (
-        <>
-          <LoginForm
-            onLogin={handleLogin}
-            isSupabaseConnected={isCloudConnected}
-            onOpenSupabaseConfig={() => setIsSupabaseModalOpen(true)}
-            onInstallPwa={pwaState.triggerInstall}
-            isPwaInstalled={pwaState.isInstalled}
-            onOpenWisdomModal={() => setShowWisdomModal(true)}
-            onOpenPrayerModal={() => setShowPrayerModal(true)}
-            onOpenSurahsModal={() => setShowSurahsModal(true)}
-          />
-          <SupabaseConfigModal
-            isOpen={isSupabaseModalOpen}
-            onClose={() => {
-              setIsSupabaseModalOpen(false);
-              setIsCloudConnected(isSupabaseConfigured());
-            }}
-            students={students}
-            sessions={sessions}
-            adminSettings={adminSettings}
-            onSyncCompleted={() => {
-              loadCloudData();
-              showToast('Data berhasil disinkronkan ke Supabase Cloud!');
-            }}
-          />
-        </>
+        <LoginForm
+          onLogin={handleLogin}
+          isSupabaseConnected={isCloudConnected}
+          onOpenSupabaseConfig={() => setIsSupabaseModalOpen(true)}
+          onInstallPwa={pwaState.triggerInstall}
+          isPwaInstalled={pwaState.isInstalled}
+          onOpenWisdomModal={() => setShowWisdomModal(true)}
+          onOpenPrayerModal={() => setShowPrayerModal(true)}
+          onOpenSurahsModal={() => setShowSurahsModal(true)}
+        />
       ) : (
         <div className="min-h-screen bg-emerald-950/5 flex flex-col font-sans text-gray-900">
           {/* Toast Notification */}
@@ -977,26 +961,6 @@ export default function App() {
             </Suspense>
           )}
 
-          {/* Supabase Cloud Connection & Sync Modal */}
-          {isSupabaseModalOpen && (
-            <Suspense fallback={null}>
-              <SupabaseConfigModal
-                isOpen={isSupabaseModalOpen}
-                onClose={() => {
-                  setIsSupabaseModalOpen(false);
-                  setIsCloudConnected(isSupabaseConfigured());
-                }}
-                students={students}
-                sessions={sessions}
-                adminSettings={adminSettings}
-                onSyncCompleted={() => {
-                  loadCloudData();
-                  showToast('Data berhasil disinkronkan ke Supabase Cloud!');
-                }}
-              />
-            </Suspense>
-          )}
-
           {/* Clean Footer */}
           <footer className="bg-emerald-950 text-emerald-300/80 text-xs py-5 border-t border-emerald-900 mt-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
@@ -1077,6 +1041,26 @@ export default function App() {
             isOpen={showSurahsModal}
             onClose={() => setShowSurahsModal(false)}
             initialTab={surahsModalTab}
+          />
+        </Suspense>
+      )}
+
+      {/* Supabase Cloud Connection & Sync Modal */}
+      {isSupabaseModalOpen && (
+        <Suspense fallback={null}>
+          <SupabaseConfigModal
+            isOpen={isSupabaseModalOpen}
+            onClose={() => {
+              setIsSupabaseModalOpen(false);
+              setIsCloudConnected(isSupabaseConfigured());
+            }}
+            students={students}
+            sessions={sessions}
+            adminSettings={adminSettings}
+            onSyncCompleted={() => {
+              loadCloudData();
+              showToast('Data berhasil disinkronkan ke Supabase Cloud!');
+            }}
           />
         </Suspense>
       )}

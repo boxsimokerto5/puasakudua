@@ -281,20 +281,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         </div>
       </div>
 
-      {/* Table of All Sessions (Full Control for Admin) - Tightened */}
+      {/* Table & Cards of All Sessions (Full Control for Admin) - Tightened */}
       <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden">
-        <div className="p-3 sm:p-3.5 bg-gray-50/90 border-b border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+        <div className="p-3 sm:p-3.5 bg-gray-50/90 border-b border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
           <div>
             <h3 className="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-1.5">
               <Calendar className="w-4 h-4 text-purple-700" />
               <span>Daftar Seluruh Sesi Puasa</span>
             </h3>
             <p className="text-[11px] text-gray-500">
-              Wewenang penuh untuk mengunci, membuka, dan mengelola riwayat sesi.
+              Klik status kunci atau tombol aksi untuk membuka/mengunci sesi secara instan.
             </p>
           </div>
 
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap w-full sm:w-auto justify-start sm:justify-end">
             <button
               type="button"
               onClick={() => onSwitchView('raport')}
@@ -349,122 +349,275 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-gray-600">
-            <thead className="bg-gray-100/80 text-gray-700 uppercase text-[10px] tracking-wider font-bold border-b border-gray-200">
-              <tr>
-                <th className="py-2.5 px-3">Nama Sesi & Tanggal</th>
-                <th className="py-2.5 px-3 text-center">Status Akses</th>
-                <th className="py-2.5 px-3 text-center">Verifikasi</th>
-                <th className="py-2.5 px-3 text-center">Jumlah Puasa</th>
-                <th className="py-2.5 px-3 text-right">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {sessionList.map((s) => {
-                const isActive = s.id === activeSessionId;
-                const recordsCount = Object.values(s.records || {}).filter(
-                  (r) => r.status === 'berpuasa'
-                ).length;
+        {/* Mobile View: Quick Card List for Easy Touch Interaction */}
+        <div className="block sm:hidden divide-y divide-gray-100 p-2 space-y-2.5 bg-gray-50/50">
+          <div className="text-[11px] text-gray-500 font-medium px-1 flex items-center justify-between">
+            <span>Daftar Sesi ({sessionList.length})</span>
+            <span className="text-[10px] text-purple-700 font-bold bg-purple-100/80 px-2 py-0.5 rounded-full">
+              Ketuk tombol kunci untuk ubah
+            </span>
+          </div>
 
-                return (
-                  <tr
-                    key={s.id}
-                    className={`hover:bg-purple-50/20 transition-colors ${
-                      isActive ? 'bg-purple-50/40 font-semibold' : ''
-                    }`}
-                  >
-                    <td className="py-2.5 px-3">
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => onSelectSession(s.id)}
-                          className={`text-left group cursor-pointer ${
-                            isActive ? 'text-purple-950 font-bold' : 'text-gray-900 hover:text-purple-700'
-                          }`}
-                        >
-                          <p className="text-xs font-bold leading-tight">{s.title}</p>
-                          <p className="text-[11px] text-gray-500 font-normal">
-                            {formatDateIndo(s.date)} ({s.date})
-                          </p>
-                        </button>
-                        {isActive && (
-                          <span className="px-1.5 py-0.5 bg-purple-200 text-purple-900 text-[9px] font-extrabold rounded">
-                            AKTIF
-                          </span>
-                        )}
-                      </div>
-                    </td>
+          {sessionList.map((s) => {
+            const isActive = s.id === activeSessionId;
+            const recordsCount = Object.values(s.records || {}).filter(
+              (r) => r.status === 'berpuasa'
+            ).length;
 
-                    <td className="py-2.5 px-3 text-center">
+            return (
+              <div
+                key={s.id}
+                className={`p-3 rounded-xl border transition-all ${
+                  isActive
+                    ? 'bg-purple-50/80 border-purple-300 shadow-xs'
+                    : 'bg-white border-gray-200/90 shadow-2xs'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <h4 className="text-xs font-bold text-gray-900 leading-tight truncate">
+                        {s.title}
+                      </h4>
+                      {isActive && (
+                        <span className="px-1.5 py-0.2 bg-purple-600 text-white text-[9px] font-extrabold rounded">
+                          AKTIF
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      {formatDateIndo(s.date)} ({s.date})
+                    </p>
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <span className="text-[11px] font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded-md">
+                      {recordsCount} Puasa
+                    </span>
+                  </div>
+                </div>
+
+                {/* Mobile Lock / Unlock Big Action Button & Select */}
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
+                  <div className="flex items-center gap-1.5">
+                    {/* Direct Lock/Unlock Button */}
+                    <button
+                      type="button"
+                      onClick={() => onToggleLockSession(s.id, !s.isLocked)}
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 ${
+                        s.isLocked
+                          ? 'bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300'
+                          : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300'
+                      }`}
+                    >
                       {s.isLocked ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                          <Lock className="w-2.5 h-2.5" /> Dikunci
-                        </span>
+                        <>
+                          <Lock className="w-3.5 h-3.5 text-rose-700" />
+                          <span>Terkunci (Buka)</span>
+                        </>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          <Unlock className="w-2.5 h-2.5" /> Terbuka
-                        </span>
+                        <>
+                          <Unlock className="w-3.5 h-3.5 text-emerald-700" />
+                          <span>Terbuka (Kunci)</span>
+                        </>
                       )}
-                    </td>
+                    </button>
 
-                    <td className="py-2.5 px-3 text-center">
-                      {s.isVerified ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                          <CheckCircle2 className="w-2.5 h-2.5 text-amber-600" /> Sah
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-gray-100 text-gray-600">
-                          Draf
-                        </span>
-                      )}
-                    </td>
+                    {s.isVerified ? (
+                      <span className="px-2 py-1 rounded-md text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-0.5">
+                        <CheckCircle2 className="w-3 h-3 text-amber-600" /> Sah
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 rounded-md text-[10px] font-medium bg-gray-100 text-gray-600">
+                        Draf
+                      </span>
+                    )}
+                  </div>
 
-                    <td className="py-2.5 px-3 text-center font-bold text-gray-900">
-                      {recordsCount} Siswa
-                    </td>
+                  <div className="flex items-center gap-1">
+                    {!isActive && (
+                      <button
+                        type="button"
+                        onClick={() => onSelectSession(s.id)}
+                        className="px-2.5 py-1.5 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-900 font-bold text-xs transition-all cursor-pointer"
+                      >
+                        Pilih
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setSessionToDelete(s)}
+                      className="p-1.5 bg-gray-100 hover:bg-rose-600 text-gray-500 hover:text-white rounded-lg transition-all cursor-pointer"
+                      title="Hapus Sesi"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-                    <td className="py-2.5 px-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        {/* Lock / Unlock Toggle button */}
+        {/* Desktop / Scrollable Table View with explicit min-width & scroll support */}
+        <div className="hidden sm:block">
+          {/* Helpful horizontal scroll indicator for tablet / smaller desktop */}
+          <div className="px-3.5 py-1.5 bg-purple-50/50 border-b border-purple-100 text-[11px] text-purple-800 flex items-center justify-between">
+            <span className="flex items-center gap-1 font-medium">
+              💡 <strong>Tip Admin:</strong> Klik status akses atau tombol gembok di kolom Aksi untuk mengunci/membuka sesi.
+            </span>
+            <span className="text-[10px] text-gray-500 font-normal">
+              ↔ Geser tabel ke samping jika diperlukan
+            </span>
+          </div>
+
+          <div className="overflow-x-auto overscroll-x-contain touch-pan-x scrollbar-thin">
+            <table className="w-full min-w-[640px] text-left text-xs text-gray-600">
+              <thead className="bg-gray-100/80 text-gray-700 uppercase text-[10px] tracking-wider font-bold border-b border-gray-200">
+                <tr>
+                  <th className="py-2.5 px-3.5 min-w-[220px]">Nama Sesi & Tanggal</th>
+                  <th className="py-2.5 px-3.5 text-center min-w-[150px]">Status Akses (Klik Ubah)</th>
+                  <th className="py-2.5 px-3.5 text-center min-w-[100px]">Verifikasi</th>
+                  <th className="py-2.5 px-3.5 text-center min-w-[110px]">Jumlah Puasa</th>
+                  <th className="py-2.5 px-3.5 text-right min-w-[130px]">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {sessionList.map((s) => {
+                  const isActive = s.id === activeSessionId;
+                  const recordsCount = Object.values(s.records || {}).filter(
+                    (r) => r.status === 'berpuasa'
+                  ).length;
+
+                  return (
+                    <tr
+                      key={s.id}
+                      className={`hover:bg-purple-50/20 transition-colors ${
+                        isActive ? 'bg-purple-50/40 font-semibold' : ''
+                      }`}
+                    >
+                      <td className="py-2.5 px-3.5">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => onSelectSession(s.id)}
+                            className={`text-left group cursor-pointer ${
+                              isActive ? 'text-purple-950 font-bold' : 'text-gray-900 hover:text-purple-700'
+                            }`}
+                          >
+                            <p className="text-xs font-bold leading-tight">{s.title}</p>
+                            <p className="text-[11px] text-gray-500 font-normal">
+                              {formatDateIndo(s.date)} ({s.date})
+                            </p>
+                          </button>
+                          {isActive && (
+                            <span className="px-1.5 py-0.5 bg-purple-200 text-purple-900 text-[9px] font-extrabold rounded">
+                              AKTIF
+                            </span>
+                          )}
+                        </div>
+                      </td>
+
+                      <td className="py-2.5 px-3.5 text-center">
+                        {/* Direct Clickable Status Badge to Toggle Lock immediately */}
                         <button
                           type="button"
                           onClick={() => onToggleLockSession(s.id, !s.isLocked)}
-                          className={`p-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold transition-all shadow-2xs cursor-pointer active:scale-95 ${
                             s.isLocked
-                              ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200'
-                              : 'bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200'
+                              ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300'
+                              : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300'
                           }`}
-                          title={s.isLocked ? 'Buka Kunci Sesi' : 'Kunci Sesi'}
+                          title={s.isLocked ? 'Klik untuk Membuka Kunci Sesi' : 'Klik untuk Mengunci Sesi'}
                         >
-                          {s.isLocked ? <Unlock className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+                          {s.isLocked ? (
+                            <>
+                              <Lock className="w-3 h-3 text-rose-600" />
+                              <span>Dikunci (Klik Buka)</span>
+                            </>
+                          ) : (
+                            <>
+                              <Unlock className="w-3 h-3 text-emerald-600" />
+                              <span>Terbuka (Klik Kunci)</span>
+                            </>
+                          )}
                         </button>
+                      </td>
 
-                        {/* Select as Active Session */}
-                        <button
-                          type="button"
-                          onClick={() => onSelectSession(s.id)}
-                          className="px-2 py-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-[10px] transition-all cursor-pointer"
-                        >
-                          Pilih
-                        </button>
+                      <td className="py-2.5 px-3.5 text-center">
+                        {s.isVerified ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                            <CheckCircle2 className="w-2.5 h-2.5 text-amber-600" /> Sah
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-gray-100 text-gray-600">
+                            Draf
+                          </span>
+                        )}
+                      </td>
 
-                        {/* Delete Session Button (Protected) */}
-                        <button
-                          type="button"
-                          onClick={() => setSessionToDelete(s)}
-                          className="p-1 bg-gray-50 hover:bg-rose-600 text-gray-400 hover:text-white rounded-md transition-all cursor-pointer"
-                          title="Hapus Sesi Puasa"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      <td className="py-2.5 px-3.5 text-center font-bold text-gray-900">
+                        {recordsCount} Siswa
+                      </td>
+
+                      <td className="py-2.5 px-3.5 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {/* Lock / Unlock Toggle button */}
+                          <button
+                            type="button"
+                            onClick={() => onToggleLockSession(s.id, !s.isLocked)}
+                            className={`px-2 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 cursor-pointer shadow-2xs ${
+                              s.isLocked
+                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                                : 'bg-rose-600 hover:bg-rose-700 text-white'
+                            }`}
+                            title={s.isLocked ? 'Buka Kunci Sesi' : 'Kunci Sesi'}
+                          >
+                            {s.isLocked ? (
+                              <>
+                                <Unlock className="w-3 h-3" />
+                                <span>Buka</span>
+                              </>
+                            ) : (
+                              <>
+                                <Lock className="w-3 h-3" />
+                                <span>Kunci</span>
+                              </>
+                            )}
+                          </button>
+
+                          {/* Select as Active Session */}
+                          {!isActive ? (
+                            <button
+                              type="button"
+                              onClick={() => onSelectSession(s.id)}
+                              className="px-2 py-1 rounded-md bg-purple-100 hover:bg-purple-200 text-purple-900 font-bold text-[10px] transition-all cursor-pointer"
+                            >
+                              Pilih
+                            </button>
+                          ) : (
+                            <span className="px-2 py-1 text-[10px] font-bold text-gray-400">
+                              Aktif
+                            </span>
+                          )}
+
+                          {/* Delete Session Button (Protected) */}
+                          <button
+                            type="button"
+                            onClick={() => setSessionToDelete(s)}
+                            className="p-1.5 bg-gray-50 hover:bg-rose-600 text-gray-400 hover:text-white rounded-md transition-all cursor-pointer"
+                            title="Hapus Sesi Puasa"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
