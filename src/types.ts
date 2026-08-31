@@ -67,6 +67,9 @@ export interface UserSession {
 export interface AdminSettings {
   allowPenginputCreateSession: boolean;
   defaultDeadlineTime: string;
+  colorTheme?: string; // 'emerald' | 'navy' | 'teal' | 'purple' | 'maroon' | 'slate' | 'amber'
+  schoolName?: string; // e.g. "SMP-SMA TAHFIDZ AL-QUR'AN"
+  schoolSubName?: string; // e.g. "SR 1 KEDIRI"
 }
 
 export type AdminTabType = 'admin' | 'input' | 'checker' | 'raport' | 'calendar' | 'catat_haid' | 'daftar_haid' | 'daftar_suci';

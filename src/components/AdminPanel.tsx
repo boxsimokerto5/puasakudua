@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FastingSession, Student, AdminSettings } from '../types';
 import { DormCardModal } from './DormCardModal';
 import { BlacklistCardModal } from './BlacklistCardModal';
+import { ThemeSettingsSection } from './ThemeSettingsSection';
 import { getCardReissueHistory } from '../utils/cardSecurity';
 import {
   ShieldAlert,
@@ -50,16 +51,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   activeSessionId,
   activeSession: propActiveSession,
   students,
-  adminSettings: _adminSettings,
+  adminSettings,
   onSelectSession,
   onToggleLockSession,
-  onUpdateAdminSettings: _onUpdateAdminSettings,
+  onUpdateAdminSettings,
   onDeleteSession,
   onCreateSession,
   onOpenStudentModal,
   onOpenPhotoModal,
   onUpdateStudents,
   onSwitchView,
+  isSupabaseConnected,
 }) => {
   const activeSession: FastingSession =
     propActiveSession ||
@@ -606,6 +608,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </div>
         </div>
       </div>
+
+      {/* School Color Theme & Institution Identity Settings Section */}
+      <ThemeSettingsSection
+        adminSettings={adminSettings}
+        onUpdateAdminSettings={onUpdateAdminSettings}
+        isSupabaseConnected={isSupabaseConnected}
+      />
 
       {/* Delete Confirmation Modal */}
       {sessionToDelete && (

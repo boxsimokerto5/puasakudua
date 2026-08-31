@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { UserSession, FastingSession, FastingStatus, Student, AdminSettings, HaidRecord, AdminTabType } from './types';
 import {
   getStoredStudents,
@@ -35,6 +35,7 @@ import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { usePwaInstall } from './hooks/usePwaInstall';
 import { useAutoUpdate } from './hooks/useAutoUpdate';
 import { INDONESIA_CITIES, CityLocation } from './utils/prayerTimes';
+import { applyThemeToDocument, getTheme } from './utils/themeConfig';
 import { Sparkles, Cloud, CloudCheck, RefreshCw, Download, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -132,10 +133,18 @@ export default function App() {
     getStoredSessions()
   );
 
-  // Admin Settings
+  // Admin Settings (Fasting Target, Sync, Color Theme, School Identity)
   const [adminSettings, setAdminSettings] = useState<AdminSettings>(() =>
     getStoredAdminSettings()
   );
+
+  // Active theme configuration
+  const activeTheme = useMemo(() => getTheme(adminSettings.colorTheme), [adminSettings.colorTheme]);
+
+  // Apply Theme CSS variables & attributes to Document Root
+  useEffect(() => {
+    applyThemeToDocument(adminSettings.colorTheme);
+  }, [adminSettings.colorTheme]);
 
   // Supabase Cloud State & Modal
   const [isCloudConnected, setIsCloudConnected] = useState<boolean>(() => isSupabaseConfigured());
@@ -219,8 +228,17 @@ export default function App() {
       // 3. Fetch Admin Settings
       const cloudSettings = await fetchAdminSettingsFromSupabase();
       if (cloudSettings) {
-        setAdminSettings(cloudSettings);
-        saveStoredAdminSettings(cloudSettings);
+        setAdminSettings((prev) => {
+          const merged: AdminSettings = {
+            ...prev,
+            ...cloudSettings,
+            colorTheme: cloudSettings.colorTheme || prev.colorTheme || 'emerald',
+            schoolName: cloudSettings.schoolName || prev.schoolName || "SMP-SMA TAHFIDZ AL-QUR'AN",
+            schoolSubName: cloudSettings.schoolSubName || prev.schoolSubName || 'SR 1 KEDIRI',
+          };
+          saveStoredAdminSettings(merged);
+          return merged;
+        });
       }
     } catch (e) {
       console.error('Error saat loadCloudData:', e);
@@ -263,8 +281,17 @@ export default function App() {
         }
       },
       (newSettings) => {
-        setAdminSettings(newSettings);
-        saveStoredAdminSettings(newSettings);
+        setAdminSettings((prev) => {
+          const merged: AdminSettings = {
+            ...prev,
+            ...newSettings,
+            colorTheme: newSettings.colorTheme || prev.colorTheme || 'emerald',
+            schoolName: newSettings.schoolName || prev.schoolName || "SMP-SMA TAHFIDZ AL-QUR'AN",
+            schoolSubName: newSettings.schoolSubName || prev.schoolSubName || 'SR 1 KEDIRI',
+          };
+          saveStoredAdminSettings(merged);
+          return merged;
+        });
       }
     );
 
@@ -684,6 +711,7 @@ export default function App() {
           <HeaderNavbar
             user={user}
             onLogout={handleLogout}
+            adminSettings={adminSettings}
             activeSessionTitle={activeSession.title}
             activeSessionDate={activeSession.date}
             activeAdminTab={activeAdminTab}
@@ -924,12 +952,12 @@ export default function App() {
           )}
 
           {/* Clean Footer */}
-          <footer className="bg-emerald-950 text-emerald-300/80 text-xs py-5 border-t border-emerald-900 mt-12">
+          <footer className={`${activeTheme.colors.footerBgClass} text-white/80 text-xs py-5 border-t border-white/10 mt-12 transition-colors duration-300`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
               <div className="flex items-center gap-2">
                 <img src="/assets/logo.svg" alt="Logo" className="w-5 h-5 object-contain" />
-                <span className="font-bold text-emerald-100">
-                  PUASAKU - SRT 1 KEDIRI
+                <span className="font-bold text-white">
+                  PUASAKU - {adminSettings.schoolSubName || 'SR 1 KEDIRI'}
                 </span>
               </div>
               <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-end">
@@ -943,18 +971,18 @@ export default function App() {
                       <Download className="w-3 h-3" />
                       <span>Pasang PWA di HP</span>
                     </button>
-                    <span className="text-emerald-700">•</span>
+                    <span className="text-white/30">•</span>
                   </>
                 )}
-                <span className="text-[11px] text-emerald-400 font-medium">
+                <span className="text-[11px] text-amber-300 font-medium">
                   {isCloudConnected ? 'Cloud Supabase Terhubung' : 'Penyimpanan Aman'}
                 </span>
-                <span className="text-emerald-700">•</span>
-                <p className="text-[11px] text-emerald-400/70">
+                <span className="text-white/30">•</span>
+                <p className="text-[11px] text-white/70">
                   Aplikasi Pencatatan & Verifikasi Amalan Puasa Siswa © {new Date().getFullYear()}
                 </p>
-                <span className="text-emerald-700">•</span>
-                <p className="text-[11px] text-emerald-300 font-medium flex items-center gap-1">
+                <span className="text-white/30">•</span>
+                <p className="text-[11px] text-white/80 font-medium flex items-center gap-1">
                   <span>Dibuat oleh</span>
                   <span className="font-bold text-amber-300">eccko developer</span>
                 </p>

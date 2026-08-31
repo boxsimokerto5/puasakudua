@@ -334,6 +334,9 @@ export function getStoredAdminSettings(): AdminSettings {
   const defaultSettings: AdminSettings = {
     allowPenginputCreateSession: false,
     defaultDeadlineTime: '15:00',
+    colorTheme: 'emerald',
+    schoolName: "SMP-SMA TAHFIDZ AL-QUR'AN",
+    schoolSubName: 'SR 1 KEDIRI',
   };
   memoryAdminSettingsCache = defaultSettings;
   return defaultSettings;

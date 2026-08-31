@@ -73,7 +73,17 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
   const [isDormCardModalOpen, setIsDormCardModalOpen] = useState<boolean>(false);
   const [isBlacklistModalOpen, setIsBlacklistModalOpen] = useState<boolean>(false);
   const [isCameraScannerOpen, setIsCameraScannerOpen] = useState<boolean>(false);
-  const [scanToast, setScanToast] = useState<{ studentName: string; time: string; isError?: boolean } | null>(null);
+  const [scanToast, setScanToast] = useState<{
+    studentName: string;
+    studentClass?: string;
+    studentNik?: string;
+    studentPhoto?: string;
+    gender?: 'Laki-laki' | 'Perempuan';
+    time: string;
+    isError?: boolean;
+    errorMessage?: string;
+    versionSuffix?: string;
+  } | null>(null);
   const [blacklistAlert, setBlacklistAlert] = useState<{
     message: string;
     student: Student | null;
@@ -109,7 +119,9 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
         activeVersion: valResult.activeVersion,
       });
       setScanToast({
-        studentName: `⛔ DITOLAK: KARTU BLACKLIST (V${valResult.scannedVersion})`,
+        studentName: valResult.student ? valResult.student.nama : `Kode: "${cleanCode}"`,
+        studentClass: valResult.student?.kelas,
+        errorMessage: `⛔ Ditolak: Kartu Blacklist (Versi Lama V${valResult.scannedVersion})`,
         time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         isError: true,
       });
@@ -128,23 +140,29 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
       }
       onUpdateRecord(foundStudent.id, 'berpuasa');
       playScanSuccessSound();
-      const verSuffix = valResult.activeVersion > 1 ? ` (V${valResult.activeVersion} DUPLIKAT)` : '';
+      const verSuffix = valResult.activeVersion > 1 ? ` (V${valResult.activeVersion})` : '';
       setScanToast({
-        studentName: `${foundStudent.nama} (${foundStudent.kelas})${verSuffix}`,
+        studentName: foundStudent.nama,
+        studentClass: foundStudent.kelas,
+        studentNik: foundStudent.nik,
+        studentPhoto: foundStudent.foto,
+        gender: foundStudent.jenisKelamin,
+        versionSuffix: verSuffix,
         time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         isError: false,
       });
-      setTimeout(() => setScanToast(null), 3500);
+      setTimeout(() => setScanToast(null), 4000);
       setSearchQuery('');
     } else {
       // Unrecognized barcode/card - play error sound feedback
       playScanErrorSound();
       setScanToast({
-        studentName: `Kode tidak terdaftar: "${cleanCode}"`,
+        studentName: `Kode "${cleanCode}"`,
+        errorMessage: 'Kartu / Barcode tidak terdaftar dalam database santri.',
         time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         isError: true,
       });
-      setTimeout(() => setScanToast(null), 3500);
+      setTimeout(() => setScanToast(null), 4000);
     }
   }, [students, isReadOnly, onUpdateRecord]);
 
@@ -259,8 +277,21 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
   // Mark student as fasting directly from search suggestion
   const handleMarkPuasaFromSuggest = (studentId: number) => {
     if (isReadOnly) return;
+    const foundStudent = students.find((s) => s.id === studentId);
     onUpdateRecord(studentId, 'berpuasa');
     playQuickChirpSound();
+    if (foundStudent) {
+      setScanToast({
+        studentName: foundStudent.nama,
+        studentClass: foundStudent.kelas,
+        studentNik: foundStudent.nik,
+        studentPhoto: foundStudent.foto,
+        gender: foundStudent.jenisKelamin,
+        time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        isError: false,
+      });
+      setTimeout(() => setScanToast(null), 4000);
+    }
     setSearchQuery('');
     if (searchInputRef.current) {
       searchInputRef.current.focus();
@@ -523,52 +554,110 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
           </div>
         </div>
 
-        {/* Floating Scan Toast on Top Center */}
+        {/* Floating Scan Toast on Top Center - Clearly Visible & Informative */}
         {scanToast && (
           <div
-            className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-sm w-[92%] sm:w-auto px-4 py-3 text-white rounded-2xl shadow-2xl border-2 flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-md ${
+            className={`fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[70] max-w-lg w-[94%] sm:w-auto min-w-[320px] sm:min-w-[420px] px-4 py-3 text-white rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.5)] border-2 flex items-center justify-between gap-3.5 animate-in fade-in zoom-in-95 slide-in-from-top-6 duration-300 backdrop-blur-md ${
               scanToast.isError
                 ? 'bg-gradient-to-r from-rose-900 via-rose-950 to-red-950 border-rose-400'
-                : 'bg-gradient-to-r from-emerald-800 via-emerald-900 to-teal-950 border-amber-400'
+                : 'bg-gradient-to-r from-[#023324] via-[#044432] to-[#022a1e] border-amber-400'
             }`}
           >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div
-                className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${
+            {/* Left Content with Avatar / Icon */}
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              {scanToast.isError ? (
+                <div className="w-11 h-11 rounded-xl bg-rose-500/20 border border-rose-400/50 flex items-center justify-center shrink-0 shadow-inner">
+                  <AlertTriangle className="w-6 h-6 text-rose-300 animate-bounce" />
+                </div>
+              ) : scanToast.studentPhoto ? (
+                <img
+                  src={scanToast.studentPhoto}
+                  alt={scanToast.studentName}
+                  className="w-11 h-13 object-cover rounded-xl border-2 border-amber-300 shadow-md shrink-0 bg-emerald-950"
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              ) : (
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 border border-amber-300/60 flex items-center justify-center shrink-0 shadow-md text-emerald-950 font-black text-base">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-950 stroke-[2.5]" />
+                </div>
+              )}
+
+              <div className="min-w-0 flex-1">
+                {scanToast.isError ? (
+                  <>
+                    <div className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-rose-300 flex items-center gap-1.5">
+                      <span>⛔ GAGAL INPUT KARTU</span>
+                      <span className="font-mono text-[9.5px] opacity-80">({scanToast.time} WIB)</span>
+                    </div>
+                    <p className="text-xs sm:text-sm font-black text-white truncate mt-0.5">
+                      {scanToast.studentName}
+                    </p>
+                    <p className="text-[10.5px] text-rose-200/90 mt-0.5">
+                      {scanToast.errorMessage || 'Kartu santri tidak dikenali atau ditolak.'}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                      <Sparkles className="w-3 h-3 text-amber-300" />
+                      <span>BERHASIL INPUT PRESENSI PUASA</span>
+                    </div>
+                    <div className="mt-0.5">
+                      <span className="text-[11px] text-emerald-200 font-medium">Berhasil input atas nama:</span>
+                      <h4 className="text-sm sm:text-base font-black text-white truncate drop-shadow-sm leading-tight">
+                        {scanToast.studentName}{scanToast.versionSuffix || ''}
+                      </h4>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 text-[10.5px] text-emerald-200/90 mt-0.5">
+                      {scanToast.studentClass && (
+                        <span className="font-semibold bg-emerald-950/70 px-1.5 py-0.2 rounded border border-emerald-700/60">
+                          Kelas: <strong className="text-amber-200">{scanToast.studentClass}</strong>
+                        </span>
+                      )}
+                      {scanToast.studentNik && (
+                        <span className="font-mono opacity-80 hidden sm:inline">
+                          NIK: {scanToast.studentNik}
+                        </span>
+                      )}
+                      <span className="font-mono text-[10px] opacity-75">
+                        {scanToast.time} WIB
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Right Status Pill & Close */}
+            <div className="flex flex-col items-end gap-1.5 shrink-0 pl-1">
+              <button
+                type="button"
+                onClick={() => setScanToast(null)}
+                className="text-emerald-300/80 hover:text-white p-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer"
+                title="Tutup Notifikasi"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <span
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-black tracking-wide shadow-xs flex items-center gap-1 ${
                   scanToast.isError
-                    ? 'bg-rose-500/20 border-rose-400/50'
-                    : 'bg-amber-400/20 border-amber-300/40'
+                    ? 'bg-rose-700 text-white border border-rose-400/60'
+                    : 'bg-gradient-to-r from-amber-400 to-yellow-400 text-emerald-950 border border-amber-200'
                 }`}
               >
                 {scanToast.isError ? (
-                  <AlertTriangle className="w-4 h-4 text-rose-300" />
+                  '✕ Ditolak'
                 ) : (
-                  <Sparkles className="w-4 h-4 text-amber-300 animate-spin" style={{ animationDuration: '3s' }} />
+                  <>
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-950 stroke-[2.5]" />
+                    <span>Berpuasa</span>
+                  </>
                 )}
-              </div>
-              <div className="min-w-0">
-                <p
-                  className={`text-[11px] font-bold flex items-center gap-1 ${
-                    scanToast.isError ? 'text-rose-300' : 'text-amber-300'
-                  }`}
-                >
-                  <span>{scanToast.isError ? '✕ Gagal Scan' : '✓ Berhasil Scan'}</span>
-                  <span className="font-mono text-[10px] opacity-80">({scanToast.time})</span>
-                </p>
-                <p className="text-xs sm:text-sm font-extrabold text-white truncate">
-                  {scanToast.studentName}
-                </p>
-              </div>
+              </span>
             </div>
-            <span
-              className={`px-2 py-0.5 rounded-lg text-[10px] font-black shrink-0 ${
-                scanToast.isError
-                  ? 'bg-rose-700 text-white border border-rose-400/50'
-                  : 'bg-emerald-600/90 text-white border border-emerald-400/40'
-              }`}
-            >
-              {scanToast.isError ? 'Tidak Terdaftar' : '✓ Berpuasa'}
-            </span>
           </div>
         )}
 

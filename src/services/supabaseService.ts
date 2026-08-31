@@ -255,6 +255,9 @@ export async function fetchAdminSettingsFromSupabase(): Promise<AdminSettings | 
     return {
       allowPenginputCreateSession: Boolean(data.allow_penginput_create_session),
       defaultDeadlineTime: data.default_deadline_time || '15:00',
+      colorTheme: data.color_theme || undefined,
+      schoolName: data.school_name || undefined,
+      schoolSubName: data.school_sub_name || undefined,
     };
   } catch (err) {
     console.error('Exception saat fetchAdminSettingsFromSupabase:', err);
@@ -266,6 +269,7 @@ export async function saveAdminSettingsToSupabase(settings: AdminSettings): Prom
   const supabase = getSupabase();
   if (!supabase) return false;
 
+  // 1. Try full upsert including color_theme and school branding
   try {
     const { error } = await supabase
       .from('admin_settings')
@@ -274,16 +278,50 @@ export async function saveAdminSettingsToSupabase(settings: AdminSettings): Prom
           id: 'global_settings',
           allow_penginput_create_session: settings.allowPenginputCreateSession,
           default_deadline_time: settings.defaultDeadlineTime,
+          color_theme: settings.colorTheme || 'emerald',
+          school_name: settings.schoolName || null,
+          school_sub_name: settings.schoolSubName || null,
           updated_at: new Date().toISOString(),
         },
         { onConflict: 'id' }
       );
 
-    if (error) {
-      console.error('Gagal menyimpan settings ke Supabase:', error.message);
-      return false;
+    if (!error) {
+      return true;
     }
-    return true;
+
+    // 2. If table doesn't have the new columns yet, fallback to saving base settings
+    const isColumnMissingError =
+      error.message?.includes('column') ||
+      error.message?.includes('schema cache') ||
+      error.code === 'PGRST204';
+
+    if (isColumnMissingError) {
+      console.warn(
+        'Kolom kustomisasi tema belum ada di tabel Supabase admin_settings. Menyimpan kolom dasar dan mengandalkan local storage.'
+      );
+
+      const { error: fallbackError } = await supabase
+        .from('admin_settings')
+        .upsert(
+          {
+            id: 'global_settings',
+            allow_penginput_create_session: settings.allowPenginputCreateSession,
+            default_deadline_time: settings.defaultDeadlineTime,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'id' }
+        );
+
+      if (fallbackError) {
+        console.error('Gagal menyimpan settings dasar ke Supabase:', fallbackError.message);
+        return false;
+      }
+      return true;
+    }
+
+    console.error('Gagal menyimpan settings ke Supabase:', error.message);
+    return false;
   } catch (err) {
     console.error('Exception saat saveAdminSettingsToSupabase:', err);
     return false;
@@ -332,6 +370,9 @@ export function setupSupabaseRealtime(
           onSettingsUpdate({
             allowPenginputCreateSession: Boolean(data.allow_penginput_create_session),
             defaultDeadlineTime: data.default_deadline_time || '15:00',
+            colorTheme: data.color_theme || undefined,
+            schoolName: data.school_name || undefined,
+            schoolSubName: data.school_sub_name || undefined,
           });
         }
       }

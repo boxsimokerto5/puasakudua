@@ -1,7 +1,8 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react';
-import { UserSession, AdminTabType } from '../types';
+import { UserSession, AdminTabType, AdminSettings } from '../types';
 import { CityLocation } from '../utils/prayerTimes';
 import { PrayerTimeHeaderPill } from './PrayerTimeHeaderPill';
+import { getTheme } from '../utils/themeConfig';
 import {
   LogOut,
   ShieldCheck,
@@ -30,6 +31,10 @@ import {
 interface HeaderNavbarProps {
   user: UserSession;
   onLogout: () => void;
+  adminSettings?: AdminSettings;
+  colorTheme?: string;
+  schoolName?: string;
+  schoolSubName?: string;
   activeSessionTitle?: string;
   activeSessionDate?: string;
   activeAdminTab?: AdminTabType;
@@ -61,6 +66,10 @@ interface HeaderStar {
 export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
   user,
   onLogout,
+  adminSettings,
+  colorTheme,
+  schoolName,
+  schoolSubName,
   activeSessionTitle,
   activeSessionDate,
   activeAdminTab = 'admin',
@@ -81,6 +90,11 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
   const isPenginput = user.role === 'penginput';
   const isPengecek = user.role === 'pengecek';
   const isHaidRole = user.role === 'haid';
+
+  const activeThemeId = adminSettings?.colorTheme || colorTheme;
+  const theme = getTheme(activeThemeId);
+  const displaySchoolName = adminSettings?.schoolName || schoolName || "SMP-SMA TAHFIDZ AL-QUR'AN";
+  const displaySchoolSubName = adminSettings?.schoolSubName || schoolSubName || 'SR 1 KEDIRI';
 
   // Navigation slider scroll management
   const navSliderRef = useRef<HTMLDivElement>(null);
@@ -206,7 +220,7 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
   }, []);
 
   return (
-    <header className="relative bg-gradient-to-r from-[#022319] via-[#033627] to-[#011a12] text-white shadow-xl border-b border-emerald-700/60 sticky top-0 z-40 overflow-hidden">
+    <header className={`relative ${theme.colors.headerGradientClass} text-white shadow-xl ${theme.colors.headerBorderClass} border-b sticky top-0 z-40 overflow-hidden`}>
       {/* Dynamic Keyframes for Header Twinkling Stars & Subtle Shooting Star */}
       <style>{`
         @keyframes headerTwinkle {
@@ -244,7 +258,7 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
         <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px] opacity-10" />
 
         {/* Ambient Top Glows */}
-        <div className="absolute -top-10 left-1/4 w-80 h-24 bg-emerald-500/10 rounded-full blur-2xl" />
+        <div className={`absolute -top-10 left-1/4 w-80 h-24 ${theme.colors.headerGlowClass} rounded-full blur-2xl`} />
         <div className="absolute -top-10 right-1/4 w-80 h-24 bg-amber-400/10 rounded-full blur-2xl" />
 
         {/* Subtle Miniature Crescent in Header Sky */}
@@ -298,7 +312,7 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
             <div className="flex items-center space-x-2 shrink min-w-0">
               <div className="relative group shrink-0">
                 <div className="absolute -inset-1 bg-amber-400/20 rounded-xl blur-xs" />
-                <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-950/90 border border-amber-400/60 p-1 flex items-center justify-center shadow-[0_0_10px_rgba(251,191,36,0.25)] shrink-0">
+                <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-black/40 border border-amber-400/60 p-1 flex items-center justify-center shadow-[0_0_10px_rgba(251,191,36,0.25)] shrink-0">
                   <img src="/assets/logo.svg" alt="Logo Puasaku" className="w-full h-full object-contain drop-shadow-sm" />
                 </div>
               </div>
@@ -307,12 +321,12 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                   <h1 className="text-sm sm:text-base lg:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300 tracking-wide font-sans drop-shadow-[0_1px_3px_rgba(251,191,36,0.3)] truncate">
                     PUASAKU
                   </h1>
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-black bg-emerald-950 text-amber-300 border border-amber-400/40 shadow-xs shrink-0">
-                    SRT 1
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-black bg-black/40 text-amber-300 border border-amber-400/40 shadow-xs shrink-0 max-w-[120px] truncate" title={displaySchoolSubName}>
+                    {displaySchoolSubName}
                   </span>
                 </div>
-                <p className="hidden sm:block text-[10.5px] text-emerald-300 font-medium -mt-0.5 truncate">
-                  {isHaidRole ? 'Portal Pencatatan Haid & Suci Santriwati' : 'Pencatatan & Verifikasi Amalan Puasa'}
+                <p className="hidden sm:block text-[10.5px] text-amber-200/90 font-medium -mt-0.5 truncate" title={displaySchoolName}>
+                  {isHaidRole ? 'Portal Pencatatan Haid & Suci Santriwati' : displaySchoolName}
                 </p>
               </div>
             </div>

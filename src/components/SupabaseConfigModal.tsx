@@ -158,11 +158,19 @@ CREATE TABLE IF NOT EXISTS public.admin_settings (
     id TEXT PRIMARY KEY DEFAULT 'global_settings',
     allow_penginput_create_session BOOLEAN DEFAULT true NOT NULL,
     default_deadline_time TEXT DEFAULT '15:00' NOT NULL,
+    color_theme TEXT DEFAULT 'emerald',
+    school_name TEXT DEFAULT 'SMP-SMA TAHFIDZ AL-QUR''AN',
+    school_sub_name TEXT DEFAULT 'SR 1 KEDIRI',
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
-INSERT INTO public.admin_settings (id, allow_penginput_create_session, default_deadline_time)
-VALUES ('global_settings', true, '15:00')
+-- Migrasi jika tabel admin_settings sudah ada sebelumnya:
+ALTER TABLE public.admin_settings ADD COLUMN IF NOT EXISTS color_theme TEXT DEFAULT 'emerald';
+ALTER TABLE public.admin_settings ADD COLUMN IF NOT EXISTS school_name TEXT DEFAULT 'SMP-SMA TAHFIDZ AL-QUR''AN';
+ALTER TABLE public.admin_settings ADD COLUMN IF NOT EXISTS school_sub_name TEXT DEFAULT 'SR 1 KEDIRI';
+
+INSERT INTO public.admin_settings (id, allow_penginput_create_session, default_deadline_time, color_theme, school_name, school_sub_name)
+VALUES ('global_settings', true, '15:00', 'emerald', 'SMP-SMA TAHFIDZ AL-QUR''AN', 'SR 1 KEDIRI')
 ON CONFLICT (id) DO NOTHING;
 
 ALTER TABLE public.students ENABLE ROW LEVEL SECURITY;
