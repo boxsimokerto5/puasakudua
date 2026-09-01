@@ -31,13 +31,13 @@ import { FastingInputterView } from './components/FastingInputterView';
 import { FastingCheckerView } from './components/FastingCheckerView';
 import { SplashScreen } from './components/SplashScreen';
 import { PrayerTimeBannerCard } from './components/PrayerTimeBannerCard';
+import { SlimBannerCarousel } from './components/SlimBannerCarousel';
 import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { usePwaInstall } from './hooks/usePwaInstall';
 import { useAutoUpdate } from './hooks/useAutoUpdate';
 import { INDONESIA_CITIES, CityLocation } from './utils/prayerTimes';
 import { applyThemeToDocument, getTheme } from './utils/themeConfig';
 import { Sparkles, Cloud, CloudCheck, RefreshCw, Download, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
 
 // Lazy-loaded heavy components (loaded only on-demand when user opens them)
 const AdminPanel = lazy(() => import('./components/AdminPanel').then(m => ({ default: m.AdminPanel })));
@@ -731,6 +731,20 @@ export default function App() {
 
           {/* Main Container */}
           <main className="max-w-7xl w-full mx-auto px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3.5 flex-1 space-y-3 sm:space-y-4">
+            {/* Slim Sliding Banner Carousel (Ramadan, Hadith, Activity Highlights) */}
+            {adminSettings.showTopBanner !== false &&
+              activeAdminTab !== 'catat_haid' &&
+              activeAdminTab !== 'daftar_haid' &&
+              activeAdminTab !== 'daftar_suci' && (
+                <SlimBannerCarousel
+                  onOpenCalendar={() => setActiveAdminTab('calendar')}
+                  onOpenWisdom={() => setShowWisdomModal(true)}
+                  onOpenPrayer={() => setShowPrayerModal(true)}
+                  onOpenSurah={() => handleOpenSurahsModal('juz_amma')}
+                  schoolName={adminSettings.schoolName}
+                />
+              )}
+
             {/* Live Ramadan Prayer Times & Imsakiyah Banner Card (Hidden on Admin, Ceklist, Form Input, Raport, Calendar, Catat Haid, Daftar Haid, and Daftar Suci for a clean focused view) */}
             {activeAdminTab !== 'admin' &&
               activeAdminTab !== 'calendar' &&
@@ -769,50 +783,41 @@ export default function App() {
             {/* View Switcher based on User Role & Selected Navigation Tab */}
             <Suspense fallback={<ViewLoadingSpinner />}>
               {activeAdminTab === 'catat_haid' || activeAdminTab === 'daftar_haid' || activeAdminTab === 'daftar_suci' ? (
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeAdminTab}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.2, ease: 'easeOut' }}
-                    className="w-full relative"
-                  >
-                    {activeAdminTab === 'catat_haid' ? (
-                      <CatatHaidView
-                        students={students}
-                        haidRecords={haidRecords}
-                        activeSession={activeSession}
-                        currentUserName={user.name}
-                        preselectedStudent={preselectedHaidStudent}
-                        onSaveHaidRecord={handleSaveHaidRecord}
-                        onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
-                        onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
-                      />
-                    ) : activeAdminTab === 'daftar_haid' ? (
-                      <DaftarHaidView
-                        students={students}
-                        haidRecords={haidRecords}
-                        currentUserName={user.name}
-                        onFinishHaid={handleFinishHaid}
-                        onUpdateHaidRecord={handleUpdateHaidRecord}
-                        onDeleteHaidRecord={handleDeleteHaidRecord}
-                        onNavigateToCatatHaid={() => {
-                          setPreselectedHaidStudent(undefined);
-                          setActiveAdminTab('catat_haid');
-                        }}
-                        onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
-                      />
-                    ) : (
-                      <DaftarSuciView
-                        students={students}
-                        haidRecords={haidRecords}
-                        onNavigateToCatatHaid={handleNavigateToCatatHaid}
-                        onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
-                      />
-                    )}
-                  </motion.div>
-                </AnimatePresence>
+                <div key={activeAdminTab} className="w-full relative transition-all duration-200 animate-in fade-in slide-in-from-bottom-2">
+                  {activeAdminTab === 'catat_haid' ? (
+                    <CatatHaidView
+                      students={students}
+                      haidRecords={haidRecords}
+                      activeSession={activeSession}
+                      currentUserName={user.name}
+                      preselectedStudent={preselectedHaidStudent}
+                      onSaveHaidRecord={handleSaveHaidRecord}
+                      onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
+                      onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
+                    />
+                  ) : activeAdminTab === 'daftar_haid' ? (
+                    <DaftarHaidView
+                      students={students}
+                      haidRecords={haidRecords}
+                      currentUserName={user.name}
+                      onFinishHaid={handleFinishHaid}
+                      onUpdateHaidRecord={handleUpdateHaidRecord}
+                      onDeleteHaidRecord={handleDeleteHaidRecord}
+                      onNavigateToCatatHaid={() => {
+                        setPreselectedHaidStudent(undefined);
+                        setActiveAdminTab('catat_haid');
+                      }}
+                      onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
+                    />
+                  ) : (
+                    <DaftarSuciView
+                      students={students}
+                      haidRecords={haidRecords}
+                      onNavigateToCatatHaid={handleNavigateToCatatHaid}
+                      onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
+                    />
+                  )}
+                </div>
               ) : activeAdminTab === 'calendar' ? (
                 <CalendarView
                   sessions={Object.values(sessions)}

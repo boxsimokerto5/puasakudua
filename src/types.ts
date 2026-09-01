@@ -70,6 +70,7 @@ export interface AdminSettings {
   colorTheme?: string; // 'emerald' | 'navy' | 'teal' | 'purple' | 'maroon' | 'slate' | 'amber'
   schoolName?: string; // e.g. "SMP-SMA TAHFIDZ AL-QUR'AN"
   schoolSubName?: string; // e.g. "SR 1 KEDIRI"
+  showTopBanner?: boolean; // true = display sliding image banner in top area
 }
 
 export type AdminTabType = 'admin' | 'input' | 'checker' | 'raport' | 'calendar' | 'catat_haid' | 'daftar_haid' | 'daftar_suci';

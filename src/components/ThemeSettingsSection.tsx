@@ -33,13 +33,17 @@ export const ThemeSettingsSection: React.FC<ThemeSettingsSectionProps> = ({
   const [schoolSubName, setSchoolSubName] = useState(
     adminSettings.schoolSubName || 'SR 1 KEDIRI'
   );
+  const [showTopBanner, setShowTopBanner] = useState<boolean>(
+    adminSettings.showTopBanner !== false
+  );
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   const activePreviewTheme = getTheme(selectedThemeId);
   const hasChanges =
     selectedThemeId !== currentThemeId ||
     schoolName !== (adminSettings.schoolName || "SMP-SMA TAHFIDZ AL-QUR'AN") ||
-    schoolSubName !== (adminSettings.schoolSubName || 'SR 1 KEDIRI');
+    schoolSubName !== (adminSettings.schoolSubName || 'SR 1 KEDIRI') ||
+    showTopBanner !== (adminSettings.showTopBanner !== false);
 
   const handleSelectTheme = (id: ThemeId) => {
     setSelectedThemeId(id);
@@ -52,6 +56,7 @@ export const ThemeSettingsSection: React.FC<ThemeSettingsSectionProps> = ({
       colorTheme: selectedThemeId,
       schoolName: schoolName.trim() || "SMP-SMA TAHFIDZ AL-QUR'AN",
       schoolSubName: schoolSubName.trim() || 'SR 1 KEDIRI',
+      showTopBanner: showTopBanner,
     };
     onUpdateAdminSettings(updatedSettings);
     setSavedSuccess(true);
@@ -64,11 +69,13 @@ export const ThemeSettingsSection: React.FC<ThemeSettingsSectionProps> = ({
     setSelectedThemeId('emerald');
     setSchoolName("SMP-SMA TAHFIDZ AL-QUR'AN");
     setSchoolSubName('SR 1 KEDIRI');
+    setShowTopBanner(true);
     const resetSettings: AdminSettings = {
       ...adminSettings,
       colorTheme: 'emerald',
       schoolName: "SMP-SMA TAHFIDZ AL-QUR'AN",
       schoolSubName: 'SR 1 KEDIRI',
+      showTopBanner: true,
     };
     onUpdateAdminSettings(resetSettings);
     setSavedSuccess(true);
@@ -314,6 +321,36 @@ export const ThemeSettingsSection: React.FC<ThemeSettingsSectionProps> = ({
               className="w-full p-2 text-xs sm:text-sm bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:outline-none focus:ring-1 focus:ring-purple-600 font-medium"
             />
           </div>
+        </div>
+
+        {/* Banner Carousel Visibility Toggle */}
+        <div className="p-3 bg-gray-50/80 rounded-xl border border-gray-200 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-800 border border-amber-200 flex items-center justify-center shrink-0">
+              <Sparkles className="w-4 h-4 text-amber-700" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-gray-900">
+                Tampilkan Banner Slider Slim di Atas
+              </p>
+              <p className="text-[11px] text-gray-500">
+                Menampilkan banner geser bertema Ramadhan, hadits keutamaan puasa, dan kalender kegiatan di halaman utama.
+              </p>
+            </div>
+          </div>
+
+          <label className="relative inline-flex items-center cursor-pointer shrink-0">
+            <input
+              type="checkbox"
+              checked={showTopBanner}
+              onChange={(e) => {
+                setShowTopBanner(e.target.checked);
+                setSavedSuccess(false);
+              }}
+              className="sr-only peer"
+            />
+            <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+          </label>
         </div>
 
         {/* Action Buttons Bar */}

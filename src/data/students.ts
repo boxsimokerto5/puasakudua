@@ -337,6 +337,7 @@ export function getStoredAdminSettings(): AdminSettings {
     colorTheme: 'emerald',
     schoolName: "SMP-SMA TAHFIDZ AL-QUR'AN",
     schoolSubName: 'SR 1 KEDIRI',
+    showTopBanner: true,
   };
   memoryAdminSettingsCache = defaultSettings;
   return defaultSettings;
