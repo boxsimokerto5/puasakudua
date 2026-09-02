@@ -56,7 +56,7 @@ export interface FastingSession {
   updatedAt?: string;
 }
 
-export type UserRole = 'admin' | 'penginput' | 'pengecek' | 'haid';
+export type UserRole = 'admin' | 'penginput' | 'pengecek' | 'haid' | 'sholat';
 
 export interface UserSession {
   username: string;
@@ -73,7 +73,26 @@ export interface AdminSettings {
   showTopBanner?: boolean; // true = display sliding image banner in top area
 }
 
-export type AdminTabType = 'admin' | 'input' | 'checker' | 'raport' | 'calendar' | 'catat_haid' | 'daftar_haid' | 'daftar_suci';
+export type AdminTabType = 'admin' | 'input' | 'checker' | 'raport' | 'calendar' | 'catat_haid' | 'daftar_haid' | 'daftar_suci' | 'sholat';
+
+export type PrayerName = 'subuh' | 'dzuhur' | 'ashar' | 'maghrib' | 'isya';
+export type PrayerStatus = 'tepat_waktu' | 'terlambat' | 'tidak_hadir' | 'haid' | 'sakit' | 'izin';
+
+export interface PrayerAttendanceRecord {
+  id: string; // e.g. "sholat-2026-09-02-dzuhur-101"
+  studentId: number;
+  studentName: string;
+  studentClass: string;
+  studentNik: string;
+  date: string; // YYYY-MM-DD
+  prayer: PrayerName;
+  status: PrayerStatus;
+  scanTime: string; // HH:mm:ss
+  recordedBy: string;
+  notes?: string;
+  lateMinutes?: number;
+  updatedAt?: string;
+}
 
 export type HaidBloodColor = 'hitam' | 'merah' | 'coklat' | 'kuning' | 'keruh';
 export type HaidStatus = 'haid_aktif' | 'selesai_mandi';

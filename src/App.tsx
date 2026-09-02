@@ -42,6 +42,7 @@ import { CalendarView } from './components/CalendarView';
 import { CatatHaidView } from './components/CatatHaidView';
 import { DaftarHaidView } from './components/DaftarHaidView';
 import { DaftarSuciView } from './components/DaftarSuciView';
+import { PrayerAttendanceView } from './components/PrayerAttendanceView';
 import { HaidNotificationModal } from './components/HaidNotificationModal';
 import { StudentDataModal } from './components/StudentDataModal';
 import { StudentPhotoUploadModal } from './components/StudentPhotoUploadModal';
@@ -304,6 +305,8 @@ export default function App() {
       setActiveAdminTab('input');
     } else if (session.role === 'haid') {
       setActiveAdminTab('catat_haid');
+    } else if (session.role === 'sholat') {
+      setActiveAdminTab('sholat');
     } else {
       setActiveAdminTab('checker');
     }
@@ -759,13 +762,14 @@ export default function App() {
                 />
               )}
 
-            {/* Session Selector / Creator Block (Shown on regular fasting session workflows; hidden on admin, raport, calendar, catat haid, daftar haid, and daftar suci) */}
+            {/* Session Selector / Creator Block (Shown on regular fasting session workflows; hidden on admin, raport, calendar, catat haid, daftar haid, daftar suci, and sholat) */}
             {activeAdminTab !== 'admin' &&
               activeAdminTab !== 'raport' &&
               activeAdminTab !== 'calendar' &&
               activeAdminTab !== 'catat_haid' &&
               activeAdminTab !== 'daftar_haid' &&
-              activeAdminTab !== 'daftar_suci' && (
+              activeAdminTab !== 'daftar_suci' &&
+              activeAdminTab !== 'sholat' && (
                 <SessionSelector
                   sessions={sessions}
                   activeSessionId={activeSessionId}
@@ -778,7 +782,16 @@ export default function App() {
               )}
 
             {/* View Switcher based on User Role & Selected Navigation Tab */}
-            {activeAdminTab === 'catat_haid' || activeAdminTab === 'daftar_haid' || activeAdminTab === 'daftar_suci' ? (
+            {activeAdminTab === 'sholat' ? (
+              <div key="sholat" className="w-full relative transition-all duration-200 animate-in fade-in slide-in-from-bottom-2">
+                <PrayerAttendanceView
+                  students={students}
+                  haidRecords={haidRecords}
+                  currentUser={user}
+                  onOpenPhotoModal={(st) => handleOpenPhotoModal(st)}
+                />
+              </div>
+            ) : activeAdminTab === 'catat_haid' || activeAdminTab === 'daftar_haid' || activeAdminTab === 'daftar_suci' ? (
               <div key={activeAdminTab} className="w-full relative transition-all duration-200 animate-in fade-in slide-in-from-bottom-2">
                 {activeAdminTab === 'catat_haid' ? (
                   <CatatHaidView

@@ -62,8 +62,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onOpenPrayerModal,
   onOpenSurahsModal,
 }) => {
-  // Mode: 'main' (Ramadhan green) or 'haid' (Feminine pink theme)
-  const [loginMode, setLoginMode] = useState<'main' | 'haid'>('main');
+  // Mode: 'main' (Ramadhan green), 'haid' (Feminine pink theme), or 'sholat' (Mosque emerald theme)
+  const [loginMode, setLoginMode] = useState<'main' | 'haid' | 'sholat'>('main');
 
   // Main login credentials
   const [username, setUsername] = useState('');
@@ -72,6 +72,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   // Haid login credentials
   const [haidUsername, setHaidUsername] = useState('');
   const [haidPassword, setHaidPassword] = useState('');
+
+  // Sholat login credentials
+  const [sholatUsername, setSholatUsername] = useState('sholat');
+  const [sholatPassword, setSholatPassword] = useState('istiqomah');
 
   const [error, setError] = useState<string | null>(propError || null);
 
@@ -146,8 +150,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         role: 'haid',
         name: 'Petugas Catat Haid & Suci',
       });
+    } else if (cleanUser === 'sholat' && cleanPass === 'istiqomah') {
+      onLogin({
+        username: 'sholat',
+        role: 'sholat',
+        name: 'Petugas Presensi Sholat',
+      });
     } else {
-      setError('Username atau Password salah! Pastikan kredensial yang Anda masukkan sesuai.');
+      setError('Username atau Password salah! Periksa kembali akun Anda.');
     }
   };
 
@@ -165,6 +175,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         role: 'haid',
         name: 'Petugas Catat Haid & Suci',
       });
+    } else if (cleanUser === 'sholat' && cleanPass === 'istiqomah') {
+      onLogin({
+        username: 'sholat',
+        role: 'sholat',
+        name: 'Petugas Presensi Sholat',
+      });
     } else if (cleanUser === 'admin' && cleanPass === 'admin') {
       onLogin({
         username: 'admin',
@@ -172,7 +188,32 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         name: 'Administrator Asrama',
       });
     } else {
-      setError('Username atau Password salah! Pastikan kredensial yang dimasukkan benar.');
+      setError('Username atau Password salah! Periksa kembali akun Anda.');
+    }
+  };
+
+  // Sholat Login Submit
+  const handleSholatSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    const cleanUser = sholatUsername.trim().toLowerCase();
+    const cleanPass = sholatPassword.trim();
+
+    if (cleanUser === 'sholat' && cleanPass === 'istiqomah') {
+      onLogin({
+        username: 'sholat',
+        role: 'sholat',
+        name: 'Petugas Presensi Sholat',
+      });
+    } else if (cleanUser === 'admin' && cleanPass === 'admin') {
+      onLogin({
+        username: 'admin',
+        role: 'admin',
+        name: 'Administrator Asrama',
+      });
+    } else {
+      setError('Username atau Password salah! Periksa kembali akun Anda.');
     }
   };
 
@@ -236,7 +277,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </div>
 
         {/* Main Soft Pink Card Container */}
-        <div className="relative z-10 max-w-md w-full space-y-5 bg-white/90 p-7 sm:p-9 rounded-3xl shadow-[0_15px_40px_rgba(244,114,182,0.18)] border border-pink-200/80 backdrop-blur-md">
+        <div className="relative z-10 max-w-sm w-full space-y-4 bg-white/95 p-5 sm:p-6 rounded-3xl shadow-[0_15px_40px_rgba(244,114,182,0.18)] border border-pink-200 backdrop-blur-md">
           {/* Back Button to Main Login */}
           <button
             type="button"
@@ -251,50 +292,50 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           </button>
 
           {/* Header Branding (Tema Manis Santriwati) */}
-          <div className="text-center space-y-2.5">
+          <div className="text-center space-y-2">
             <div className="relative inline-block">
-              <div className="absolute -inset-2 bg-gradient-to-r from-pink-300/50 via-rose-200/60 to-pink-300/50 rounded-3xl blur-md animate-pulse" />
-              <div className="relative p-3 rounded-2xl bg-gradient-to-tr from-pink-400 to-rose-400 text-white shadow-md border border-pink-100 [animation:softPulseGlow_3s_ease-in-out_infinite]">
-                <Droplets className="w-9 h-9 text-white" />
+              <div className="absolute -inset-1.5 bg-gradient-to-r from-pink-300/50 via-rose-200/60 to-pink-300/50 rounded-2xl blur-md animate-pulse" />
+              <div className="relative p-2.5 rounded-2xl bg-gradient-to-tr from-pink-400 to-rose-400 text-white shadow-md border border-pink-100 [animation:softPulseGlow_3s_ease-in-out_infinite]">
+                <Droplets className="w-7 h-7 text-white" />
               </div>
             </div>
 
             <div>
-              <div className="flex items-center justify-center gap-2">
-                <Heart className="w-4 h-4 text-pink-400 fill-pink-400/40" />
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight font-sans">
+              <div className="flex items-center justify-center gap-1.5">
+                <Heart className="w-3.5 h-3.5 text-pink-400 fill-pink-400/40" />
+                <h2 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight font-sans">
                   Pencatatan Haid
                 </h2>
-                <Heart className="w-4 h-4 text-pink-400 fill-pink-400/40" />
+                <Heart className="w-3.5 h-3.5 text-pink-400 fill-pink-400/40" />
               </div>
               <div className="flex items-center justify-center gap-2 mt-1">
-                <div className="h-[1.5px] w-6 bg-gradient-to-r from-transparent to-pink-300 rounded-full" />
-                <span className="px-3 py-0.5 rounded-full text-[10.5px] font-black bg-pink-100 text-pink-700 border border-pink-200 shadow-xs tracking-wider">
-                  PORTAL KHUSUS SANTRIWATI
+                <div className="h-[1px] w-5 bg-gradient-to-r from-transparent to-pink-300 rounded-full" />
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-pink-100 text-pink-700 border border-pink-200 tracking-wider">
+                  PORTAL SANTRIWATI
                 </span>
-                <div className="h-[1.5px] w-6 bg-gradient-to-l from-transparent to-pink-300 rounded-full" />
+                <div className="h-[1px] w-5 bg-gradient-to-l from-transparent to-pink-300 rounded-full" />
               </div>
-              <p className="text-xs text-slate-600 font-medium mt-1.5 max-w-xs mx-auto">
+              <p className="text-[11.5px] text-slate-600 font-medium mt-1 max-w-xs mx-auto">
                 Pencatatan Udzur Syar'i, Pemantauan Haid & Masa Suci Fiqih Syafi'i
               </p>
             </div>
           </div>
 
           {/* Form Login Soft Pink */}
-          <form onSubmit={handleHaidSubmit} className="space-y-3.5 pt-1">
+          <form onSubmit={handleHaidSubmit} className="space-y-3 pt-1">
             {error && (
-              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-start gap-2 shadow-xs animate-in fade-in duration-150">
+              <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-start gap-2 shadow-xs animate-in fade-in duration-150">
                 <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1">
+              <label className="block text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-1">
                 Username Petugas Haid
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-pink-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-pink-400">
                   <User className="w-4 h-4" />
                 </div>
                 <input
@@ -302,7 +343,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                   value={haidUsername}
                   onChange={(e) => setHaidUsername(e.target.value)}
                   placeholder="Masukkan username"
-                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-pink-50/60 border border-pink-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all shadow-xs"
+                  className="w-full pl-9 pr-3.5 py-2 text-xs sm:text-sm bg-pink-50/60 border border-pink-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all shadow-xs"
                   required
                   autoComplete="username"
                 />
@@ -310,11 +351,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1">
+              <label className="block text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-1">
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-pink-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-pink-400">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
@@ -322,7 +363,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                   value={haidPassword}
                   onChange={(e) => setHaidPassword(e.target.value)}
                   placeholder="Masukkan password"
-                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-pink-50/60 border border-pink-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all shadow-xs"
+                  className="w-full pl-9 pr-3.5 py-2 text-xs sm:text-sm bg-pink-50/60 border border-pink-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all shadow-xs"
                   required
                   autoComplete="current-password"
                 />
@@ -331,21 +372,175 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-pink-500 via-rose-400 to-pink-500 hover:from-pink-600 hover:to-rose-500 active:scale-98 text-white font-black text-sm shadow-[0_4px_15px_rgba(244,114,182,0.35)] border border-pink-200 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer mt-3"
+              className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-pink-500 via-rose-400 to-pink-500 hover:from-pink-600 hover:to-rose-500 active:scale-98 text-white font-black text-xs sm:text-sm shadow-[0_4px_12px_rgba(244,114,182,0.35)] border border-pink-200 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer mt-2"
             >
               <Droplets className="w-4 h-4 text-pink-100" />
               <span>Masuk Portal Haid & Suci</span>
               <ArrowRight className="w-4 h-4 text-pink-100" />
             </button>
+
+            {/* Shortcut to Sholat Login from Haid */}
+            <button
+              type="button"
+              onClick={() => {
+                setError(null);
+                setLoginMode('sholat');
+              }}
+              className="w-full py-2 px-3 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-all flex items-center justify-center gap-2"
+            >
+              <Clock className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Beralih ke Presensi Sholat</span>
+            </button>
           </form>
 
           {/* Sweet Footer Note */}
-          <div className="pt-3 border-t border-pink-100 text-center space-y-1">
-            <p className="text-[11px] text-pink-800 flex items-center justify-center gap-1 font-semibold">
-              <HeartPulse className="w-3.5 h-3.5 text-rose-500" />
+          <div className="pt-2.5 border-t border-pink-100 text-center space-y-0.5">
+            <p className="text-[10.5px] text-pink-800 flex items-center justify-center gap-1 font-semibold">
+              <HeartPulse className="w-3 h-3 text-rose-500" />
               <span>Portal Terproteksi Khusus Ustadzah & Siswi</span>
             </p>
-            <p className="text-[10.5px] text-slate-500">
+            <p className="text-[10px] text-slate-500">
+              SMP / SMA SRT 1 Kediri
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // VIEW 3: HALAMAN LOGIN KHUSUS PRESENSI SHOLAT BERJAMAAH (TEMA ISLAMIC MOSQUE)
+  // =========================================================================
+  if (loginMode === 'sholat') {
+    return (
+      <div className="relative min-h-screen flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#021814] via-[#042d25] to-[#01140e] text-slate-100 overflow-hidden select-none">
+        {/* Starry Ambiance */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-10 -right-20 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-1/3 -left-20 w-72 h-72 bg-emerald-600/15 rounded-full blur-3xl pointer-events-none" />
+
+          {stars.slice(0, 25).map((star) => (
+            <div
+              key={star.id}
+              style={{
+                position: 'absolute',
+                top: `${star.top}%`,
+                left: `${star.left}%`,
+                width: `${star.size}px`,
+                height: `${star.size}px`,
+                backgroundColor: star.color,
+                opacity: star.opacity,
+                borderRadius: '50%',
+                boxShadow: `0 0 ${star.size * 2}px ${star.color}`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Sholat Card Container */}
+        <div className="relative z-10 max-w-sm w-full space-y-4 bg-slate-900/95 p-5 sm:p-6 rounded-3xl shadow-[0_20px_50px_rgba(4,45,37,0.8)] border border-emerald-500/30 backdrop-blur-md">
+          {/* Back Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setError(null);
+              setLoginMode('main');
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-800/80 hover:bg-slate-750 text-emerald-300 border border-emerald-600/40 transition-all cursor-pointer shadow-xs active:scale-95"
+          >
+            <ChevronLeft className="w-4 h-4 text-emerald-400" />
+            <span>Kembali ke Login Utama</span>
+          </button>
+
+          {/* Header Branding */}
+          <div className="text-center space-y-2">
+            <div className="relative inline-block">
+              <div className="w-13 h-13 mx-auto rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-400 p-0.5 shadow-[0_0_20px_rgba(16,185,129,0.4)] flex items-center justify-center">
+                <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-emerald-400 animate-pulse" />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <span className="text-[11px] font-serif text-emerald-400 tracking-wider">
+                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+              </span>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-0.5">
+                Presensi Sholat Berjamaah
+              </h2>
+              <p className="text-[11.5px] text-emerald-200/80 mt-0.5">
+                Portal Petugas Musyrif & Pengecekan Kedisiplinan Ibadah Sholat Santri
+              </p>
+            </div>
+          </div>
+
+          {/* Form Login Sholat */}
+          <form onSubmit={handleSholatSubmit} className="space-y-3 pt-1">
+            {error && (
+              <div className="p-2.5 rounded-xl bg-red-950/80 border border-red-500/70 text-red-200 text-xs font-semibold flex items-start gap-2 shadow-md">
+                <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-[11px] font-black text-emerald-300 uppercase tracking-wider mb-1">
+                Username
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-emerald-400">
+                  <User className="w-4 h-4" />
+                </div>
+                <input
+                  type="text"
+                  value={sholatUsername}
+                  onChange={(e) => setSholatUsername(e.target.value)}
+                  placeholder="Masukkan username sholat"
+                  className="w-full pl-9 pr-3.5 py-2 text-xs sm:text-sm bg-slate-950 border border-emerald-500/40 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all"
+                  required
+                  autoComplete="username"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-black text-emerald-300 uppercase tracking-wider mb-1">
+                Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-emerald-400">
+                  <Lock className="w-4 h-4" />
+                </div>
+                <input
+                  type="password"
+                  value={sholatPassword}
+                  onChange={(e) => setSholatPassword(e.target.value)}
+                  placeholder="Masukkan password"
+                  className="w-full pl-9 pr-3.5 py-2 text-xs sm:text-sm bg-slate-950 border border-emerald-500/40 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all"
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-500 hover:to-teal-500 active:scale-98 text-white font-black text-xs sm:text-sm shadow-[0_0_16px_rgba(16,185,129,0.35)] border border-emerald-400/40 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer mt-2"
+            >
+              <Clock className="w-4 h-4 text-emerald-200" />
+              <span>Masuk Portal Presensi Sholat</span>
+              <ArrowRight className="w-4 h-4 text-emerald-200" />
+            </button>
+          </form>
+
+          {/* Footer Note */}
+          <div className="pt-2.5 border-t border-slate-800 text-center space-y-0.5">
+            <p className="text-[10.5px] text-emerald-400/90 font-medium">
+              Sistem Otomatisasi Absensi Scanner & Pemantauan Masbuq
+            </p>
+            <p className="text-[10px] text-slate-500">
               SMP / SMA SRT 1 Kediri
             </p>
           </div>
@@ -655,28 +850,28 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
       {/* Main Login Frame Container (Seamless Cosmic Glassmorphism matching reference image) */}
       <div
-        className="relative z-10 max-w-md w-full space-y-6 p-7 sm:p-9 rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.85)] border border-amber-400/30 backdrop-blur-md overflow-hidden"
+        className="relative z-10 max-w-sm w-full space-y-4 p-5 sm:p-6 rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.85)] border border-amber-400/30 backdrop-blur-md overflow-hidden"
         style={{
-          background: 'linear-gradient(180deg, rgba(3, 20, 32, 0.45) 0%, rgba(2, 28, 38, 0.7) 35%, rgba(2, 22, 29, 0.88) 70%, rgba(1, 15, 20, 0.96) 100%)',
+          background: 'linear-gradient(180deg, rgba(3, 20, 32, 0.55) 0%, rgba(2, 28, 38, 0.78) 35%, rgba(2, 22, 29, 0.92) 70%, rgba(1, 15, 20, 0.98) 100%)',
         }}
       >
         {/* Header Branding (Circular Gold Medallion Logo & Gold Typography) */}
-        <div className="relative z-10 text-center space-y-3">
+        <div className="relative z-10 text-center space-y-2">
           {/* Triple Gold-Rimmed Center Medallion Emblem */}
           <div className="relative inline-block">
             {/* Outer Radiant Glow */}
-            <div className="absolute -inset-3 bg-gradient-to-r from-amber-400/40 via-teal-300/30 to-yellow-300/40 rounded-full blur-lg animate-pulse" />
+            <div className="absolute -inset-2 bg-gradient-to-r from-amber-400/40 via-teal-300/30 to-yellow-300/40 rounded-full blur-md animate-pulse" />
             
             {/* Outer Gold Bezel */}
-            <div className="relative p-1.5 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-200 to-amber-600 shadow-[0_0_25px_rgba(251,191,36,0.6)]">
+            <div className="relative p-1 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-200 to-amber-600 shadow-[0_0_20px_rgba(251,191,36,0.6)]">
               {/* Inner Gold Bezel Ring */}
-              <div className="p-1 rounded-full bg-gradient-to-b from-amber-700 via-amber-400 to-amber-800">
+              <div className="p-0.5 rounded-full bg-gradient-to-b from-amber-700 via-amber-400 to-amber-800">
                 {/* Deep Emerald-Teal Emblem Core */}
-                <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-gradient-to-b from-[#064e3b] via-[#022c22] to-[#011a14] border border-amber-300/60 shadow-inner flex items-center justify-center p-2">
+                <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-gradient-to-b from-[#064e3b] via-[#022c22] to-[#011a14] border border-amber-300/60 shadow-inner flex items-center justify-center p-1.5">
                   <img
                     src="/assets/logo.svg"
                     alt="Logo Puasaku"
-                    className="w-14 h-14 sm:w-16 sm:h-16 object-contain drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]"
+                    className="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]"
                   />
                 </div>
               </div>
@@ -685,24 +880,24 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
           <div>
             {/* PUASAKU Golden Headline */}
-            <h2 className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-[#fff6d6] via-[#ffd966] to-[#df9b13] tracking-[0.18em] font-serif drop-shadow-[0_2px_12px_rgba(251,191,36,0.45)]">
+            <h2 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-b from-[#fff6d6] via-[#ffd966] to-[#df9b13] tracking-[0.18em] font-serif drop-shadow-[0_2px_10px_rgba(251,191,36,0.45)]">
               PUASAKU
             </h2>
             
             {/* SRT 1 KEDIRI Subtitle */}
-            <div className="flex items-center justify-center gap-2 mt-1.5">
-              <span className="text-xs sm:text-sm font-bold text-amber-300 tracking-[0.25em]">
+            <div className="flex items-center justify-center gap-2 mt-0.5">
+              <span className="text-[11px] sm:text-xs font-bold text-amber-300 tracking-[0.25em]">
                 SRT 1 KEDIRI
               </span>
             </div>
 
             {/* Description Text */}
-            <p className="text-xs text-amber-100/85 font-normal mt-2 max-w-xs mx-auto leading-relaxed">
+            <p className="text-[11px] text-amber-100/85 font-normal mt-1 max-w-xs mx-auto leading-relaxed">
               Sistem Informasi Pencatatan & Verifikasi Amalan Puasa Siswa
             </p>
 
             {/* Glowing Golden Horizon Line */}
-            <div className="relative mt-3.5 mb-1 flex items-center justify-center">
+            <div className="relative mt-2.5 mb-0.5 flex items-center justify-center">
               <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-amber-400/70 to-transparent" />
               <div className="absolute w-1.5 h-1.5 rounded-full bg-amber-200 shadow-[0_0_6px_#fef08a]" />
             </div>
@@ -710,25 +905,25 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </div>
 
         {/* Form Login */}
-        <form onSubmit={handleMainSubmit} className="space-y-4 pt-1">
+        <form onSubmit={handleMainSubmit} className="space-y-3 pt-0.5">
           {error && (
-            <div className="p-3.5 rounded-xl bg-red-950/80 border border-red-500/70 text-red-200 text-xs font-semibold flex items-start gap-2.5 shadow-md animate-in fade-in duration-150">
+            <div className="p-2.5 rounded-xl bg-red-950/80 border border-red-500/70 text-red-200 text-xs font-semibold flex items-start gap-2 shadow-md animate-in fade-in duration-150">
               <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
 
           {/* Mini Ramadan Desert Line with Walking Camel */}
-          <div className="relative pt-1 pb-1 px-1 overflow-hidden" title="Unta Berjalan di Bawah Langit Ramadhan">
-            <div className="relative w-full h-[1.5px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent rounded-full shadow-[0_0_6px_rgba(251,191,36,0.4)]" />
+          <div className="relative pt-0.5 pb-0.5 px-1 overflow-hidden" title="Unta Berjalan di Bawah Langit Ramadhan">
+            <div className="relative w-full h-[1px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent rounded-full shadow-[0_0_6px_rgba(251,191,36,0.4)]" />
 
             <div
-              className="absolute bottom-[2px] pointer-events-none origin-bottom [animation:camelWalkTrack_14s_easeInOutSine_infinite]"
+              className="absolute bottom-[1px] pointer-events-none origin-bottom [animation:camelWalkTrack_14s_easeInOutSine_infinite]"
             >
               <div className="[animation:camelGait_0.65s_ease-in-out_infinite]">
                 <svg
                   viewBox="0 0 44 36"
-                  className="w-5 h-4 sm:w-5.5 sm:h-4.5 text-amber-300 fill-current drop-shadow-[0_0_6px_rgba(251,191,36,0.8)]"
+                  className="w-4.5 h-3.5 text-amber-300 fill-current drop-shadow-[0_0_6px_rgba(251,191,36,0.8)]"
                 >
                   <path d="M38 6.5c0-1.8-2-3-3.6-2-1.2.8-1 2.5-1 3.8l-2.4 4.5c-1.3-.4-2.8-1.2-4.5-1.2-2 0-3.8 1-4.8 2.2-1.4-1-3-1.6-4.6-1.3-2.2.3-3.8 1.8-4.3 3.8h-.8c-.8 0-1.5.8-1.5 1.8 0 1.2.4 2.4 1 3.2l-.5 7c0 .8.6 1.5 1.5 1.5.8 0 1.4-.6 1.5-1.4l.5-6.2h3.2l.5 6.2c.1.8.7 1.4 1.5 1.4.8 0 1.5-.7 1.5-1.5l-.5-7c1.8-.4 3.5-1.5 4.4-3l.5 8.5c0 .8.6 1.5 1.5 1.5.8 0 1.4-.6 1.5-1.4l.5-7h2.8l.5 7c.1.8.7 1.4 1.5 1.4.8 0 1.5-.7 1.5-1.5l-.7-8.2c1.5-1.8 1.8-4.4.7-6.6l-.3-3.8c.8-1 2.2-2.2 2.2-3.8z" />
                 </svg>
@@ -738,11 +933,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
           {/* USERNAME Field (Neon Cyan/Teal Stroke Pill Container) */}
           <div>
-            <label className="block text-xs font-black text-amber-300/95 uppercase tracking-[0.15em] mb-1.5">
+            <label className="block text-[11px] font-black text-amber-300/95 uppercase tracking-[0.15em] mb-1">
               USERNAME
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-teal-300">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-teal-300">
                 <User className="w-4 h-4" />
               </div>
               <input
@@ -750,7 +945,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Masukkan username"
-                className="w-full pl-11 pr-4 py-3 text-sm bg-[#022228]/60 border-2 border-teal-400/80 rounded-2xl text-white placeholder-teal-300/40 focus:bg-[#021b20]/90 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-[0_0_16px_rgba(20,184,166,0.22)]"
+                className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm bg-[#022228]/60 border-2 border-teal-400/80 rounded-xl text-white placeholder-teal-300/40 focus:bg-[#021b20]/90 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-[0_0_12px_rgba(20,184,166,0.2)]"
                 required
                 autoComplete="username"
               />
@@ -759,11 +954,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
           {/* PASSWORD Field (Neon Cyan/Teal Stroke Pill Container) */}
           <div>
-            <label className="block text-xs font-black text-amber-300/95 uppercase tracking-[0.15em] mb-1.5">
+            <label className="block text-[11px] font-black text-amber-300/95 uppercase tracking-[0.15em] mb-1">
               PASSWORD
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-teal-300">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-teal-300">
                 <Lock className="w-4 h-4" />
               </div>
               <input
@@ -771,7 +966,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Masukkan password"
-                className="w-full pl-11 pr-4 py-3 text-sm bg-[#022228]/60 border-2 border-teal-400/80 rounded-2xl text-white placeholder-teal-300/40 focus:bg-[#021b20]/90 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-[0_0_16px_rgba(20,184,166,0.22)]"
+                className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm bg-[#022228]/60 border-2 border-teal-400/80 rounded-xl text-white placeholder-teal-300/40 focus:bg-[#021b20]/90 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-300 transition-all shadow-[0_0_12px_rgba(20,184,166,0.2)]"
                 required
                 autoComplete="current-password"
               />
@@ -781,38 +976,51 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           {/* Button: Masuk ke Sistem (Gradient Teal-Emerald to Olive-Amber) */}
           <button
             type="submit"
-            className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#0d5959] via-[#0e6955] to-[#786118] hover:from-[#116e6e] hover:via-[#138068] hover:to-[#8c711c] text-white font-black text-sm shadow-[0_0_25px_rgba(20,184,166,0.3)] border border-teal-300/50 hover:border-amber-300 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer mt-4 active:scale-98"
+            className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0d5959] via-[#0e6955] to-[#786118] hover:from-[#116e6e] hover:via-[#138068] hover:to-[#8c711c] text-white font-black text-xs sm:text-sm shadow-[0_0_20px_rgba(20,184,166,0.25)] border border-teal-300/50 hover:border-amber-300 transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer mt-2.5 active:scale-98"
           >
             <span>Masuk ke Sistem</span>
             <ArrowRight className="w-4 h-4 text-amber-200" />
           </button>
 
-          {/* Button: Pencatatan Haid (Gradient Wine-Crimson with Rose Glow) */}
-          <button
-            type="button"
-            onClick={() => {
-              setError(null);
-              setLoginMode('haid');
-            }}
-            className="w-full py-3 px-4 rounded-2xl text-xs font-black bg-gradient-to-r from-[#6b1435] via-[#881337] to-[#b91c5c] hover:from-[#801840] hover:via-[#9f1642] hover:to-[#cf2068] text-pink-100 border border-pink-400/60 shadow-[0_0_20px_rgba(244,114,182,0.3)] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
-          >
-            <Droplets className="w-4 h-4 text-pink-300 shrink-0" />
-            <span>Pencatatan Haid</span>
-            <Heart className="w-3.5 h-3.5 text-pink-300 fill-pink-300/40 shrink-0" />
-          </button>
+          {/* Button: Pencatatan Haid (Gradient Wine-Crimson with Rose Glow) & Button: Presensi Sholat */}
+          <div className="grid grid-cols-2 gap-2 pt-0.5">
+            <button
+              type="button"
+              onClick={() => {
+                setError(null);
+                setLoginMode('haid');
+              }}
+              className="w-full py-2 px-2.5 rounded-xl text-[11.5px] font-black bg-gradient-to-r from-[#6b1435] via-[#881337] to-[#b91c5c] hover:from-[#801840] hover:via-[#9f1642] hover:to-[#cf2068] text-pink-100 border border-pink-400/60 shadow-[0_0_16px_rgba(244,114,182,0.25)] transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
+            >
+              <Droplets className="w-3.5 h-3.5 text-pink-300 shrink-0" />
+              <span>Catat Haid</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setError(null);
+                setLoginMode('sholat');
+              }}
+              className="w-full py-2 px-2.5 rounded-xl text-[11.5px] font-black bg-gradient-to-r from-[#064e3b] via-[#047857] to-[#0f766e] hover:from-[#065f46] hover:via-[#059669] hover:to-[#115e59] text-emerald-100 border border-emerald-400/60 shadow-[0_0_16px_rgba(16,185,129,0.25)] transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
+            >
+              <Clock className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
+              <span>Presensi Sholat</span>
+            </button>
+          </div>
         </form>
 
         {/* Action Shortcuts: Prayer Times, Wisdom & PWA Install */}
-        <div className="space-y-2 pt-1">
+        <div className="space-y-1.5 pt-0.5">
           {onOpenPrayerModal && (
             <button
               type="button"
               onClick={onOpenPrayerModal}
-              className="w-full py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-950/90 via-[#033c2a] to-emerald-950/90 hover:from-emerald-900 hover:to-emerald-900 text-amber-300 border border-amber-400/50 shadow-[0_0_12px_rgba(251,191,36,0.15)] transition-all cursor-pointer backdrop-blur-xs"
+              className="w-full py-2 px-3 rounded-xl text-[11.5px] font-black flex items-center justify-center gap-1.5 bg-gradient-to-r from-emerald-950/90 via-[#033c2a] to-emerald-950/90 hover:from-emerald-900 hover:to-emerald-900 text-amber-300 border border-amber-400/50 shadow-[0_0_10px_rgba(251,191,36,0.12)] transition-all cursor-pointer backdrop-blur-xs"
             >
               <Clock className="w-3.5 h-3.5 text-amber-400" />
               <span>Jadwal Sholat & Imsakiyah Kediri</span>
-              <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+              <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
             </button>
           )}
 
@@ -820,11 +1028,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <button
               type="button"
               onClick={onOpenWisdomModal}
-              className="w-full py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-[#021f26]/80 hover:bg-[#032e38] text-teal-200 border border-teal-700/60 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
+              className="w-full py-1.5 px-3 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 bg-[#021f26]/80 hover:bg-[#032e38] text-teal-200 border border-teal-700/60 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
             >
-              <Moon className="w-3.5 h-3.5 text-amber-300 fill-amber-300/30" />
-              <span>Buka Mutiara Hikmah Puasa</span>
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+              <Moon className="w-3 h-3 text-amber-300 fill-amber-300/30" />
+              <span>Mutiara Hikmah Puasa</span>
+              <Sparkles className="w-3 h-3 text-amber-400 animate-pulse" />
             </button>
           )}
 
@@ -832,11 +1040,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <button
               type="button"
               onClick={onOpenSurahsModal}
-              className="w-full py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 bg-[#021f26]/80 hover:bg-[#032e38] text-amber-200 border border-teal-500/50 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
+              className="w-full py-1.5 px-3 rounded-xl text-[11px] font-black flex items-center justify-center gap-1.5 bg-[#021f26]/80 hover:bg-[#032e38] text-amber-200 border border-teal-500/50 shadow-xs transition-all cursor-pointer backdrop-blur-xs"
             >
-              <BookOpen className="w-3.5 h-3.5 text-amber-300" />
-              <span>Juz 'Amma, Yasin, Dzikir Sholat & Doa</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30">
+              <BookOpen className="w-3 h-3 text-amber-300" />
+              <span>Juz 'Amma, Yasin, Dzikir & Doa</span>
+              <span className="text-[9.5px] px-1 py-0.1 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30">
                 Lengkap
               </span>
             </button>
@@ -846,22 +1054,22 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <button
               type="button"
               onClick={onInstallPwa}
-              className="w-full py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-emerald-950 shadow-[0_0_15px_rgba(251,191,36,0.3)] border border-amber-300 transition-all cursor-pointer"
+              className="w-full py-2 px-3 rounded-xl text-[11.5px] font-black flex items-center justify-center gap-1.5 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-emerald-950 shadow-[0_0_12px_rgba(251,191,36,0.25)] border border-amber-300 transition-all cursor-pointer"
             >
-              <Download className="w-4 h-4" />
-              <span>Pasang Aplikasi PUASAKU (PWA di HP)</span>
-              <Sparkles className="w-3.5 h-3.5 text-emerald-950 animate-pulse" />
+              <Download className="w-3.5 h-3.5" />
+              <span>Pasang Aplikasi PUASAKU (PWA)</span>
+              <Sparkles className="w-3 h-3 text-emerald-950 animate-pulse" />
             </button>
           )}
         </div>
 
         {/* Clean Footer Info */}
-        <div className="pt-4 border-t border-teal-900/60 text-center space-y-1.5">
-          <p className="text-[11px] text-teal-300/90 flex items-center justify-center gap-1.5 font-medium">
-            <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+        <div className="pt-2.5 border-t border-teal-900/60 text-center space-y-0.5">
+          <p className="text-[10px] text-teal-300/90 flex items-center justify-center gap-1 font-medium">
+            <ShieldCheck className="w-3 h-3 text-amber-400" />
             Portal Terproteksi • SMP / SMA SRT 1 Kediri
           </p>
-          <p className="text-[11px] text-teal-400/80 flex items-center justify-center gap-1 font-medium">
+          <p className="text-[10px] text-teal-400/80 flex items-center justify-center gap-1 font-medium">
             <span>Dibuat oleh</span>
             <span className="font-bold text-amber-300 tracking-wide hover:text-amber-200 transition-colors">
               eccko developer

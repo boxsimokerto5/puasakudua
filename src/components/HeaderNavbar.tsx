@@ -23,6 +23,7 @@ import {
   CalendarCheck,
   Droplets,
   HeartPulse,
+  Clock,
   ChevronLeft,
   ChevronRight,
   RefreshCw,
@@ -94,6 +95,7 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
   const isPenginput = user.role === 'penginput';
   const isPengecek = user.role === 'pengecek';
   const isHaidRole = user.role === 'haid';
+  const isSholatRole = user.role === 'sholat';
 
   const activeThemeId = adminSettings?.colorTheme || colorTheme;
   const theme = getTheme(activeThemeId);
@@ -385,6 +387,8 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                     ? 'bg-purple-950/90 border-purple-500/70 text-purple-200'
                     : isHaidRole
                     ? 'bg-rose-950/90 border-rose-500/70 text-rose-200'
+                    : isSholatRole
+                    ? 'bg-emerald-950/90 border-emerald-500/70 text-emerald-300'
                     : isPenginput
                     ? 'bg-amber-950/90 border-amber-500/70 text-amber-200'
                     : 'bg-emerald-950/90 border-emerald-600/70 text-emerald-200'
@@ -394,6 +398,8 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                   <KeyRound className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-purple-300 shrink-0" />
                 ) : isHaidRole ? (
                   <Droplets className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-rose-400 shrink-0" />
+                ) : isSholatRole ? (
+                  <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-300 shrink-0" />
                 ) : isPenginput ? (
                   <UserCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-300 shrink-0" />
                 ) : (
@@ -485,6 +491,37 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                         <span>Daftar Suci</span>
                       </button>
                     </>
+                  ) : isSholatRole ? (
+                    <>
+                      {/* Dedicated Petugas Sholat View */}
+                      <button
+                        type="button"
+                        data-active={activeAdminTab === 'sholat'}
+                        onClick={() => onSelectAdminTab('sholat')}
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 active:scale-95 ${
+                          activeAdminTab === 'sholat'
+                            ? 'bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600 text-white shadow-[0_2px_12px_rgba(16,185,129,0.45)] ring-1 ring-emerald-300 font-black'
+                            : 'text-emerald-300 hover:text-white hover:bg-emerald-900/40'
+                        }`}
+                      >
+                        <Clock className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
+                        <span>Presensi Sholat Berjamaah</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        data-active={activeAdminTab === 'calendar'}
+                        onClick={() => onSelectAdminTab('calendar')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                          activeAdminTab === 'calendar'
+                            ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-md ring-1 ring-teal-300 font-black'
+                            : 'text-teal-300 hover:text-white hover:bg-emerald-800/70'
+                        }`}
+                      >
+                        <CalendarCheck className="w-3.5 h-3.5 text-teal-300 shrink-0" />
+                        <span>Kalender</span>
+                      </button>
+                    </>
                   ) : (
                     <>
                       {isAdmin && (
@@ -502,6 +539,21 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                           <span>Admin</span>
                         </button>
                       )}
+
+                      {/* Presensi Sholat Tab for Admin / General */}
+                      <button
+                        type="button"
+                        data-active={activeAdminTab === 'sholat'}
+                        onClick={() => onSelectAdminTab('sholat')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                          activeAdminTab === 'sholat'
+                            ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md ring-1 ring-emerald-300 font-black'
+                            : 'text-emerald-300 hover:text-white hover:bg-emerald-800/60'
+                        }`}
+                      >
+                        <Clock className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
+                        <span>Presensi Sholat</span>
+                      </button>
 
                       {(isAdmin || isPenginput) && (
                         <button
