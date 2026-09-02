@@ -41,6 +41,22 @@ import {
   playScanErrorSound,
 } from '../utils/audioNotification';
 
+interface HaidScanToast {
+  studentId?: number;
+  studentName: string;
+  studentClass?: string;
+  studentNik?: string;
+  studentPhoto?: string;
+  type: 'valid_ready' | 'active_haid' | 'fiqh_warning' | 'male_rejected' | 'invalid_card' | 'blacklisted';
+  badge: string;
+  title: string;
+  description: string;
+  detailBadge?: string;
+  suciDays?: number;
+  time: string;
+  isError: boolean;
+}
+
 interface CatatHaidViewProps {
   students?: Student[];
   haidRecords?: HaidRecord[];
@@ -75,6 +91,26 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
     record: HaidRecord;
     currentDay: number;
   } | null>(null);
+  const [scanToast, setScanToast] = useState<HaidScanToast | null>(null);
+  const scanToastTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const triggerScanToast = useCallback((toast: HaidScanToast) => {
+    if (scanToastTimerRef.current) {
+      clearTimeout(scanToastTimerRef.current);
+    }
+    setScanToast(toast);
+    scanToastTimerRef.current = setTimeout(() => {
+      setScanToast(null);
+    }, 6000);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (scanToastTimerRef.current) {
+        clearTimeout(scanToastTimerRef.current);
+      }
+    };
+  }, []);
 
   // Pre-calculated O(1) status lookup map for all students to prevent repeated date calculations
   const studentStatusMap = useMemo(() => {
@@ -218,15 +254,55 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
     return calculateSuciDaysForStudent(selectedStudent.id, haidRecords);
   }, [selectedStudent, haidRecords]);
 
-  // Handle Barcode/QR Scan result
+  // Handle Barcode/QR Scan result with rich pop-up notification
   const handleScanCode = (code: string) => {
     const cleanCode = code.trim();
     if (!cleanCode) return;
 
+    const scanTimeStr =
+      new Date().toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      }) + ' WIB';
+
     const validation = validateScannedCard(cleanCode, students);
 
+    // Case 1: Blacklisted card (old version / reported lost)
+    if (validation.isBlacklisted) {
+      playScanErrorSound();
+      const sName = validation.student ? validation.student.nama : `Kartu: "${cleanCode}"`;
+      triggerScanToast({
+        studentName: sName,
+        studentClass: validation.student?.kelas,
+        studentNik: validation.student?.nik,
+        studentPhoto: validation.student?.foto,
+        type: 'blacklisted',
+        badge: '⛔ KARTU DINONAKTIFKAN / DIBLOKIR',
+        title: 'Kartu Tidak Berlaku (Versi Lama)',
+        description: validation.message || 'Kartu ini telah dilaporkan hilang/rusak dan digantikan versi baru.',
+        time: scanTimeStr,
+        isError: true,
+      });
+      setScanFeedback({
+        message: `⛔ Kartu ditolak: ${validation.message}`,
+        isError: true,
+      });
+      return;
+    }
+
+    // Case 2: Unrecognized / Not found card
     if (!validation.isValid || !validation.student) {
       playScanErrorSound();
+      triggerScanToast({
+        studentName: `Barcode: "${cleanCode}"`,
+        type: 'invalid_card',
+        badge: '⚠️ KARTU TIDAK DIKENALI',
+        title: 'Barcode Santri Tidak Terdaftar',
+        description: 'Kartu tidak ditemukan dalam database atau format barcode tidak sesuai.',
+        time: scanTimeStr,
+        isError: true,
+      });
       setScanFeedback({
         message: `⚠️ Kartu tidak dikenali: ${cleanCode}`,
         isError: true,
@@ -236,8 +312,22 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
 
     const matchedStudent = validation.student;
 
+    // Case 3: Male student scanned on Catat Haid
     if (matchedStudent.jenisKelamin !== 'Perempuan') {
       playScanErrorSound();
+      triggerScanToast({
+        studentId: matchedStudent.id,
+        studentName: matchedStudent.nama,
+        studentClass: matchedStudent.kelas,
+        studentNik: matchedStudent.nik,
+        studentPhoto: matchedStudent.foto,
+        type: 'male_rejected',
+        badge: '⛔ DITOLAK: SANTRI LAKI-LAKI',
+        title: 'Pencatatan Khusus Santriwati',
+        description: `${matchedStudent.nama} adalah santri Laki-laki. Menu Catat Haid khusus untuk santriwati.`,
+        time: scanTimeStr,
+        isError: true,
+      });
       setScanFeedback({
         message: `⚠️ ${matchedStudent.nama} adalah santri Laki-laki. Pencatatan haid khusus untuk santriwati.`,
         isError: true,
@@ -245,6 +335,7 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
       return;
     }
 
+    // Select this student in form
     setSelectedStudent(matchedStudent);
     setSearchQuery('');
 
@@ -258,6 +349,20 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
         currentDay,
       });
       playScanSuccessSound();
+      triggerScanToast({
+        studentId: matchedStudent.id,
+        studentName: matchedStudent.nama,
+        studentClass: matchedStudent.kelas,
+        studentNik: matchedStudent.nik,
+        studentPhoto: matchedStudent.foto,
+        type: 'active_haid',
+        badge: '🩸 SEDANG AKTIF MASA HAID',
+        title: `Menjalani Haid Hari ke-${currentDay}`,
+        description: `Mulai sejak ${existingActive.startDate} (${existingActive.startTime || '00:00'}). Formulir siap diperbarui.`,
+        detailBadge: `Hari ke-${currentDay}`,
+        time: scanTimeStr,
+        isError: false,
+      });
       setScanFeedback({
         message: `ℹ️ ${matchedStudent.nama} sedang dalam masa haid (Hari ke-${currentDay}).`,
         isError: false,
@@ -270,12 +375,45 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
     if (checkSuci.hasPreviousRecord && checkSuci.isUnder15Days) {
       playScanErrorSound();
       setIsFiqhWarningModalOpen(true);
+      triggerScanToast({
+        studentId: matchedStudent.id,
+        studentName: matchedStudent.nama,
+        studentClass: matchedStudent.kelas,
+        studentNik: matchedStudent.nik,
+        studentPhoto: matchedStudent.foto,
+        type: 'fiqh_warning',
+        badge: '⚠️ PERINGATAN: BELUM 15 HARI SUCI',
+        title: 'Terindikasi Darah Istihadhah',
+        description: `Baru suci ${checkSuci.days} hari (Kurang dari batas minimal 15 hari). Wajib tetap sholat & puasa!`,
+        suciDays: checkSuci.days,
+        detailBadge: `Baru Suci ${checkSuci.days} Hari`,
+        time: scanTimeStr,
+        isError: true,
+      });
       setScanFeedback({
         message: `⚠️ PERINGATAN: ${matchedStudent.nama} baru menjalani masa suci Hari ke-${checkSuci.days} (Terindikasi alasan tidak valid / Istihadhah).`,
         isError: true,
       });
     } else {
       playScanSuccessSound();
+      const suciDesc = checkSuci.hasPreviousRecord
+        ? `Masa suci terakhir: ${checkSuci.days} hari lalu (Memenuhi syarat fiqih minimal 15 hari ✅)`
+        : 'Riwayat baru / belum ada catatan haid sebelumnya.';
+      triggerScanToast({
+        studentId: matchedStudent.id,
+        studentName: matchedStudent.nama,
+        studentClass: matchedStudent.kelas,
+        studentNik: matchedStudent.nik,
+        studentPhoto: matchedStudent.foto,
+        type: 'valid_ready',
+        badge: '🌸 TERPINDAI: KARTU SANTRIWATI',
+        title: 'Kartu Valid & Siap Dicatat',
+        description: suciDesc,
+        suciDays: checkSuci.hasPreviousRecord ? checkSuci.days : undefined,
+        detailBadge: checkSuci.hasPreviousRecord ? `Suci ${checkSuci.days} Hari` : 'Santriwati Putri',
+        time: scanTimeStr,
+        isError: false,
+      });
       setScanFeedback({
         message: `✅ Terpindai: ${matchedStudent.nama} (${matchedStudent.kelas})`,
         isError: false,
@@ -397,6 +535,169 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
         </div>
       </div>
 
+      {/* 🌸 FLOATING / EMBEDDED POP-UP NOTIFIKASI HASIL SCAN KARTU HAID */}
+      {scanToast && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className={`relative z-30 p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl border shadow-lg transition-all animate-in zoom-in-95 duration-200 ${
+            scanToast.type === 'valid_ready'
+              ? 'bg-gradient-to-r from-pink-900 via-rose-900 to-pink-950 text-white border-pink-400/50 shadow-[0_8px_30px_rgba(244,114,182,0.35)]'
+              : scanToast.type === 'active_haid'
+              ? 'bg-gradient-to-r from-rose-950 via-purple-950 to-pink-950 text-white border-rose-400/60 shadow-[0_8px_30px_rgba(225,29,72,0.35)]'
+              : scanToast.type === 'fiqh_warning'
+              ? 'bg-gradient-to-r from-amber-950 via-rose-950 to-amber-900 text-white border-amber-400/70 shadow-[0_8px_30px_rgba(245,158,11,0.35)]'
+              : 'bg-gradient-to-r from-rose-950 via-slate-900 to-rose-900 text-white border-rose-500/50 shadow-[0_8px_30px_rgba(244,63,94,0.35)]'
+          }`}
+        >
+          <div className="flex items-start sm:items-center justify-between gap-3">
+            {/* Left: Avatar / Student Photo */}
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              {scanToast.studentPhoto ? (
+                <img
+                  src={scanToast.studentPhoto}
+                  alt={scanToast.studentName}
+                  className="w-12 h-14 object-cover rounded-xl border-2 border-pink-300 shadow-md shrink-0 bg-pink-950"
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              ) : (
+                <div
+                  className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0 shadow-md border ${
+                    scanToast.type === 'valid_ready'
+                      ? 'bg-gradient-to-br from-pink-400 to-rose-500 border-pink-200 text-pink-950 font-black'
+                      : scanToast.type === 'active_haid'
+                      ? 'bg-gradient-to-br from-rose-500 to-pink-600 border-rose-300 text-white font-black'
+                      : scanToast.type === 'fiqh_warning'
+                      ? 'bg-gradient-to-br from-amber-400 to-rose-500 border-amber-200 text-amber-950 font-black'
+                      : 'bg-gradient-to-br from-rose-600 to-slate-800 border-rose-400 text-white font-black'
+                  }`}
+                >
+                  {scanToast.type === 'valid_ready' ? (
+                    <Droplets className="w-6 h-6 text-white stroke-[2.5]" />
+                  ) : scanToast.type === 'active_haid' ? (
+                    <HeartPulse className="w-6 h-6 text-white stroke-[2.5] animate-pulse" />
+                  ) : scanToast.type === 'fiqh_warning' ? (
+                    <AlertTriangle className="w-6 h-6 text-amber-950 stroke-[2.5]" />
+                  ) : (
+                    <AlertCircle className="w-6 h-6 text-white stroke-[2.5]" />
+                  )}
+                </div>
+              )}
+
+              {/* Middle: Details & Fiqh Context */}
+              <div className="min-w-0 flex-1">
+                {/* Header Badge & Time */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span
+                    className={`text-[9.5px] sm:text-[10.5px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                      scanToast.type === 'valid_ready'
+                        ? 'bg-pink-500/30 text-pink-200 border-pink-400/40'
+                        : scanToast.type === 'active_haid'
+                        ? 'bg-rose-500/30 text-rose-200 border-rose-400/40'
+                        : scanToast.type === 'fiqh_warning'
+                        ? 'bg-amber-500/30 text-amber-200 border-amber-400/40'
+                        : 'bg-rose-500/30 text-rose-200 border-rose-400/40'
+                    }`}
+                  >
+                    {scanToast.badge}
+                  </span>
+                  <span className="font-mono text-[9px] sm:text-[10px] text-pink-200/75">
+                    ({scanToast.time})
+                  </span>
+                </div>
+
+                {/* Student Name */}
+                <h4 className="text-sm sm:text-base font-black text-white truncate drop-shadow-sm mt-0.5 leading-tight">
+                  {scanToast.studentName}
+                </h4>
+
+                {/* Class & Details Pills */}
+                <div className="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-[11px] text-pink-100/90 mt-0.5">
+                  {scanToast.studentClass && (
+                    <span className="font-semibold bg-white/15 px-1.5 py-0.2 rounded border border-white/20">
+                      Kelas: <strong className="text-pink-200">{scanToast.studentClass}</strong>
+                    </span>
+                  )}
+                  {scanToast.studentNik && (
+                    <span className="font-mono opacity-80 hidden sm:inline">
+                      NIK: {scanToast.studentNik}
+                    </span>
+                  )}
+                  {scanToast.detailBadge && (
+                    <span
+                      className={`font-black px-2 py-0.2 rounded-md ${
+                        scanToast.type === 'valid_ready'
+                          ? 'bg-emerald-500/30 text-emerald-200 border border-emerald-400/40'
+                          : scanToast.type === 'active_haid'
+                          ? 'bg-rose-500/30 text-rose-200 border border-rose-400/40'
+                          : scanToast.type === 'fiqh_warning'
+                          ? 'bg-amber-500/30 text-amber-200 border border-amber-400/40'
+                          : 'bg-white/10 text-pink-100'
+                      }`}
+                    >
+                      {scanToast.detailBadge}
+                    </span>
+                  )}
+                </div>
+
+                {/* Description / Fiqh Note */}
+                <p className="text-[10.5px] sm:text-xs text-pink-100/90 mt-1 leading-tight line-clamp-2">
+                  {scanToast.description}
+                </p>
+              </div>
+            </div>
+
+            {/* Right: Close & Status Pill */}
+            <div className="flex flex-col items-end gap-1.5 shrink-0 pl-1">
+              <button
+                type="button"
+                onClick={() => setScanToast(null)}
+                className="text-pink-200/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                title="Tutup Notifikasi"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <span
+                className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-black tracking-wide shadow-xs flex items-center gap-1 ${
+                  scanToast.type === 'valid_ready'
+                    ? 'bg-emerald-500 text-white'
+                    : scanToast.type === 'active_haid'
+                    ? 'bg-rose-500 text-white'
+                    : scanToast.type === 'fiqh_warning'
+                    ? 'bg-amber-500 text-amber-950'
+                    : 'bg-rose-600 text-white'
+                }`}
+              >
+                {scanToast.type === 'valid_ready' ? (
+                  <>
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>SIAP DICATAT</span>
+                  </>
+                ) : scanToast.type === 'active_haid' ? (
+                  <>
+                    <HeartPulse className="w-3.5 h-3.5" />
+                    <span>HAID AKTIF</span>
+                  </>
+                ) : scanToast.type === 'fiqh_warning' ? (
+                  <>
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <span>PERINGATAN</span>
+                  </>
+                ) : (
+                  <>
+                    <X className="w-3.5 h-3.5" />
+                    <span>DITOLAK</span>
+                  </>
+                )}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Grid: Left (Scanner & Picker) - Right (Fiqh Form) */}
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
         {/* Left Column: 5 Cols on Desktop - Search & Scan */}
@@ -490,9 +791,18 @@ export const CatatHaidView: React.FC<CatatHaidViewProps> = ({
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Ketik nama / NIK..."
+                  placeholder="Ketik nama / NIK / Scan barcode..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const q = searchQuery.trim();
+                      if (q) {
+                        e.preventDefault();
+                        handleScanCode(q);
+                      }
+                    }
+                  }}
                   className="w-full pl-7 pr-7 py-1.5 text-xs bg-pink-50/50 border border-pink-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-pink-400 focus:outline-none"
                 />
                 <Search className="w-3.5 h-3.5 text-pink-400 absolute left-2.5 top-2" />

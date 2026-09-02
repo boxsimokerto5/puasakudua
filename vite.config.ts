@@ -59,59 +59,15 @@ export default defineConfig(() => {
       },
       dedupe: ['react', 'react-dom'],
     },
+    optimizeDeps: {
+      include: ['react', 'react-dom', 'lucide-react', '@supabase/supabase-js'],
+    },
     build: {
       target: 'es2020',
-      minify: 'esbuild',
+      minify: 'esbuild' as const,
       cssMinify: true,
       sourcemap: false,
-      chunkSizeWarningLimit: 1000,
-      rollupOptions: {
-        output: {
-          manualChunks(id) {
-            // Vendor libraries splitting
-            if (id.includes('node_modules')) {
-              if (
-                id.includes('react') ||
-                id.includes('react-dom') ||
-                id.includes('scheduler') ||
-                id.includes('motion') ||
-                id.includes('lucide-react')
-              ) {
-                return 'vendor-core';
-              }
-              if (
-                id.includes('jspdf') ||
-                id.includes('html2canvas') ||
-                id.includes('canvg') ||
-                id.includes('dompurify')
-              ) {
-                return 'vendor-pdf';
-              }
-              if (
-                id.includes('html5-qrcode') ||
-                id.includes('qrcode') ||
-                id.includes('jsbarcode')
-              ) {
-                return 'vendor-scanner';
-              }
-              if (id.includes('@supabase') || id.includes('canvas-confetti')) {
-                return 'vendor-utils';
-              }
-              return 'vendor-libs';
-            }
-            // Split huge static Islamic texts and data
-            if (id.includes('/src/data/shortSurahsData') || id.includes('/src/data/yasinData') || id.includes('/src/data/tahlilData')) {
-              return 'data-quran-tahlil';
-            }
-            if (id.includes('/src/data/sholatGuideData') || id.includes('/src/data/dzikirSholatData') || id.includes('/src/data/dailyPrayersData') || id.includes('/src/data/mahalulQiyamData')) {
-              return 'data-ibadah-guide';
-            }
-            if (id.includes('/src/data/students') || id.includes('/src/data/studentPhotos')) {
-              return 'data-students';
-            }
-          },
-        },
-      },
+      chunkSizeWarningLimit: 1500,
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.

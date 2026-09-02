@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -9,10 +9,26 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
+// Global variable to capture beforeinstallprompt even before React renders
+declare global {
+  interface Window {
+    __pwaDeferredPrompt?: BeforeInstallPromptEvent | null;
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    window.__pwaDeferredPrompt = e as BeforeInstallPromptEvent;
+  });
+}
+
 const PWA_DISMISSED_KEY = 'puasaku_pwa_dismissed_until';
 
 export function usePwaInstall() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(() => {
+    return (typeof window !== 'undefined' && window.__pwaDeferredPrompt) || null;
+  });
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
@@ -37,14 +53,20 @@ export function usePwaInstall() {
     const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
     setIsIOS(isIosDevice);
 
-    // 3. Check dismissed cooldown
+    // 3. Sync if global prompt already exists
+    if (window.__pwaDeferredPrompt && !deferredPrompt) {
+      setDeferredPrompt(window.__pwaDeferredPrompt);
+    }
+
+    // 4. Check dismissed cooldown
     const dismissedUntil = localStorage.getItem(PWA_DISMISSED_KEY);
     const isDismissed = dismissedUntil && parseInt(dismissedUntil, 10) > Date.now();
 
-    // 4. Handle beforeinstallprompt (Android / Chrome / Edge / Desktop)
+    // 5. Handle beforeinstallprompt (Android / Chrome / Edge / Desktop)
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       const promptEvent = e as BeforeInstallPromptEvent;
+      window.__pwaDeferredPrompt = promptEvent;
       setDeferredPrompt(promptEvent);
 
       // Automatically show banner after 1.5 seconds if not dismissed
@@ -55,9 +77,10 @@ export function usePwaInstall() {
       }
     };
 
-    // 5. Handle appinstalled event
+    // 6. Handle appinstalled event
     const handleAppInstalled = () => {
       setIsInstalled(true);
+      window.__pwaDeferredPrompt = null;
       setDeferredPrompt(null);
       setShowAutoBanner(false);
       localStorage.removeItem(PWA_DISMISSED_KEY);
@@ -85,31 +108,34 @@ export function usePwaInstall() {
     };
   }, []);
 
-  const triggerInstall = async () => {
+  const triggerInstall = useCallback(async () => {
     if (isIOS) {
       setShowIosGuide(true);
       setShowAutoBanner(false);
       return;
     }
 
-    if (!deferredPrompt) {
-      // Fallback for browsers that don't support beforeinstallprompt
+    const activePrompt = deferredPrompt || (typeof window !== 'undefined' ? window.__pwaDeferredPrompt : null);
+
+    if (!activePrompt) {
+      // Fallback guide if browser does not support or hasn't fired beforeinstallprompt
       setShowIosGuide(true);
       return;
     }
 
     try {
-      await deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
+      await activePrompt.prompt();
+      const choice = await activePrompt.userChoice;
       if (choice.outcome === 'accepted') {
         setIsInstalled(true);
         setShowAutoBanner(false);
       }
+      window.__pwaDeferredPrompt = null;
       setDeferredPrompt(null);
     } catch (err) {
       console.error('[PWA] Prompt error:', err);
     }
-  };
+  }, [deferredPrompt, isIOS]);
 
   const dismissBanner = (hours = 24) => {
     setShowAutoBanner(false);
