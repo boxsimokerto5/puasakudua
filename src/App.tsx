@@ -73,9 +73,9 @@ export default function App() {
 
   // Short Surahs Modal State
   const [showSurahsModal, setShowSurahsModal] = useState(false);
-  const [surahsModalTab, setSurahsModalTab] = useState<'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat'>('juz_amma');
+  const [surahsModalTab, setSurahsModalTab] = useState<'juz_amma' | 'yasin' | 'tahlil' | 'sholawat' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat'>('juz_amma');
 
-  const handleOpenSurahsModal = (tab: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat' = 'juz_amma') => {
+  const handleOpenSurahsModal = (tab: 'juz_amma' | 'yasin' | 'tahlil' | 'sholawat' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat' = 'juz_amma') => {
     setSurahsModalTab(tab);
     setShowSurahsModal(true);
   };

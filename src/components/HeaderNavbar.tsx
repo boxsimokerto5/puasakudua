@@ -45,7 +45,7 @@ interface HeaderNavbarProps {
   isPwaInstalled?: boolean;
   onOpenWisdomModal?: () => void;
   onOpenPrayerModal?: () => void;
-  onOpenSurahsModal?: (tab?: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat') => void;
+  onOpenSurahsModal?: (tab?: 'juz_amma' | 'yasin' | 'tahlil' | 'sholawat' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat') => void;
   haidActiveCount?: number;
   onOpenHaidNotification?: () => void;
   selectedCity?: CityLocation;

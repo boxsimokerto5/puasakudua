@@ -9,6 +9,7 @@ import { TAHLIL_DATA, TahlilItem } from '../data/tahlilData';
 import { MAHALUL_QIYAM_DATA, MahalulQiyamVerse } from '../data/mahalulQiyamData';
 import { DAILY_PRAYERS_DATA, DailyPrayer, PrayerCategory } from '../data/dailyPrayersData';
 import { DZIKIR_SHOLAT_DATA, DzikirSholatItem } from '../data/dzikirSholatData';
+import { SHOLAWAT_DATA, SholawatItem } from '../data/sholawatData';
 import {
   SHOLAT_GUIDE_DATA,
   SHOLAT_GUIDE_CATEGORIES,
@@ -45,12 +46,14 @@ import {
   Star,
   Moon,
   Compass,
+  Flame,
+  Music,
 } from 'lucide-react';
 
 interface ShortSurahsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialTab?: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat';
+  initialTab?: 'juz_amma' | 'yasin' | 'tahlil' | 'sholawat' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat';
 }
 
 /**
@@ -115,8 +118,8 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
   onClose,
   initialTab = 'juz_amma',
 }) => {
-  // Main Module Tab: Juz 'Amma, Surat Yasin, Tahlil, Mahalul Qiyam, Dzikir Sholat, Doa Harian, or Tata Cara Sholat
-  const [mainTab, setMainTab] = useState<'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat'>(initialTab);
+  // Main Module Tab: Juz 'Amma, Surat Yasin, Tahlil, Sholawat, Mahalul Qiyam, Dzikir Sholat, Doa Harian, or Tata Cara Sholat
+  const [mainTab, setMainTab] = useState<'juz_amma' | 'yasin' | 'tahlil' | 'sholawat' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat'>(initialTab);
 
   // Juz Amma Selected Surah
   const [selectedSurahNumber, setSelectedSurahNumber] = useState<number>(1);
@@ -128,6 +131,14 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
   const [tasbihCounts, setTasbihCounts] = useState<Record<number, number>>({});
   const [copiedTahlilId, setCopiedTahlilId] = useState<number | null>(null);
   const [isWholeTahlilCopied, setIsWholeTahlilCopied] = useState<boolean>(false);
+
+  // Sholawat state & filter
+  const [sholawatCategoryFilter, setSholawatCategoryFilter] = useState<'all' | 'hajat' | 'fadhilah' | 'wirid' | 'syiir' | 'ziarah'>('all');
+  const [sholawatViewMode, setSholawatViewMode] = useState<'cards' | 'compact_list'>('cards');
+  const [expandedSholawatId, setExpandedSholawatId] = useState<number | null>(null);
+  const [sholawatCounts, setSholawatCounts] = useState<Record<number, number>>({});
+  const [copiedSholawatId, setCopiedSholawatId] = useState<number | null>(null);
+  const [isSholawatWholeCopied, setIsSholawatWholeCopied] = useState<boolean>(false);
 
   // Mahalul Qiyam section filter & clicker
   const [mqSectionFilter, setMqSectionFilter] = useState<'all' | 'salam' | 'pujian' | 'syauq' | 'marhaban' | 'doa'>('all');
@@ -260,6 +271,30 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
     return list;
   }, [doaCategoryFilter, searchQuery]);
 
+  // Filtered Sholawat Data
+  const filteredSholawat = useMemo<SholawatItem[]>(() => {
+    let list = SHOLAWAT_DATA;
+    if (sholawatCategoryFilter !== 'all') {
+      list = list.filter((s) => s.category === sholawatCategoryFilter);
+    }
+    const q = searchQuery.toLowerCase().trim();
+    if (q) {
+      list = list.filter(
+        (s) =>
+          s.title.toLowerCase().includes(q) ||
+          s.arabicTitle.includes(q) ||
+          s.numberFormatted.includes(q) ||
+          s.latin.toLowerCase().includes(q) ||
+          s.translation.toLowerCase().includes(q) ||
+          s.fadhilah.toLowerCase().includes(q) ||
+          (s.source && s.source.toLowerCase().includes(q)) ||
+          s.categoryLabel.toLowerCase().includes(q) ||
+          (s.benefits && s.benefits.some((b) => b.toLowerCase().includes(q)))
+      );
+    }
+    return list;
+  }, [sholawatCategoryFilter, searchQuery]);
+
   // Filtered Tata Cara Sholat Data
   const filteredSholatGuide = useMemo<SholatGuideItem[]>(() => {
     let list = SHOLAT_GUIDE_DATA;
@@ -308,7 +343,7 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
   const nextSurah = currentIndex < SHORT_SURAHS_DATA.length - 1 ? SHORT_SURAHS_DATA[currentIndex + 1] : null;
 
   // Handle Tab Switch
-  const handleTabChange = (newTab: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat') => {
+  const handleTabChange = (newTab: 'juz_amma' | 'yasin' | 'tahlil' | 'sholawat' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat') => {
     stopAll();
     setMainTab(newTab);
     setSearchQuery('');
@@ -529,6 +564,70 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
     setExpandedSholatId((prev) => (prev === id ? null : id));
   };
 
+  // Sholawat Copy & Counter handlers
+  const handleCopySholawat = (item: SholawatItem) => {
+    let text = `🌟 *${item.numberFormatted} - ${item.title.toUpperCase()}*\n`;
+    text += `Kategori: ${item.categoryLabel}\n`;
+    if (item.source) text += `Sumber/Sanad: ${item.source}\n`;
+    text += `Fadhilah: ${item.fadhilah}\n\n`;
+    text += `*Teks Arab:*\n${item.arabic}\n\n`;
+    text += `*Transliterasi Latin:*\n_${item.latin}_\n\n`;
+    text += `*Arti / Terjemahan:*\n"${item.translation}"\n\n`;
+
+    if (item.benefits && item.benefits.length > 0) {
+      text += `*Keutamaan & Cara Pengamalan:*\n`;
+      item.benefits.forEach((b) => {
+        text += `• ${b}\n`;
+      });
+      text += `\n`;
+    }
+
+    text += `(Aplikasi PUASAKU - SMP/SMA SRT 1 Kediri)`;
+
+    navigator.clipboard.writeText(text);
+    setCopiedSholawatId(item.id);
+    setTimeout(() => setCopiedSholawatId(null), 2000);
+  };
+
+  const handleCopyWholeSholawat = () => {
+    let text = `✨ *KUMPULAN SHOLAWAT NABI MUHAMMAD SAW LENGKAP* ✨\n`;
+    text += `Koleksi Bacaan Sholawat Masyhur, Fadhilah Hajat, Wirid Rezeki & Qasidah Nabawiyyah\n\n`;
+    text += `========================================\n\n`;
+
+    filteredSholawat.forEach((item) => {
+      text += `[${item.numberFormatted}] ${item.title.toUpperCase()}\n`;
+      text += `Kategori: ${item.categoryLabel} • Fadhilah: ${item.fadhilah}\n\n`;
+      text += `${item.arabic}\n\n`;
+      text += `_${item.latin}_\n\n`;
+      text += `"${item.translation}"\n\n`;
+      text += `----------------------------------------\n\n`;
+    });
+
+    text += `(Aplikasi PUASAKU - SMP/SMA SRT 1 Kediri)`;
+
+    navigator.clipboard.writeText(text);
+    setIsSholawatWholeCopied(true);
+    setTimeout(() => setIsSholawatWholeCopied(false), 2000);
+  };
+
+  const handleIncrementSholawat = (id: number) => {
+    setSholawatCounts((prev) => ({
+      ...prev,
+      [id]: (prev[id] || 0) + 1,
+    }));
+  };
+
+  const handleResetSholawat = (id: number) => {
+    setSholawatCounts((prev) => ({
+      ...prev,
+      [id]: 0,
+    }));
+  };
+
+  const handleToggleSholawatExpand = (id: number) => {
+    setExpandedSholawatId((prev) => (prev === id ? null : id));
+  };
+
   // Tasbih & Counter helpers
   const handleIncrementTasbih = (id: number) => {
     setTasbihCounts((prev) => ({
@@ -666,6 +765,19 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
               >
                 <BookMarked className="w-3 h-3 shrink-0" />
                 <span>Tahlil</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleTabChange('sholawat')}
+                className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                  mainTab === 'sholawat'
+                    ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-600 text-white shadow-xs ring-1 ring-amber-300/60 font-black'
+                    : 'text-slate-300 hover:text-amber-300 hover:bg-white/5'
+                }`}
+              >
+                <Sparkles className="w-3 h-3 text-amber-300 shrink-0" />
+                <span>Sholawat</span>
               </button>
 
               <button
@@ -1522,6 +1634,541 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                   );
                 })}
               </div>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* TAB: KUMPULAN SHOLAWAT NABI SAW (LENGKAP, RAPI & INDAH)   */}
+          {/* ========================================================= */}
+          {mainTab === 'sholawat' && (
+            <div
+              ref={versesContainerRef}
+              className="flex-1 overflow-y-auto p-3 sm:p-5 bg-gradient-to-b from-[#faf8f5] via-[#f5f0e6] to-[#ece5d8] custom-scrollbar flex flex-col text-slate-800"
+            >
+              {/* Sholawat Header Banner (Ornate Symmetrical Frame) */}
+              <div className="py-5 px-4 sm:py-6 sm:px-6 rounded-2xl bg-gradient-to-r from-[#03281d] via-[#054633] to-[#022118] border-2 border-amber-400/80 shadow-md mb-3.5 relative overflow-hidden text-white flex flex-col items-center justify-center text-center">
+                {/* Ramadan Starry Sky Backdrop */}
+                <RamadanStarryBackdrop variant="emerald" showCrescent={true} />
+
+                {/* Ornate Frame Outer Line */}
+                <div className="absolute inset-1.5 border border-amber-300/30 rounded-xl pointer-events-none" />
+
+                <div className="relative z-10 w-full flex flex-col items-center justify-center text-center space-y-2 max-w-2xl mx-auto">
+                  <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-gradient-to-r from-amber-400/20 via-emerald-500/25 to-amber-400/20 border border-amber-300/50 text-amber-200 text-xs font-bold shadow-2xs backdrop-blur-xs leading-none mx-auto text-center">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse shrink-0" />
+                    <span className="leading-normal">✨ Kumpulan Sholawat & Qasidah Nabawiyyah Terlengkap 🌙</span>
+                  </div>
+
+                  <h2 className="text-xl sm:text-2xl font-black text-amber-300 tracking-wide font-sans drop-shadow-xs text-center mx-auto">
+                    Kumpulan Sholawat Nabi SAW
+                  </h2>
+
+                  <p className="text-2xl sm:text-3xl font-arabic font-bold text-amber-200/90 text-center tracking-wide leading-relaxed mx-auto">
+                    مَجْمُوْعَةُ الصَّلَوَاتِ عَلَى خَيْرِ الْبَرِيَّةِ ﷺ
+                  </p>
+
+                  <p className="text-xs sm:text-sm text-emerald-100/90 max-w-xl mx-auto leading-relaxed font-sans text-center">
+                    Koleksi sholawat mutabaroh: Sholawat Haji, Nariyah, Asyghil, Bahriyyah, Busyro, Al-Fatih, Tarhim, Tibbil Qulub, Nuridzati, Nuril Anwar, Tanpo Waton, Ziarah Wali, Munjiyat, Ibrahimiyyah, Jibril, Badar, dan Nahdliyyah.
+                  </p>
+
+                  {/* Summary Badges & Copy All Button */}
+                  <div className="flex flex-wrap items-center justify-center gap-2 pt-1 mx-auto">
+                    <span className="px-3 py-1 rounded-xl text-xs font-bold bg-amber-400/20 text-amber-200 border border-amber-300/40 shadow-xs">
+                      {filteredSholawat.length} Sholawat Tersedia
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleCopyWholeSholawat}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-emerald-800/80 hover:bg-emerald-700 text-emerald-100 border border-emerald-400/40 transition-all cursor-pointer shadow-xs"
+                      title="Salin Semua Sholawat Beserta Arti & Fadhilah"
+                    >
+                      {isSholawatWholeCopied ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-300" />
+                          <span>Semua Tersalin!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 text-amber-300" />
+                          <span>Salin Seluruh Sholawat</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Search & Category Filter Bar */}
+              <div className="bg-white/95 rounded-2xl p-3 border border-amber-200/80 shadow-xs mb-3.5 space-y-2.5">
+                {/* Search & View Mode Switcher */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+                  <div className="relative w-full sm:flex-1">
+                    <Search className="w-4 h-4 text-emerald-700 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Cari nomor (001), judul sholawat, teks latin, atau fadhilah..."
+                      className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm rounded-xl border border-emerald-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-600 bg-[#faf8f5] text-slate-800 placeholder-slate-400"
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery('')}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* View Mode Toggle */}
+                  <div className="flex items-center bg-emerald-50 p-1 rounded-xl border border-emerald-200 shrink-0 w-full sm:w-auto justify-center">
+                    <button
+                      type="button"
+                      onClick={() => setSholawatViewMode('cards')}
+                      className={`px-3 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                        sholawatViewMode === 'cards'
+                          ? 'bg-emerald-700 text-white shadow-xs'
+                          : 'text-emerald-800 hover:bg-emerald-100'
+                      }`}
+                    >
+                      Mode Baca Lengkap
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSholawatViewMode('compact_list')}
+                      className={`px-3 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                        sholawatViewMode === 'compact_list'
+                          ? 'bg-emerald-700 text-white shadow-xs'
+                          : 'text-emerald-800 hover:bg-emerald-100'
+                      }`}
+                    >
+                      Mode Daftar (001 - 018)
+                    </button>
+                  </div>
+                </div>
+
+                {/* Category Pills */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setSholawatCategoryFilter('all')}
+                    className={`px-3 py-1 rounded-lg font-bold transition-all whitespace-nowrap cursor-pointer ${
+                      sholawatCategoryFilter === 'all'
+                        ? 'bg-emerald-700 text-white shadow-xs'
+                        : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200'
+                    }`}
+                  >
+                    Semua ({SHOLAWAT_DATA.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSholawatCategoryFilter('hajat')}
+                    className={`px-3 py-1 rounded-lg font-bold transition-all whitespace-nowrap cursor-pointer ${
+                      sholawatCategoryFilter === 'hajat'
+                        ? 'bg-amber-600 text-white shadow-xs'
+                        : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200'
+                    }`}
+                  >
+                    🤲 Hajat & Rezeki
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSholawatCategoryFilter('fadhilah')}
+                    className={`px-3 py-1 rounded-lg font-bold transition-all whitespace-nowrap cursor-pointer ${
+                      sholawatCategoryFilter === 'fadhilah'
+                        ? 'bg-rose-700 text-white shadow-xs'
+                        : 'bg-rose-50 text-rose-800 hover:bg-rose-100 border border-rose-200'
+                    }`}
+                  >
+                    💖 Pelapang & Kesembuhan
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSholawatCategoryFilter('wirid')}
+                    className={`px-3 py-1 rounded-lg font-bold transition-all whitespace-nowrap cursor-pointer ${
+                      sholawatCategoryFilter === 'wirid'
+                        ? 'bg-indigo-700 text-white shadow-xs'
+                        : 'bg-indigo-50 text-indigo-800 hover:bg-indigo-100 border border-indigo-200'
+                    }`}
+                  >
+                    📿 Wirid & Keutamaan
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSholawatCategoryFilter('syiir')}
+                    className={`px-3 py-1 rounded-lg font-bold transition-all whitespace-nowrap cursor-pointer ${
+                      sholawatCategoryFilter === 'syiir'
+                        ? 'bg-teal-700 text-white shadow-xs'
+                        : 'bg-teal-50 text-teal-800 hover:bg-teal-100 border border-teal-200'
+                    }`}
+                  >
+                    📜 Qasidah & Syi'ir
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSholawatCategoryFilter('ziarah')}
+                    className={`px-3 py-1 rounded-lg font-bold transition-all whitespace-nowrap cursor-pointer ${
+                      sholawatCategoryFilter === 'ziarah'
+                        ? 'bg-cyan-700 text-white shadow-xs'
+                        : 'bg-cyan-50 text-cyan-800 hover:bg-cyan-100 border border-cyan-200'
+                    }`}
+                  >
+                    🕌 Ziarah Auliya
+                  </button>
+                </div>
+              </div>
+
+              {/* Sholawat Cards Content */}
+              {filteredSholawat.length === 0 ? (
+                <div className="bg-white rounded-2xl p-8 text-center border border-amber-200 text-slate-500">
+                  <Sparkles className="w-8 h-8 text-amber-400 mx-auto mb-2 opacity-60" />
+                  <p className="font-bold text-slate-700">Tidak ada sholawat yang sesuai pencarian</p>
+                  <p className="text-xs text-slate-500 mt-1">Coba gunakan kata kunci nama sholawat lain atau reset filter kategori.</p>
+                </div>
+              ) : sholawatViewMode === 'compact_list' ? (
+                /* Compact List View (Mirrors the mobile book style in the uploaded screenshot, elevated with modern elegance) */
+                <div className="space-y-2.5">
+                  {filteredSholawat.map((item) => {
+                    const isExpanded = expandedSholawatId === item.id;
+                    const count = sholawatCounts[item.id] || 0;
+
+                    return (
+                      <div
+                        key={item.id}
+                        className="rounded-2xl bg-gradient-to-r from-[#032e22] via-[#054b37] to-[#032b1f] border border-emerald-600/70 shadow-sm overflow-hidden text-white transition-all"
+                      >
+                        {/* Compact Clickable Row Header */}
+                        <div
+                          onClick={() => handleToggleSholawatExpand(item.id)}
+                          className="px-3.5 py-3 sm:px-4 sm:py-3.5 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/5 transition-all select-none"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            {/* Number Badge (001, 002...) */}
+                            <div className="w-11 h-9 rounded-xl bg-emerald-950/80 border border-amber-300/40 flex items-center justify-center text-amber-300 font-mono font-bold text-xs shrink-0 shadow-inner">
+                              {item.numberFormatted}
+                            </div>
+
+                            {/* Title & Category */}
+                            <div className="min-w-0">
+                              <h4 className="text-sm sm:text-base font-bold text-white truncate tracking-wide">
+                                {item.title}
+                              </h4>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-[11px] text-emerald-200/90 truncate font-sans">
+                                  {item.categoryLabel}
+                                </span>
+                                {item.source && (
+                                  <span className="hidden sm:inline-block text-[10px] text-amber-300/80 truncate">
+                                    • {item.source}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            {count > 0 && (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-emerald-950">
+                                {count}x
+                              </span>
+                            )}
+                            <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-amber-300">
+                              {isExpanded ? (
+                                <ChevronUp className="w-4 h-4" />
+                              ) : (
+                                <ChevronDown className="w-4 h-4" />
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Expandable Full Reading Content */}
+                        {isExpanded && (
+                          <div className="p-4 sm:p-5 bg-[#faf8f5] text-slate-800 border-t border-emerald-700/40 space-y-4">
+                            {/* Arabic Title & Fadhilah Box */}
+                            <div className="p-3.5 rounded-xl bg-amber-50/90 border border-amber-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                              <div>
+                                <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block">
+                                  🌟 Fadhilah & Keutamaan
+                                </span>
+                                <p className="text-xs sm:text-sm text-slate-700 mt-1 font-sans leading-relaxed">
+                                  {item.fadhilah}
+                                </p>
+                              </div>
+                              <span className="font-arabic text-lg sm:text-xl font-bold text-amber-900 shrink-0 self-end sm:self-center">
+                                {item.arabicTitle}
+                              </span>
+                            </div>
+
+                            {/* Arabic Text (High Contrast & Clear) */}
+                            <div className="p-4 rounded-xl bg-white border border-emerald-200 shadow-2xs">
+                              <p
+                                className={`text-right font-arabic font-bold text-slate-900 whitespace-pre-line ${getArabicSizeClass()}`}
+                                dir="rtl"
+                              >
+                                {item.arabic}
+                              </p>
+                            </div>
+
+                            {/* Latin Transliteration */}
+                            {showLatin && (
+                              <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-100">
+                                <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block mb-1">
+                                  Transliterasi Latin:
+                                </span>
+                                <p className="text-xs sm:text-sm font-sans font-semibold text-emerald-950 leading-relaxed whitespace-pre-line">
+                                  {item.latin}
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Indonesian Translation */}
+                            {showTranslation && (
+                              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                                <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-1">
+                                  Terjemahan Bahasa Indonesia:
+                                </span>
+                                <p className="text-xs sm:text-sm font-sans text-slate-700 leading-relaxed whitespace-pre-line">
+                                  {item.translation}
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Benefits List */}
+                            {item.benefits && item.benefits.length > 0 && (
+                              <div className="space-y-1.5 pt-1">
+                                <span className="text-xs font-bold text-emerald-900 block">
+                                  Mutiara Hikmah & Pengamalan:
+                                </span>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  {item.benefits.map((b, idx) => (
+                                    <div
+                                      key={idx}
+                                      className="flex items-start gap-2 text-xs text-slate-700 bg-white p-2 rounded-lg border border-slate-200/80"
+                                    >
+                                      <span className="text-amber-500 font-bold shrink-0">•</span>
+                                      <span>{b}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Action Toolbar */}
+                            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200">
+                              {/* Digital Tasbih / Counter */}
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleIncrementSholawat(item.id)}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                  <span>Hitung Wirid</span>
+                                  <span className="px-1.5 py-0.5 rounded-md bg-emerald-950/40 text-amber-200 text-[11px] font-mono">
+                                    {count}x
+                                  </span>
+                                </button>
+
+                                {count > 0 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleResetSholawat(item.id)}
+                                    className="p-1.5 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 cursor-pointer text-xs"
+                                    title="Reset Hitungan"
+                                  >
+                                    <RotateCcw className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* Copy Button */}
+                              <button
+                                type="button"
+                                onClick={() => handleCopySholawat(item)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs transition-all cursor-pointer"
+                              >
+                                {copiedSholawatId === item.id ? (
+                                  <>
+                                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                    <span className="text-emerald-700">Tersalin!</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="w-3.5 h-3.5 text-slate-500" />
+                                    <span>Salin Sholawat</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* Full Card Reading View (Rich, Spaced, and Beautiful) */
+                <div className="space-y-4">
+                  {filteredSholawat.map((item) => {
+                    const count = sholawatCounts[item.id] || 0;
+
+                    return (
+                      <div
+                        key={item.id}
+                        className="rounded-2xl bg-white border border-amber-200/90 shadow-xs hover:shadow-md transition-all overflow-hidden"
+                      >
+                        {/* Card Header */}
+                        <div className="px-4 py-3.5 bg-gradient-to-r from-[#03291d] via-[#054330] to-[#022218] text-white flex flex-wrap items-center justify-between gap-2.5">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-8 rounded-xl bg-amber-400/20 border border-amber-300/40 flex items-center justify-center text-amber-300 font-mono font-bold text-xs shrink-0 shadow-inner">
+                              {item.numberFormatted}
+                            </div>
+                            <div>
+                              <h3 className="text-sm sm:text-base font-bold text-white tracking-wide">
+                                {item.title}
+                              </h3>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-400/20 text-emerald-200 border border-emerald-300/30">
+                                  {item.categoryLabel}
+                                </span>
+                                {item.source && (
+                                  <span className="text-[11px] text-amber-200/80 truncate">
+                                    • {item.source}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {/* Calligraphic Arabic Title */}
+                            <span className="font-arabic text-base sm:text-lg font-bold text-amber-200">
+                              {item.arabicTitle}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Card Body */}
+                        <div className="p-4 sm:p-5 space-y-4">
+                          {/* Fadhilah Notice Box */}
+                          <div className="p-3 rounded-xl bg-amber-50/90 border border-amber-200 flex items-start gap-2.5">
+                            <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                            <div className="text-xs sm:text-sm text-amber-950 leading-relaxed font-sans">
+                              <span className="font-bold">Keutamaan: </span>
+                              {item.fadhilah}
+                            </div>
+                          </div>
+
+                          {/* Arabic Text (Prominent, High Contrast) */}
+                          <div className="p-4 sm:p-5 rounded-2xl bg-[#faf8f5] border border-emerald-100 shadow-inner">
+                            <p
+                              className={`text-right font-arabic font-bold text-slate-900 whitespace-pre-line ${getArabicSizeClass()}`}
+                              dir="rtl"
+                            >
+                              {item.arabic}
+                            </p>
+                          </div>
+
+                          {/* Latin Transliteration */}
+                          {showLatin && (
+                            <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-100">
+                              <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block mb-1">
+                                Transliterasi Latin:
+                              </span>
+                              <p className="text-xs sm:text-sm font-sans font-semibold text-emerald-950 leading-relaxed whitespace-pre-line">
+                                {item.latin}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Indonesian Translation */}
+                          {showTranslation && (
+                            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                              <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-1">
+                                Arti & Terjemahan:
+                              </span>
+                              <p className="text-xs sm:text-sm font-sans text-slate-700 leading-relaxed whitespace-pre-line">
+                                {item.translation}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Benefits Bullets */}
+                          {item.benefits && item.benefits.length > 0 && (
+                            <div className="space-y-1.5 pt-1">
+                              <span className="text-xs font-bold text-slate-700 block">
+                                Mutiara Faedah & Amalan:
+                              </span>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {item.benefits.map((b, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="flex items-start gap-2 text-xs text-slate-600 bg-[#fbf9f6] p-2 rounded-lg border border-slate-200"
+                                  >
+                                    <span className="text-amber-500 font-bold shrink-0">•</span>
+                                    <span>{b}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Action Footer */}
+                          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                            {/* Interactive Digital Tasbih */}
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleIncrementSholawat(item.id)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                                <span>Hitung Wirid</span>
+                                <span className="px-1.5 py-0.5 rounded-md bg-emerald-950/40 text-amber-200 text-[11px] font-mono">
+                                  {count}x
+                                </span>
+                              </button>
+
+                              {count > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleResetSholawat(item.id)}
+                                  className="p-1.5 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 cursor-pointer text-xs"
+                                  title="Reset Hitungan"
+                                >
+                                  <RotateCcw className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+
+                            {/* Copy Button */}
+                            <button
+                              type="button"
+                              onClick={() => handleCopySholawat(item)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs transition-all cursor-pointer"
+                            >
+                              {copiedSholawatId === item.id ? (
+                                <>
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                  <span className="text-emerald-700">Tersalin!</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3.5 h-3.5 text-slate-500" />
+                                  <span>Salin Sholawat</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 
