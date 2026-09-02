@@ -46,6 +46,8 @@ interface HeaderNavbarProps {
   onOpenWisdomModal?: () => void;
   onOpenPrayerModal?: () => void;
   onOpenSurahsModal?: (tab?: 'juz_amma' | 'yasin' | 'tahlil' | 'mahalul_qiyam' | 'dzikir_sholat' | 'doa_harian' | 'tata_cara_sholat') => void;
+  haidActiveCount?: number;
+  onOpenHaidNotification?: () => void;
   selectedCity?: CityLocation;
   hasUpdate?: boolean;
   isUpdating?: boolean;
@@ -81,6 +83,8 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
   onOpenWisdomModal,
   onOpenPrayerModal,
   onOpenSurahsModal,
+  haidActiveCount = 0,
+  onOpenHaidNotification,
   selectedCity,
   hasUpdate = false,
   isUpdating = false,
@@ -560,6 +564,24 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                         <CalendarCheck className="w-3.5 h-3.5 text-teal-300 shrink-0" />
                         <span>Kalender</span>
                       </button>
+
+                      {/* Notifikasi Haid (Sejajar dengan Kalender) */}
+                      {onOpenHaidNotification && (
+                        <button
+                          type="button"
+                          onClick={onOpenHaidNotification}
+                          title="Lihat Daftar Santriwati yang Sedang Haid"
+                          className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 active:scale-95 bg-gradient-to-r from-pink-600 via-rose-500 to-pink-600 hover:from-pink-500 hover:to-rose-400 text-white shadow-md ring-1 ring-pink-300/80 border border-pink-400/50"
+                        >
+                          <HeartPulse className="w-3.5 h-3.5 text-pink-200 shrink-0" />
+                          <span>Notifikasi Haid</span>
+                          {haidActiveCount > 0 && (
+                            <span className="bg-white text-rose-700 text-[10px] font-black px-1.5 py-0.2 rounded-full shadow-xs leading-none">
+                              {haidActiveCount}
+                            </span>
+                          )}
+                        </button>
+                      )}
 
                       {/* Catat Haid Tab for Admin */}
                       {isAdmin && (

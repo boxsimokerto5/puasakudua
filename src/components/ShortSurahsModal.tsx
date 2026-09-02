@@ -1017,47 +1017,47 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
                 {/* ========================================================= */}
                 {/* SURAH BANNER CARD (Bingkai / Frame Ornamen Presisi & Pas) */}
                 {/* ========================================================= */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-950 via-[#043e2e] to-emerald-950 border-2 border-amber-400/80 shadow-md mb-3 text-center relative overflow-hidden text-white">
+                <div className="py-5 px-4 sm:py-6 sm:px-6 rounded-2xl bg-gradient-to-r from-emerald-950 via-[#043e2e] to-emerald-950 border-2 border-amber-400/80 shadow-md mb-3.5 relative overflow-hidden text-white flex flex-col items-center justify-center text-center">
                   {/* Subtle Celestial Backdrop */}
                   <RamadanStarryBackdrop variant="emerald" showCrescent={true} />
 
                   {/* Ornate Frame Outer Line */}
                   <div className="absolute inset-1.5 border border-amber-300/30 rounded-xl pointer-events-none" />
 
-                  <div className="relative z-10 space-y-1.5">
+                  <div className="relative z-10 w-full flex flex-col items-center justify-center text-center space-y-2">
                     {/* Centered Category Pill Badge */}
-                    <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-400/20 border border-amber-300/50 text-amber-200 text-[11px] font-bold shadow-2xs backdrop-blur-xs">
-                      <Star className="w-3 h-3 text-amber-300 fill-amber-300" />
-                      <span>
+                    <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-400/20 border border-amber-300/50 text-amber-200 text-xs font-bold shadow-2xs backdrop-blur-xs leading-none mx-auto text-center">
+                      <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300 shrink-0" />
+                      <span className="leading-normal">
                         Surat ke-{currentSurah.number} • Golongan {currentSurah.type} • {currentSurah.totalVerses} Ayat
                       </span>
                     </div>
 
                     {/* Main Latin Title - Perfectly Centered & Symmetrical */}
-                    <h2 className="text-xl sm:text-2xl font-black text-amber-300 tracking-wide font-sans drop-shadow-xs">
+                    <h2 className="text-xl sm:text-2xl font-black text-amber-300 tracking-wide font-sans drop-shadow-xs text-center mx-auto">
                       Surat {currentSurah.name}
                     </h2>
 
                     {/* Arabic Calligraphic Title in an Ornate Frame Box */}
-                    <div className="inline-block my-0.5 px-5 py-1 rounded-xl bg-white/10 border border-amber-300/40 backdrop-blur-xs">
-                      <p className="text-2xl sm:text-3xl font-arabic font-bold text-amber-200 leading-normal">
+                    <div className="inline-flex items-center justify-center my-0.5 px-6 py-1.5 rounded-xl bg-white/10 border border-amber-300/40 backdrop-blur-xs mx-auto shadow-inner">
+                      <p className="text-2xl sm:text-3xl font-arabic font-bold text-amber-200 leading-normal text-center">
                         سُورَةُ {currentSurah.arabicName}
                       </p>
                     </div>
 
                     {/* Surah Meaning & Info */}
-                    <p className="text-xs text-emerald-100/90 font-medium">
+                    <p className="text-xs sm:text-sm text-emerald-100/90 font-medium text-center mx-auto max-w-lg leading-relaxed">
                       Artinya: <span className="text-white font-semibold">"{currentSurah.translation}"</span>
                     </p>
 
                     {/* Action Bar (Salin Seluruh Surat) */}
-                    <div className="flex items-center justify-center gap-2 pt-1">
+                    <div className="flex items-center justify-center gap-2 pt-1 mx-auto">
                       <button
                         type="button"
                         onClick={handleCopyWholeSurah}
-                        className="px-3 py-1 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 text-xs font-bold flex items-center gap-1.5 border border-amber-300/40 shadow-2xs transition-all cursor-pointer backdrop-blur-xs"
+                        className="px-3.5 py-1.5 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 text-xs font-bold flex items-center justify-center gap-1.5 border border-amber-300/40 shadow-2xs transition-all cursor-pointer backdrop-blur-xs"
                       >
-                        {isWholeSurahCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        {isWholeSurahCopied ? <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> : <Copy className="w-3.5 h-3.5 shrink-0" />}
                         <span>{isWholeSurahCopied ? 'Tersalin!' : `Salin Seluruh Surat ${currentSurah.name}`}</span>
                       </button>
                     </div>
@@ -1066,11 +1066,11 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
 
                 {/* Bismillah Header (Soft Light Card) */}
                 {currentSurah.bismillah && (
-                  <div className="py-3 my-2 text-center border border-amber-200/80 bg-white/85 rounded-xl shadow-2xs">
-                    <p className="text-2xl sm:text-3xl font-arabic text-amber-950 leading-relaxed font-bold">
+                  <div className="py-3.5 px-4 my-2 text-center border border-amber-200/80 bg-white/85 rounded-xl shadow-2xs flex flex-col items-center justify-center">
+                    <p className="text-2xl sm:text-3xl font-arabic text-amber-950 leading-relaxed font-bold text-center">
                       بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
                     </p>
-                    <p className="text-[11px] text-slate-500 mt-1 italic font-sans">
+                    <p className="text-xs text-slate-500 mt-1 italic font-sans text-center">
                       Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.
                     </p>
                   </div>
@@ -1190,40 +1190,40 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
               className="flex-1 overflow-y-auto p-3 sm:p-5 bg-gradient-to-b from-[#faf8f5] via-[#f6f2ea] to-[#f0ebe0] custom-scrollbar flex flex-col text-slate-800"
             >
               {/* Yasin Header Banner (Ornate Symmetrical Frame) */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#2c1202] via-[#4d2303] to-[#250f01] border-2 border-amber-400/80 shadow-md mb-3 text-center relative overflow-hidden text-white">
+              <div className="py-5 px-4 sm:py-6 sm:px-6 rounded-2xl bg-gradient-to-r from-[#2c1202] via-[#4d2303] to-[#250f01] border-2 border-amber-400/80 shadow-md mb-3.5 relative overflow-hidden text-white flex flex-col items-center justify-center text-center">
                 {/* Ramadan Starry Sky Backdrop */}
                 <RamadanStarryBackdrop variant="amber" showCrescent={true} />
 
                 {/* Ornate Frame Outer Line */}
                 <div className="absolute inset-1.5 border border-amber-300/30 rounded-xl pointer-events-none" />
 
-                <div className="relative z-10 space-y-1.5">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-400/20 border border-amber-300/50 text-amber-200 text-[11px] font-bold shadow-2xs backdrop-blur-xs">
-                    <Moon className="w-3.5 h-3.5 text-amber-300 fill-amber-300 animate-pulse" />
-                    <span>🌙 Berkah Malam Ramadhan • Jantung Al-Qur'an (Qalbul Qur'an) ✨</span>
+                <div className="relative z-10 w-full flex flex-col items-center justify-center text-center space-y-2">
+                  <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-400/20 border border-amber-300/50 text-amber-200 text-xs font-bold shadow-2xs backdrop-blur-xs leading-none mx-auto text-center">
+                    <Moon className="w-3.5 h-3.5 text-amber-300 fill-amber-300 animate-pulse shrink-0" />
+                    <span className="leading-normal">🌙 Berkah Malam Ramadhan • Jantung Al-Qur'an (Qalbul Qur'an) ✨</span>
                   </div>
 
-                  <h2 className="text-xl sm:text-2xl font-black text-amber-300 tracking-wide font-sans drop-shadow-xs">
+                  <h2 className="text-xl sm:text-2xl font-black text-amber-300 tracking-wide font-sans drop-shadow-xs text-center mx-auto">
                     Surat Yasin
                   </h2>
 
-                  <div className="inline-block my-0.5 px-5 py-1 rounded-xl bg-white/10 border border-amber-300/40 backdrop-blur-xs">
-                    <p className="text-2xl sm:text-3xl font-arabic font-bold text-amber-200 leading-normal">
+                  <div className="inline-flex items-center justify-center my-0.5 px-6 py-1.5 rounded-xl bg-white/10 border border-amber-300/40 backdrop-blur-xs mx-auto shadow-inner">
+                    <p className="text-2xl sm:text-3xl font-arabic font-bold text-amber-200 leading-normal text-center">
                       سُورَةُ يسٓ
                     </p>
                   </div>
 
-                  <p className="text-xs text-amber-100/90 font-medium">
+                  <p className="text-xs sm:text-sm text-amber-100/90 font-medium text-center mx-auto max-w-lg leading-relaxed">
                     "Yasin" • Surah ke-36 • Golongan Makkiyyah • 83 Ayat
                   </p>
 
-                  <div className="flex items-center justify-center gap-2 pt-1">
+                  <div className="flex items-center justify-center gap-2 pt-1 mx-auto">
                     <button
                       type="button"
                       onClick={handleCopyWholeSurah}
-                      className="px-3.5 py-1.5 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 text-xs font-bold flex items-center gap-1.5 border border-amber-300/40 shadow-2xs transition-all cursor-pointer backdrop-blur-xs"
+                      className="px-3.5 py-1.5 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 text-xs font-bold flex items-center justify-center gap-1.5 border border-amber-300/40 shadow-2xs transition-all cursor-pointer backdrop-blur-xs"
                     >
-                      {isWholeSurahCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      {isWholeSurahCopied ? <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> : <Copy className="w-3.5 h-3.5 shrink-0" />}
                       <span>{isWholeSurahCopied ? 'Tersalin!' : 'Salin Seluruh Surat Yasin'}</span>
                     </button>
                   </div>
@@ -1231,11 +1231,11 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
               </div>
 
               {/* Bismillah Header (Soft Light Card) */}
-              <div className="py-3 my-2 text-center border border-amber-200/80 bg-white/85 rounded-xl shadow-2xs">
-                <p className="text-2xl sm:text-3xl font-arabic text-amber-950 leading-relaxed font-bold">
+              <div className="py-3.5 px-4 my-2 text-center border border-amber-200/80 bg-white/85 rounded-xl shadow-2xs flex flex-col items-center justify-center">
+                <p className="text-2xl sm:text-3xl font-arabic text-amber-950 leading-relaxed font-bold text-center">
                   بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
                 </p>
-                <p className="text-[11px] text-slate-500 mt-1 italic font-sans">
+                <p className="text-xs text-slate-500 mt-1 italic font-sans text-center">
                   Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.
                 </p>
               </div>
@@ -1328,39 +1328,39 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
               className="flex-1 overflow-y-auto p-3 sm:p-5 bg-gradient-to-b from-[#faf8f5] via-[#f6f2ea] to-[#f0ebe0] custom-scrollbar flex flex-col text-slate-800"
             >
               {/* Tahlil Header Banner (Ornate Symmetrical Frame - Pas & Elegan) */}
-              <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-[#02202a] via-[#043e50] to-[#021c25] border-2 border-cyan-400/80 shadow-lg mb-3.5 text-center relative overflow-hidden text-white">
+              <div className="py-5 px-4 sm:py-6 sm:px-6 rounded-2xl bg-gradient-to-br from-[#02202a] via-[#043e50] to-[#021c25] border-2 border-cyan-400/80 shadow-lg mb-3.5 relative overflow-hidden text-white flex flex-col items-center justify-center text-center">
                 <RamadanStarryBackdrop variant="cyan" showCrescent={true} />
 
                 {/* Ornate Frame Double Border */}
                 <div className="absolute inset-1.5 sm:inset-2 border border-cyan-300/40 rounded-xl pointer-events-none" />
                 <div className="absolute inset-2.5 sm:inset-3 border border-cyan-400/20 rounded-lg pointer-events-none" />
 
-                <div className="relative z-10 space-y-2 max-w-2xl mx-auto px-1 sm:px-2">
+                <div className="relative z-10 w-full flex flex-col items-center justify-center text-center space-y-2 max-w-2xl mx-auto px-1 sm:px-2">
                   {/* Top Badge: Susunan Bacaan & Doa Khusus Arwah */}
-                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-cyan-400/20 border border-cyan-300/60 text-cyan-200 text-xs font-bold shadow-xs backdrop-blur-xs">
+                  <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-cyan-400/20 border border-cyan-300/60 text-cyan-200 text-xs font-bold shadow-xs backdrop-blur-xs leading-none mx-auto text-center">
                     <BookMarked className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
-                    <span>Susunan Bacaan & Doa Khusus Arwah</span>
+                    <span className="leading-normal">Susunan Bacaan & Doa Khusus Arwah</span>
                   </div>
 
                   {/* Main Title Latin */}
-                  <h2 className="text-lg sm:text-2xl font-black text-cyan-200 tracking-wide font-sans drop-shadow-sm">
+                  <h2 className="text-lg sm:text-2xl font-black text-cyan-200 tracking-wide font-sans drop-shadow-sm text-center mx-auto">
                     Tahlil & Doa Khusus Arwah
                   </h2>
 
                   {/* Arabic Calligraphy in a Dedicated Frame Box */}
-                  <div className="inline-block my-1 px-5 sm:px-7 py-1.5 rounded-xl bg-slate-950/40 border border-cyan-300/50 backdrop-blur-xs shadow-inner">
-                    <p className="text-xl sm:text-3xl font-arabic font-bold text-cyan-100 leading-normal drop-shadow-xs">
+                  <div className="inline-flex items-center justify-center my-1 px-6 sm:px-8 py-1.5 rounded-xl bg-slate-950/40 border border-cyan-300/50 backdrop-blur-xs shadow-inner mx-auto">
+                    <p className="text-xl sm:text-3xl font-arabic font-bold text-cyan-100 leading-normal drop-shadow-xs text-center">
                       تَرْتِيْبُ التَّهْلِيْلِ وَالدُّعَاءِ لِلأَمْوَاتِ
                     </p>
                   </div>
 
                   {/* Subtitle Description */}
-                  <p className="text-[11px] sm:text-xs text-cyan-100/90 font-medium leading-relaxed max-w-xl mx-auto">
+                  <p className="text-xs sm:text-sm text-cyan-100/90 font-medium leading-relaxed max-w-xl mx-auto text-center">
                     Tawasul Al-Fatihah • Surat Pilihan • Dzikir & Tahlil • Doa Khusus Ahli Kubur / Arwah
                   </p>
 
                   {/* Section Filter Pills */}
-                  <div className="flex items-center justify-center gap-1.5 pt-2 flex-wrap text-xs">
+                  <div className="flex items-center justify-center gap-1.5 pt-2 flex-wrap text-xs mx-auto">
                     <button
                       type="button"
                       onClick={() => setTahlilSectionFilter('all')}
@@ -1534,35 +1534,35 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
               className="flex-1 overflow-y-auto p-3 sm:p-5 bg-gradient-to-b from-[#faf8f5] via-[#f6f2ea] to-[#f0ebe0] custom-scrollbar flex flex-col text-slate-800"
             >
               {/* Mahalul Qiyam Header Banner (Ornate Symmetrical Frame) */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#380816] via-[#5e1026] to-[#300612] border-2 border-amber-400/80 shadow-md mb-3 text-center relative overflow-hidden text-white">
+              <div className="py-5 px-4 sm:py-6 sm:px-6 rounded-2xl bg-gradient-to-r from-[#380816] via-[#5e1026] to-[#300612] border-2 border-amber-400/80 shadow-md mb-3.5 relative overflow-hidden text-white flex flex-col items-center justify-center text-center">
                 {/* Ramadan Starry Sky Backdrop */}
                 <RamadanStarryBackdrop variant="rose" showCrescent={true} />
 
                 {/* Ornate Frame Outer Line */}
                 <div className="absolute inset-1.5 border border-amber-300/30 rounded-xl pointer-events-none" />
 
-                <div className="relative z-10 space-y-1.5">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-gradient-to-r from-amber-400/20 via-rose-500/25 to-amber-400/20 border border-amber-300/50 text-amber-200 text-[11px] font-bold shadow-2xs backdrop-blur-xs">
-                    <Moon className="w-3.5 h-3.5 text-amber-300 fill-amber-300 animate-pulse" />
-                    <span>🌙 Nuansa Berkah Ramadhan • Maulid Simtudduror & Ad-Diba'i ✨</span>
+                <div className="relative z-10 w-full flex flex-col items-center justify-center text-center space-y-2">
+                  <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-gradient-to-r from-amber-400/20 via-rose-500/25 to-amber-400/20 border border-amber-300/50 text-amber-200 text-xs font-bold shadow-2xs backdrop-blur-xs leading-none mx-auto text-center">
+                    <Moon className="w-3.5 h-3.5 text-amber-300 fill-amber-300 animate-pulse shrink-0" />
+                    <span className="leading-normal">🌙 Nuansa Berkah Ramadhan • Maulid Simtudduror & Ad-Diba'i ✨</span>
                   </div>
 
-                  <h2 className="text-xl sm:text-2xl font-black text-amber-300 tracking-wide font-sans drop-shadow-xs">
+                  <h2 className="text-xl sm:text-2xl font-black text-amber-300 tracking-wide font-sans drop-shadow-xs text-center mx-auto">
                     Mahalul Qiyam
                   </h2>
 
-                  <div className="inline-block my-0.5 px-5 py-1 rounded-xl bg-white/10 border border-amber-300/40 backdrop-blur-xs">
-                    <p className="text-2xl sm:text-3xl font-arabic font-bold text-amber-200 leading-normal">
+                  <div className="inline-flex items-center justify-center my-0.5 px-6 py-1.5 rounded-xl bg-white/10 border border-amber-300/40 backdrop-blur-xs mx-auto shadow-inner">
+                    <p className="text-2xl sm:text-3xl font-arabic font-bold text-amber-200 leading-normal text-center">
                       مَحَلُّ الْقِيَامِ الشَّرِيْفِ
                     </p>
                   </div>
 
-                  <p className="text-xs text-rose-100/90 max-w-lg mx-auto leading-relaxed font-medium">
+                  <p className="text-xs sm:text-sm text-rose-100/90 max-w-lg mx-auto leading-relaxed font-medium text-center">
                     Bait Qasidah & Shalawat Berdiri Menyambut Kelahiran Baginda Nabi Muhammad SAW Penuh Cinta & Ketakziman
                   </p>
 
                   {/* Section Filter Pills for Mahalul Qiyam */}
-                  <div className="flex items-center justify-center gap-1.5 pt-1.5 flex-wrap text-xs">
+                  <div className="flex items-center justify-center gap-1.5 pt-1.5 flex-wrap text-xs mx-auto">
                     <button
                       type="button"
                       onClick={() => setMqSectionFilter('all')}
@@ -1754,34 +1754,34 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
               className="flex-1 overflow-y-auto p-3 sm:p-5 bg-gradient-to-b from-[#faf8f5] via-[#f5f2eb] to-[#efebe2] custom-scrollbar flex flex-col text-slate-800"
             >
               {/* Dzikir Sholat Header Banner */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-900 border border-emerald-700/50 shadow-md mb-3 text-center relative overflow-hidden text-white">
+              <div className="py-5 px-4 sm:py-6 sm:px-6 rounded-2xl bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-900 border border-emerald-700/50 shadow-md mb-3.5 relative overflow-hidden text-white flex flex-col items-center justify-center text-center">
                 <RamadanStarryBackdrop variant="emerald" showCrescent={true} />
                 <div className="absolute top-0 right-0 opacity-10 font-arabic text-8xl select-none pointer-events-none p-2 text-emerald-200">
                   أَذْكَارُ الصَّلَاةِ
                 </div>
                 
-                <div className="relative z-10 space-y-1.5">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-200 text-[11px] font-bold shadow-2xs backdrop-blur-xs">
-                    <Layers className="w-3.5 h-3.5 text-amber-300" />
-                    <span>Wirid & Doa Ba'da Sholat Fardhu</span>
+                <div className="relative z-10 w-full flex flex-col items-center justify-center text-center space-y-2">
+                  <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-200 text-xs font-bold shadow-2xs backdrop-blur-xs leading-none mx-auto text-center">
+                    <Layers className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                    <span className="leading-normal">Wirid & Doa Ba'da Sholat Fardhu</span>
                   </div>
 
-                  <h2 className="text-xl sm:text-2xl font-black text-amber-300 tracking-wide font-sans drop-shadow-xs">
+                  <h2 className="text-xl sm:text-2xl font-black text-amber-300 tracking-wide font-sans drop-shadow-xs text-center mx-auto">
                     Dzikir & Doa Sesudah Sholat
                   </h2>
                   
-                  <div className="inline-block my-0.5 px-5 py-1 rounded-xl bg-white/10 border border-amber-300/40 backdrop-blur-xs">
-                    <p className="text-2xl sm:text-3xl font-arabic font-bold text-emerald-100 leading-normal">
+                  <div className="inline-flex items-center justify-center my-0.5 px-6 py-1.5 rounded-xl bg-white/10 border border-amber-300/40 backdrop-blur-xs mx-auto shadow-inner">
+                    <p className="text-2xl sm:text-3xl font-arabic font-bold text-emerald-100 leading-normal text-center">
                       أَذْكَارُ وَأَدْعِيَةُ بَعْدَ الصَّلَاةِ الْمَكْتُوبَةِ
                     </p>
                   </div>
 
-                  <p className="text-xs text-emerald-100/90 max-w-xl mx-auto leading-relaxed font-medium">
+                  <p className="text-xs sm:text-sm text-emerald-100/90 max-w-xl mx-auto leading-relaxed font-medium text-center">
                     Susunan bacaan istighfar, ayat kursi, tasbih 33x, dan doa memohon keselamatan dunia-akhirat sesuai Sunnah Rasulullah SAW
                   </p>
 
                   {/* Section Filter Pills for Dzikir Sholat */}
-                  <div className="flex items-center justify-center gap-1.5 pt-1.5 flex-wrap text-xs">
+                  <div className="flex items-center justify-center gap-1.5 pt-1.5 flex-wrap text-xs mx-auto">
                     <button
                       type="button"
                       onClick={() => setDzikirSectionFilter('all')}
@@ -1978,34 +1978,34 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
               className="flex-1 overflow-y-auto p-3 sm:p-5 bg-gradient-to-b from-[#faf8f5] via-[#f5f2eb] to-[#efebe2] custom-scrollbar flex flex-col text-slate-800"
             >
               {/* Doa Harian Header Banner */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-teal-950 via-emerald-900 to-teal-900 border border-teal-700/50 shadow-md mb-3 text-center relative overflow-hidden text-white">
+              <div className="py-5 px-4 sm:py-6 sm:px-6 rounded-2xl bg-gradient-to-r from-teal-950 via-emerald-900 to-teal-900 border border-teal-700/50 shadow-md mb-3.5 relative overflow-hidden text-white flex flex-col items-center justify-center text-center">
                 <RamadanStarryBackdrop variant="teal" showCrescent={true} />
                 <div className="absolute top-0 right-0 opacity-10 font-arabic text-8xl select-none pointer-events-none p-2 text-emerald-200">
                   الأَدْعِيَةُ
                 </div>
                 
-                <div className="relative z-10 space-y-1.5">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-200 text-[11px] font-bold shadow-2xs backdrop-blur-xs">
-                    <HeartHandshake className="w-3.5 h-3.5 text-amber-300" />
-                    <span>Kumpulan Doa Pilihan Santri & Umat Islam</span>
+                <div className="relative z-10 w-full flex flex-col items-center justify-center text-center space-y-2">
+                  <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-200 text-xs font-bold shadow-2xs backdrop-blur-xs leading-none mx-auto text-center">
+                    <HeartHandshake className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                    <span className="leading-normal">Kumpulan Doa Pilihan Santri & Umat Islam</span>
                   </div>
 
-                  <h2 className="text-xl sm:text-2xl font-black text-amber-300 tracking-wide font-sans drop-shadow-xs">
+                  <h2 className="text-xl sm:text-2xl font-black text-amber-300 tracking-wide font-sans drop-shadow-xs text-center mx-auto">
                     Doa-Doa Harian Lengkap
                   </h2>
                   
-                  <div className="inline-block my-0.5 px-5 py-1 rounded-xl bg-white/10 border border-teal-300/40 backdrop-blur-xs">
-                    <p className="text-2xl sm:text-3xl font-arabic font-bold text-teal-100 leading-normal">
+                  <div className="inline-flex items-center justify-center my-0.5 px-6 py-1.5 rounded-xl bg-white/10 border border-teal-300/40 backdrop-blur-xs mx-auto shadow-inner">
+                    <p className="text-2xl sm:text-3xl font-arabic font-bold text-teal-100 leading-normal text-center">
                       الأَدْعِيَةُ الْيَوْمِيَّةُ الْمَأْثُورَةُ
                     </p>
                   </div>
 
-                  <p className="text-xs text-teal-100/90 max-w-xl mx-auto leading-relaxed font-medium">
+                  <p className="text-xs sm:text-sm text-teal-100/90 max-w-xl mx-auto leading-relaxed font-medium text-center">
                     Kumpulan doa sehari-hari bersumber dari Al-Qur'an dan Sunnah Rasulullah SAW lengkap dengan adab, teks Arab, Latin, dan Terjemahan
                   </p>
 
                   {/* Category Filter Pills for Doa Harian */}
-                  <div className="flex items-center justify-center gap-1.5 pt-1.5 flex-wrap text-xs">
+                  <div className="flex items-center justify-center gap-1.5 pt-1.5 flex-wrap text-xs mx-auto">
                     <button
                       type="button"
                       onClick={() => setDoaCategoryFilter('all')}
@@ -2215,25 +2215,25 @@ export const ShortSurahsModal: React.FC<ShortSurahsModalProps> = ({
           {mainTab === 'tata_cara_sholat' && (
             <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 space-y-4 custom-scrollbar bg-[#faf8f5]">
               {/* Header Banner */}
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#03281d] via-[#043e2d] to-[#022017] p-4 sm:p-5 text-white border border-emerald-700/60 shadow-md">
+              <div className="py-5 px-4 sm:py-6 sm:px-6 rounded-2xl bg-gradient-to-r from-[#03281d] via-[#043e2d] to-[#022017] text-white border border-emerald-700/60 shadow-md relative overflow-hidden flex flex-col items-center justify-center text-center">
                 <RamadanStarryBackdrop variant="emerald" showCrescent={true} />
-                <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="p-1 rounded-lg bg-amber-400/20 text-amber-300 border border-amber-300/30">
-                        <Compass className="w-4 h-4" />
-                      </span>
-                      <h3 className="text-base sm:text-lg font-black text-amber-200 tracking-wide font-sans">
-                        Panduan Tata Cara Sholat & Fikih Ibadah
-                      </h3>
-                    </div>
-                    <p className="text-xs sm:text-sm text-emerald-200/90 mt-1 max-w-2xl">
-                      Panduan lengkap gerakan, bacaan rukun, lafal niat sholat fardhu & sunnah, wudhu, tayamum, serta sujud sahwi / tilawah / syukur sesuai sunnah Rasulullah SAW.
-                    </p>
+                <div className="relative z-10 w-full flex flex-col items-center justify-center text-center space-y-2 max-w-2xl mx-auto">
+                  <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-400/20 border border-amber-300/30 text-amber-200 text-xs font-bold shadow-2xs backdrop-blur-xs leading-none mx-auto text-center">
+                    <Compass className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                    <span className="leading-normal">Panduan Praktis & Fikih Ibadah Terpadu</span>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+
+                  <h3 className="text-lg sm:text-2xl font-black text-amber-200 tracking-wide font-sans text-center mx-auto">
+                    Panduan Tata Cara Sholat & Fikih Ibadah
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-emerald-200/90 max-w-xl mx-auto leading-relaxed text-center">
+                    Panduan lengkap gerakan, bacaan rukun, lafal niat sholat fardhu & sunnah, wudhu, tayamum, serta sujud sahwi / tilawah / syukur sesuai sunnah Rasulullah SAW.
+                  </p>
+
+                  <div className="flex items-center justify-center gap-2 pt-1 mx-auto">
                     <span className="px-3 py-1 rounded-xl text-xs font-bold bg-amber-400/20 text-amber-300 border border-amber-300/40">
-                      {filteredSholatGuide.length} Materi Panduan
+                      {filteredSholatGuide.length} Materi Panduan Tersedia
                     </span>
                   </div>
                 </div>

@@ -42,6 +42,7 @@ import { CalendarView } from './components/CalendarView';
 import { CatatHaidView } from './components/CatatHaidView';
 import { DaftarHaidView } from './components/DaftarHaidView';
 import { DaftarSuciView } from './components/DaftarSuciView';
+import { HaidNotificationModal } from './components/HaidNotificationModal';
 import { StudentDataModal } from './components/StudentDataModal';
 import { StudentPhotoUploadModal } from './components/StudentPhotoUploadModal';
 import { SupabaseConfigModal } from './components/SupabaseConfigModal';
@@ -169,7 +170,13 @@ export default function App() {
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [photoTargetStudent, setPhotoTargetStudent] = useState<Student | null>(null);
+  const [isHaidNotificationModalOpen, setIsHaidNotificationModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Active Haid Count
+  const activeHaidCount = useMemo(() => {
+    return haidRecords.filter((r) => r.status === 'haid_aktif').length;
+  }, [haidRecords]);
 
   // Helper to open student photo modal
   const handleOpenPhotoModal = useCallback((student?: Student) => {
@@ -711,6 +718,8 @@ export default function App() {
             onOpenWisdomModal={() => setShowWisdomModal(true)}
             onOpenPrayerModal={() => setShowPrayerModal(true)}
             onOpenSurahsModal={(tab) => handleOpenSurahsModal(tab || 'juz_amma')}
+            haidActiveCount={activeHaidCount}
+            onOpenHaidNotification={() => setIsHaidNotificationModalOpen(true)}
             selectedCity={selectedCity}
             hasUpdate={autoUpdate.hasUpdate}
             isUpdating={autoUpdate.isUpdating}
@@ -854,6 +863,7 @@ export default function App() {
                 <FastingInputterView
                   students={students}
                   activeSession={activeSession}
+                  haidRecords={haidRecords}
                   onUpdateRecord={handleUpdateRecord}
                   onBulkUpdateRecords={handleBulkUpdateRecords}
                   onOpenStudentModal={() => setIsStudentModalOpen(true)}
@@ -877,6 +887,7 @@ export default function App() {
                 <FastingInputterView
                   students={students}
                   activeSession={activeSession}
+                  haidRecords={haidRecords}
                   onUpdateRecord={handleUpdateRecord}
                   onBulkUpdateRecords={handleBulkUpdateRecords}
                   onOpenPhotoModal={() => handleOpenPhotoModal()}
@@ -1031,6 +1042,16 @@ export default function App() {
             loadCloudData();
             showToast('Data berhasil disinkronkan ke Supabase Cloud!');
           }}
+        />
+      )}
+
+      {/* Notifikasi Haid Siswi Modal */}
+      {isHaidNotificationModalOpen && (
+        <HaidNotificationModal
+          isOpen={isHaidNotificationModalOpen}
+          onClose={() => setIsHaidNotificationModalOpen(false)}
+          haidRecords={haidRecords}
+          students={students}
         />
       )}
     </>

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { Student, FastingSession, FastingStatus } from '../types';
+import { Student, FastingSession, FastingStatus, HaidRecord } from '../types';
 import { getUniqueClasses } from '../data/students';
 import { PdfExportModal } from './PdfExportModal';
 import { DormCardModal } from './DormCardModal';
@@ -32,7 +32,7 @@ import {
   ScanBarcode,
   Volume2,
   LogOut,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react';
 import {
   playScanSuccessSound,
@@ -43,6 +43,7 @@ import {
 interface FastingInputterViewProps {
   students: Student[];
   activeSession: FastingSession;
+  haidRecords?: HaidRecord[];
   onUpdateRecord: (studentId: number, status: FastingStatus, notes?: string) => void;
   onBulkUpdateRecords: (updates: { studentId: number; status: FastingStatus }[]) => void;
   onOpenStudentModal?: () => void;
@@ -56,6 +57,7 @@ interface FastingInputterViewProps {
 export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
   students,
   activeSession,
+  haidRecords = [],
   onUpdateRecord,
   onBulkUpdateRecords,
   onOpenStudentModal,
@@ -539,7 +541,7 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
               <span>PDF Rekap</span>
             </button>
 
-            {/* 7. Keluar Button */}
+            {/* 6. Keluar Button */}
             {onLogout && (
               <button
                 type="button"
