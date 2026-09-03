@@ -357,40 +357,97 @@ export const PrayerAttendanceView: React.FC<PrayerAttendanceViewProps> = ({
     }
   };
 
-  // Camera scanner lifecycle
+  // Camera scanner lifecycle & safety refs
+  const processScannedCodeRef = useRef(processScannedCode);
   useEffect(() => {
+    processScannedCodeRef.current = processScannedCode;
+  });
+  const lastScannedTimeRef = useRef<number>(0);
+
+  useEffect(() => {
+    const safeStopScanner = async (scanner: Html5Qrcode | null) => {
+      if (!scanner) return;
+      try {
+        if (scanner.isScanning) {
+          await scanner.stop();
+        }
+      } catch {
+        // Safe ignore
+      }
+      try {
+        scanner.clear();
+      } catch {
+        // Safe ignore
+      }
+    };
+
     if (!isCameraActive) {
-      if (scannerInstanceRef.current && scannerInstanceRef.current.isScanning) {
-        scannerInstanceRef.current.stop().then(() => scannerInstanceRef.current?.clear()).catch(() => {});
+      if (scannerInstanceRef.current) {
+        const inst = scannerInstanceRef.current;
+        scannerInstanceRef.current = null;
+        safeStopScanner(inst);
       }
       return;
     }
 
-    const html5QrCode = new Html5Qrcode(qrRegionId);
-    scannerInstanceRef.current = html5QrCode;
-    setCameraError(null);
+    let isMounted = true;
+    let localScanner: Html5Qrcode | null = null;
 
-    html5QrCode
-      .start(
-        { facingMode: 'environment' },
-        { fps: 15, qrbox: { width: 260, height: 180 } },
-        (decodedText) => {
-          processScannedCode(decodedText);
-        },
-        () => {}
-      )
-      .catch((err) => {
+    const startCamera = async () => {
+      // Allow DOM element to mount
+      await new Promise((r) => setTimeout(r, 120));
+      if (!isMounted) return;
+
+      const element = document.getElementById(qrRegionId);
+      if (!element) return;
+
+      try {
+        localScanner = new Html5Qrcode(qrRegionId);
+        scannerInstanceRef.current = localScanner;
+        setCameraError(null);
+
+        await localScanner.start(
+          { facingMode: 'environment' },
+          { fps: 15, qrbox: { width: 260, height: 180 } },
+          (decodedText) => {
+            if (!isMounted) return;
+            const now = Date.now();
+            if (now - lastScannedTimeRef.current < 1200) return;
+            lastScannedTimeRef.current = now;
+            processScannedCodeRef.current(decodedText);
+          },
+          () => {}
+        );
+
+        if (!isMounted && localScanner) {
+          await safeStopScanner(localScanner);
+        }
+      } catch (err: unknown) {
+        if (!isMounted) return;
         console.error('Camera sholat error:', err);
-        setCameraError('Gagal mengakses kamera. Izinkan akses kamera pada browser Anda.');
-        setIsCameraActive(false);
-      });
-
-    return () => {
-      if (html5QrCode.isScanning) {
-        html5QrCode.stop().then(() => html5QrCode.clear()).catch(() => {});
+        const errMsg = String(err || '');
+        if (errMsg.includes('NotAllowedError') || errMsg.includes('Permission denied')) {
+          setCameraError('Akses kamera diblokir. Izinkan izin kamera pada browser Anda.');
+        } else if (errMsg.includes('Cannot transition')) {
+          // Ignore transient transition error
+        } else {
+          setCameraError('Gagal mengakses kamera. Pastikan kamera terhubung.');
+        }
       }
     };
-  }, [isCameraActive, selectedPrayer, selectedDate, inputStatusMode]);
+
+    startCamera();
+
+    return () => {
+      isMounted = false;
+      if (localScanner) {
+        const inst = localScanner;
+        localScanner = null;
+        scannerInstanceRef.current = null;
+        safeStopScanner(inst);
+      }
+    };
+  }, [isCameraActive]);
 
   // Bulk mark all remaining absent as 'tidak_hadir'
   const handleBulkMarkAbsent = () => {
@@ -469,14 +526,14 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 text-slate-100 pb-16">
-      {/* Top Emerald/Gold Banner & Live Clock Info (Compact & Clean) */}
-      <div className="bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 border-b border-emerald-800/40 px-3 py-2.5 sm:px-5 shadow-lg">
+    <div className="min-h-screen bg-gradient-to-b from-[#f4fbf7] via-[#edf7f2] to-[#e4f3eb] text-slate-800 pb-16">
+      {/* Top Emerald/Gold Banner & Live Clock Info (Compact, Lembut Terang Islami) */}
+      <div className="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 border-b border-emerald-700/50 px-3 py-2.5 sm:px-5 shadow-sm text-white">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 p-0.5 shadow-md shadow-emerald-500/20 flex items-center justify-center shrink-0">
-              <div className="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
-                <Clock className="w-4.5 h-4.5 text-emerald-400 animate-pulse" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-400 via-teal-300 to-amber-300 p-0.5 shadow-md shadow-emerald-950/20 flex items-center justify-center shrink-0">
+              <div className="w-full h-full bg-emerald-900 rounded-[10px] flex items-center justify-center">
+                <Clock className="w-4.5 h-4.5 text-emerald-300 animate-pulse" />
               </div>
             </div>
             <div>
@@ -484,11 +541,11 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                 <h1 className="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-1.5">
                   Presensi Sholat Berjamaah
                 </h1>
-                <span className="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                <span className="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-amber-400/20 text-amber-200 border border-amber-400/40 font-serif">
                   {currentSlotInfo.arabicLabel}
                 </span>
               </div>
-              <p className="text-[11px] text-emerald-200/80">
+              <p className="text-[11px] text-emerald-100/90 font-medium">
                 Scanner Cepat & Pemantauan Disiplin Ibadah Santri SRT 1 Kediri
               </p>
             </div>
@@ -496,24 +553,24 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
 
           {/* Real-time Digital Clock & Status Badge */}
           <div className="flex flex-wrap items-center gap-2">
-            <div className="bg-slate-900/90 border border-emerald-500/30 rounded-xl px-3 py-1.5 flex items-center gap-2.5 shadow-inner text-xs">
+            <div className="bg-emerald-950/60 border border-emerald-600/40 rounded-xl px-3 py-1.5 flex items-center gap-2.5 shadow-inner text-xs text-white">
               <div className="text-right">
-                <div className="text-[10px] text-slate-400 leading-tight">Waktu Server</div>
-                <div className="text-sm font-mono font-bold text-emerald-300 leading-none mt-0.5">
+                <div className="text-[10px] text-emerald-200/80 leading-tight">Waktu Server</div>
+                <div className="text-sm font-mono font-bold text-amber-300 leading-none mt-0.5">
                   {currentTime.toLocaleTimeString('id-ID')} WIB
                 </div>
               </div>
-              <div className="h-6 w-px bg-slate-800" />
+              <div className="h-6 w-px bg-emerald-700/60" />
               <div className="text-left">
-                <div className="text-[10px] text-slate-400 leading-tight">Aturan Jam</div>
+                <div className="text-[10px] text-emerald-200/80 leading-tight">Aturan Jam</div>
                 <div className="text-xs font-semibold leading-none mt-0.5">
                   {calculatedStatusAtMoment.status === 'tepat_waktu' ? (
-                    <span className="text-emerald-400 flex items-center gap-1">
+                    <span className="text-emerald-200 flex items-center gap-1 font-bold">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
                       🟢 Tepat Waktu ({currentSlotInfo.onTimeStart} - {currentSlotInfo.onTimeEnd})
                     </span>
                   ) : (
-                    <span className="text-amber-400 flex items-center gap-1">
+                    <span className="text-amber-200 flex items-center gap-1 font-bold">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                       🟡 Terlambat / Masbuq (&gt; {currentSlotInfo.onTimeEnd})
                     </span>
@@ -523,13 +580,13 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
             </div>
 
             {/* Date Picker */}
-            <div className="flex items-center gap-1.5 bg-slate-900/80 border border-slate-700/60 rounded-xl px-2.5 py-1.5 text-xs">
-              <Calendar className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <div className="flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-600/40 rounded-xl px-2.5 py-1.5 text-xs text-emerald-100">
+              <Calendar className="w-3.5 h-3.5 text-amber-300 shrink-0" />
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer"
+                className="bg-transparent text-xs text-white font-medium focus:outline-none cursor-pointer"
               />
             </div>
           </div>
@@ -537,7 +594,7 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
       </div>
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 pt-3 space-y-2.5">
-        {/* 5 Waktu Sholat Selector Bar (Compact) */}
+        {/* 5 Waktu Sholat Selector Bar (Compact & Soft Islamic Nuance) */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 sm:gap-2">
           {(['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'] as PrayerName[]).map((prayerKey) => {
             const slot = PRAYER_SLOTS[prayerKey];
@@ -550,8 +607,8 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                 onClick={() => setSelectedPrayer(prayerKey)}
                 className={`relative px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border text-left transition-all duration-150 overflow-hidden cursor-pointer ${
                   isSelected
-                    ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white border-emerald-400 shadow-md shadow-emerald-900/40 ring-1 ring-emerald-400/50'
-                    : 'bg-slate-900/80 text-slate-300 border-slate-800 hover:border-slate-700 hover:bg-slate-850'
+                    ? 'bg-gradient-to-br from-emerald-700 via-teal-700 to-emerald-800 text-white border-emerald-600 shadow-md ring-2 ring-emerald-400/40'
+                    : 'bg-white/95 text-slate-700 border-emerald-100 hover:border-emerald-300 hover:bg-emerald-50/50 shadow-xs'
                 }`}
               >
                 {isAutoActive && (
@@ -561,10 +618,14 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                   </span>
                 )}
                 <div className="flex items-center justify-between">
-                  <div className="text-[10px] opacity-75 font-serif">{slot.arabicLabel}</div>
+                  <div className={`text-[10.5px] font-serif ${isSelected ? 'text-amber-200' : 'text-emerald-700 font-bold'}`}>
+                    {slot.arabicLabel}
+                  </div>
                 </div>
-                <div className="font-bold text-xs sm:text-sm capitalize leading-tight">{slot.label}</div>
-                <div className="text-[10px] opacity-80 mt-0.5 font-mono">
+                <div className={`font-bold text-xs sm:text-sm capitalize leading-tight ${isSelected ? 'text-white' : 'text-slate-800'}`}>
+                  {slot.label}
+                </div>
+                <div className={`text-[10px] mt-0.5 font-mono ${isSelected ? 'text-emerald-200' : 'text-slate-500'}`}>
                   {slot.onTimeStart} - {slot.onTimeEnd}
                 </div>
               </button>
@@ -572,90 +633,90 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
           })}
         </div>
 
-        {/* Dynamic Rule Description Banner (Compact & Clean) */}
-        <div className="bg-slate-900/90 border border-emerald-500/20 rounded-xl px-3 py-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-slate-300 shadow-sm">
+        {/* Dynamic Rule Description Banner (Compact & Soft Islamic Nuance) */}
+        <div className="bg-white/95 border border-emerald-200/80 rounded-xl px-3 py-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-slate-700 shadow-xs">
           <div className="flex items-center gap-2">
-            <div className="p-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+            <div className="p-1 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
               <Info className="w-4 h-4" />
             </div>
             <div className="text-[11.5px] leading-tight">
-              <span className="font-bold text-white">Ketentuan {currentSlotInfo.label}:</span>{' '}
-              {currentSlotInfo.description}
+              <span className="font-bold text-emerald-900">Ketentuan {currentSlotInfo.label}:</span>{' '}
+              <span className="text-slate-600">{currentSlotInfo.description}</span>
             </div>
           </div>
           <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
             <button
               onClick={handleCopyReport}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 text-[11px] font-semibold transition-colors cursor-pointer"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-[11px] font-bold transition-colors cursor-pointer"
             >
-              {copiedState ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+              {copiedState ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3 text-emerald-700" />}
               {copiedState ? 'Tersalin!' : 'Salin Laporan WA'}
             </button>
           </div>
         </div>
 
-        {/* Quick Stats Grid (Compact 6-Columns) */}
+        {/* Quick Stats Grid (Compact 6-Columns - Soft Islamic Palette) */}
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 sm:gap-2">
-          <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-2.5 shadow-xs">
-            <div className="text-[10.5px] text-slate-400">Total Santri</div>
-            <div className="text-lg sm:text-xl font-black text-white mt-0.5">{stats.totalSantri}</div>
-            <div className="text-[10px] text-slate-500">Semua santri</div>
+          <div className="bg-white border border-slate-200/90 rounded-xl p-2.5 shadow-xs">
+            <div className="text-[10.5px] text-slate-500 font-medium">Total Santri</div>
+            <div className="text-lg sm:text-xl font-black text-slate-800 mt-0.5">{stats.totalSantri}</div>
+            <div className="text-[10px] text-slate-400">Semua santri</div>
           </div>
 
-          <div className="bg-emerald-950/40 border border-emerald-800/40 rounded-xl p-2.5 shadow-xs">
-            <div className="text-[10.5px] text-emerald-400 flex items-center gap-1 truncate">
-              <CheckCircle2 className="w-3 h-3 shrink-0" /> Tepat Waktu
+          <div className="bg-emerald-50/80 border border-emerald-200 rounded-xl p-2.5 shadow-xs">
+            <div className="text-[10.5px] text-emerald-800 font-bold flex items-center gap-1 truncate">
+              <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" /> Tepat Waktu
             </div>
-            <div className="text-lg sm:text-xl font-black text-emerald-300 mt-0.5">{stats.tepatWaktu}</div>
-            <div className="text-[10px] text-emerald-400/70">{stats.persentaseTepatWaktu}% dr hadir</div>
+            <div className="text-lg sm:text-xl font-black text-emerald-700 mt-0.5">{stats.tepatWaktu}</div>
+            <div className="text-[10px] text-emerald-600/80 font-medium">{stats.persentaseTepatWaktu}% dr hadir</div>
           </div>
 
-          <div className="bg-amber-950/40 border border-amber-800/40 rounded-xl p-2.5 shadow-xs">
-            <div className="text-[10.5px] text-amber-400 flex items-center gap-1 truncate">
-              <Clock className="w-3 h-3 shrink-0" /> Terlambat
+          <div className="bg-amber-50/80 border border-amber-200 rounded-xl p-2.5 shadow-xs">
+            <div className="text-[10.5px] text-amber-800 font-bold flex items-center gap-1 truncate">
+              <Clock className="w-3 h-3 text-amber-600 shrink-0" /> Terlambat
             </div>
-            <div className="text-lg sm:text-xl font-black text-amber-300 mt-0.5">{stats.terlambat}</div>
-            <div className="text-[10px] text-amber-400/70">Masbuq</div>
+            <div className="text-lg sm:text-xl font-black text-amber-700 mt-0.5">{stats.terlambat}</div>
+            <div className="text-[10px] text-amber-600/80 font-medium">Masbuq</div>
           </div>
 
-          <div className="bg-pink-950/40 border border-pink-800/40 rounded-xl p-2.5 shadow-xs">
-            <div className="text-[10.5px] text-pink-400 flex items-center gap-1 truncate">
-              <Droplets className="w-3 h-3 shrink-0" /> Udzur Haid
+          <div className="bg-pink-50/80 border border-pink-200 rounded-xl p-2.5 shadow-xs">
+            <div className="text-[10.5px] text-pink-800 font-bold flex items-center gap-1 truncate">
+              <Droplets className="w-3 h-3 text-pink-600 shrink-0" /> Udzur Haid
             </div>
-            <div className="text-lg sm:text-xl font-black text-pink-300 mt-0.5">{stats.haid}</div>
-            <div className="text-[10px] text-pink-400/70">Sinkron haid</div>
+            <div className="text-lg sm:text-xl font-black text-pink-700 mt-0.5">{stats.haid}</div>
+            <div className="text-[10px] text-pink-600/80 font-medium">Sinkron haid</div>
           </div>
 
-          <div className="bg-blue-950/40 border border-blue-800/40 rounded-xl p-2.5 shadow-xs">
-            <div className="text-[10.5px] text-blue-400 flex items-center gap-1 truncate">
-              <HeartPulse className="w-3 h-3 shrink-0" /> Sakit / Izin
+          <div className="bg-blue-50/80 border border-blue-200 rounded-xl p-2.5 shadow-xs">
+            <div className="text-[10.5px] text-blue-800 font-bold flex items-center gap-1 truncate">
+              <HeartPulse className="w-3 h-3 text-blue-600 shrink-0" /> Sakit / Izin
             </div>
-            <div className="text-lg sm:text-xl font-black text-blue-300 mt-0.5">{stats.sakit + stats.izin}</div>
-            <div className="text-[10px] text-blue-400/70">Asrama/Izin</div>
+            <div className="text-lg sm:text-xl font-black text-blue-700 mt-0.5">{stats.sakit + stats.izin}</div>
+            <div className="text-[10px] text-blue-600/80 font-medium">Asrama/Izin</div>
           </div>
 
-          <div className="bg-rose-950/40 border border-rose-800/40 rounded-xl p-2.5 shadow-xs">
-            <div className="text-[10.5px] text-rose-400 flex items-center gap-1 truncate">
-              <UserX className="w-3 h-3 shrink-0" /> Belum Hadir
+          <div className="bg-rose-50/80 border border-rose-200 rounded-xl p-2.5 shadow-xs">
+            <div className="text-[10.5px] text-rose-800 font-bold flex items-center gap-1 truncate">
+              <UserX className="w-3 h-3 text-rose-600 shrink-0" /> Belum Hadir
             </div>
-            <div className="text-lg sm:text-xl font-black text-rose-300 mt-0.5">{stats.belumAbsen}</div>
-            <div className="text-[10px] text-rose-400/70">Ghaib / Alpa</div>
+            <div className="text-lg sm:text-xl font-black text-rose-700 mt-0.5">{stats.belumAbsen}</div>
+            <div className="text-[10px] text-rose-600/80 font-medium">Ghaib / Alpa</div>
           </div>
         </div>
 
-        {/* Tab Navigation Navigation (Rapat & Rapi) */}
-        <div className="flex border-b border-slate-800 gap-1 sm:gap-2 overflow-x-auto pb-0.5 pt-1">
+        {/* Tab Navigation (Rapat & Rapi - Nuansa Lembut Terang) */}
+        <div className="flex border-b border-emerald-200/80 gap-1 sm:gap-2 overflow-x-auto pb-0.5 pt-1">
           <button
             onClick={() => setActiveTab('input')}
             className={`flex items-center gap-1.5 px-3 py-1.5 font-bold text-xs rounded-t-lg transition-all border-b-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'input'
-                ? 'border-emerald-400 text-emerald-400 bg-slate-900/90'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-emerald-600 text-emerald-800 bg-white shadow-xs'
+                : 'border-transparent text-slate-500 hover:text-emerald-800 hover:bg-emerald-50/50'
             }`}
           >
             <Camera className="w-3.5 h-3.5" />
             <span>Input Presensi</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-mono font-bold">
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-mono font-bold">
               {stats.totalHadir}
             </span>
           </button>
@@ -664,14 +725,14 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
             onClick={() => setActiveTab('terlambat')}
             className={`flex items-center gap-1.5 px-3 py-1.5 font-bold text-xs rounded-t-lg transition-all border-b-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'terlambat'
-                ? 'border-amber-400 text-amber-400 bg-slate-900/90'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-amber-600 text-amber-800 bg-white shadow-xs'
+                : 'border-transparent text-slate-500 hover:text-amber-800 hover:bg-amber-50/50'
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
             <span>Daftar Terlambat</span>
             {stats.terlambat > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500/20 text-amber-300 font-mono font-bold">
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 text-amber-800 font-mono font-bold">
                 {stats.terlambat}
               </span>
             )}
@@ -681,14 +742,14 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
             onClick={() => setActiveTab('tidak_hadir')}
             className={`flex items-center gap-1.5 px-3 py-1.5 font-bold text-xs rounded-t-lg transition-all border-b-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'tidak_hadir'
-                ? 'border-rose-400 text-rose-400 bg-slate-900/90'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-rose-600 text-rose-800 bg-white shadow-xs'
+                : 'border-transparent text-slate-500 hover:text-rose-800 hover:bg-rose-50/50'
             }`}
           >
             <UserX className="w-3.5 h-3.5" />
             <span>Belum Hadir & Udzur</span>
             {stats.belumAbsen > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500/20 text-rose-300 font-mono font-bold">
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-100 text-rose-800 font-mono font-bold">
                 {stats.belumAbsen}
               </span>
             )}
@@ -698,8 +759,8 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
             onClick={() => setActiveTab('rekap')}
             className={`flex items-center gap-1.5 px-3 py-1.5 font-bold text-xs rounded-t-lg transition-all border-b-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'rekap'
-                ? 'border-teal-400 text-teal-400 bg-slate-900/90'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-teal-600 text-teal-800 bg-white shadow-xs'
+                : 'border-transparent text-slate-500 hover:text-teal-800 hover:bg-teal-50/50'
             }`}
           >
             <Share2 className="w-3.5 h-3.5" />
@@ -715,23 +776,23 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
             {/* Left Column: Scanner & Quick Action Bar (5 Cols) */}
             <div className="lg:col-span-5 space-y-3">
               {/* Camera Scanner Box */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-lg">
+              <div className="bg-white border border-emerald-100/90 rounded-2xl p-3.5 sm:p-4 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+                    <div className="p-1.5 rounded-lg bg-emerald-100 text-emerald-800">
                       <Camera className="w-4 h-4" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-white text-sm">Kamera Scanner Barcode / QR</h3>
-                      <p className="text-[11px] text-slate-400">Arahkan kartu santri ke kamera</p>
+                      <h3 className="font-bold text-emerald-950 text-sm">Kamera Scanner Barcode / QR</h3>
+                      <p className="text-[11px] text-slate-500">Arahkan kartu santri ke kamera</p>
                     </div>
                   </div>
                   <button
                     onClick={() => setIsCameraActive(!isCameraActive)}
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer ${
                       isCameraActive
-                        ? 'bg-rose-600 hover:bg-rose-500 text-white'
-                        : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                        ? 'bg-rose-600 hover:bg-rose-700 text-white'
+                        : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                     }`}
                   >
                     {isCameraActive ? 'Matikan' : 'Buka Kamera'}
@@ -740,19 +801,19 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
 
                 {/* Inline Camera Reader Box */}
                 {isCameraActive ? (
-                  <div className="relative rounded-xl overflow-hidden bg-black aspect-video border border-emerald-500/30 flex items-center justify-center">
+                  <div className="relative rounded-xl overflow-hidden bg-black aspect-video border border-emerald-500/50 flex items-center justify-center shadow-inner">
                     <div id={qrRegionId} className="w-full h-full" />
                   </div>
                 ) : (
-                  <div className="rounded-xl border-2 border-dashed border-slate-800 p-5 text-center bg-slate-950/50 flex flex-col items-center justify-center">
-                    <Camera className="w-8 h-8 text-slate-600 mb-1.5" />
-                    <p className="text-xs font-semibold text-slate-300">Kamera Scanner Siaga</p>
-                    <p className="text-[11px] text-slate-500 max-w-xs mt-0.5">
+                  <div className="rounded-xl border-2 border-dashed border-emerald-200/80 p-5 text-center bg-emerald-50/40 flex flex-col items-center justify-center">
+                    <Camera className="w-8 h-8 text-emerald-600/70 mb-1.5" />
+                    <p className="text-xs font-bold text-emerald-900">Kamera Scanner Siaga</p>
+                    <p className="text-[11px] text-slate-600 max-w-xs mt-0.5">
                       Gunakan kamera HP/laptop, scanner barcode USB, atau ketik NIK di bawah.
                     </p>
                     <button
                       onClick={() => setIsCameraActive(true)}
-                      className="mt-2.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition-colors shadow-sm cursor-pointer"
+                      className="mt-2.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-colors shadow-xs cursor-pointer"
                     >
                       Buka Scanner Kamera
                     </button>
@@ -760,8 +821,8 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                 )}
 
                 {cameraError && (
-                  <div className="mt-2.5 p-2 bg-rose-950/50 border border-rose-800 text-rose-300 text-xs rounded-lg flex items-center gap-2">
-                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  <div className="mt-2.5 p-2 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-lg flex items-center gap-2">
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-rose-600" />
                     <span>{cameraError}</span>
                   </div>
                 )}
@@ -774,7 +835,7 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                   }}
                   className="mt-3"
                 >
-                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
                     Input Cepat Barcode / NIK:
                   </label>
                   <div className="flex gap-1.5">
@@ -783,11 +844,11 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                       value={manualInputCode}
                       onChange={(e) => setManualInputCode(e.target.value)}
                       placeholder="Scan USB atau ketik NIK..."
-                      className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                      className="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                     />
                     <button
                       type="submit"
-                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition-colors shadow-xs shrink-0 cursor-pointer"
+                      className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-colors shadow-xs shrink-0 cursor-pointer"
                     >
                       Enter
                     </button>
@@ -795,45 +856,45 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                 </form>
 
                 {/* Mode Override Status Selector */}
-                <div className="mt-3 pt-2.5 border-t border-slate-800">
-                  <div className="text-[11px] font-semibold text-slate-400 mb-1.5">Override Mode Status:</div>
+                <div className="mt-3 pt-2.5 border-t border-slate-150">
+                  <div className="text-[11px] font-bold text-slate-700 mb-1.5">Override Mode Status:</div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                     <button
                       onClick={() => setInputStatusMode('auto')}
-                      className={`px-2 py-1.5 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+                      className={`px-2 py-1.5 rounded-lg text-[11px] font-bold border transition-all cursor-pointer ${
                         inputStatusMode === 'auto'
-                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500'
-                          : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700'
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-emerald-50/60 hover:border-emerald-300'
                       }`}
                     >
-                      ⚡ Otomatis Jam
+                      ⚡ Otomatis
                     </button>
                     <button
                       onClick={() => setInputStatusMode('tepat_waktu')}
-                      className={`px-2 py-1.5 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+                      className={`px-2 py-1.5 rounded-lg text-[11px] font-bold border transition-all cursor-pointer ${
                         inputStatusMode === 'tepat_waktu'
-                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500'
-                          : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700'
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-emerald-50/60 hover:border-emerald-300'
                       }`}
                     >
                       🟢 Tepat
                     </button>
                     <button
                       onClick={() => setInputStatusMode('terlambat')}
-                      className={`px-2 py-1.5 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+                      className={`px-2 py-1.5 rounded-lg text-[11px] font-bold border transition-all cursor-pointer ${
                         inputStatusMode === 'terlambat'
-                          ? 'bg-amber-500/20 text-amber-300 border-amber-500'
-                          : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700'
+                          ? 'bg-amber-600 text-white border-amber-600 shadow-xs'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-amber-50/60 hover:border-amber-300'
                       }`}
                     >
                       🟡 Terlambat
                     </button>
                     <button
                       onClick={() => setInputStatusMode('sakit')}
-                      className={`px-2 py-1.5 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+                      className={`px-2 py-1.5 rounded-lg text-[11px] font-bold border transition-all cursor-pointer ${
                         inputStatusMode === 'sakit'
-                          ? 'bg-blue-500/20 text-blue-300 border-blue-500'
-                          : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700'
+                          ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-blue-50/60 hover:border-blue-300'
                       }`}
                     >
                       🏥 Sakit/Izin
@@ -844,13 +905,13 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
 
               {/* Instant Scan Result Toast / Feedback Card */}
               {lastScannedResult && (
-                <div className="bg-gradient-to-r from-emerald-950/80 to-slate-900 border border-emerald-500/40 rounded-2xl p-3 shadow-md animate-fade-in">
+                <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-300 rounded-2xl p-3 shadow-sm animate-fade-in">
                   <div className="flex items-center gap-3">
                     {lastScannedResult.student.foto ? (
                       <img
                         src={lastScannedResult.student.foto}
                         alt={lastScannedResult.student.nama}
-                        className="w-11 h-11 rounded-xl object-cover border border-emerald-500 shadow-xs shrink-0"
+                        className="w-11 h-11 rounded-xl object-cover border border-emerald-400 shadow-xs shrink-0"
                       />
                     ) : (
                       <div className="w-11 h-11 rounded-xl bg-emerald-700 text-white font-bold text-sm flex items-center justify-center shadow-xs shrink-0">
@@ -859,17 +920,17 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-bold text-white text-xs sm:text-sm truncate">
+                        <h4 className="font-bold text-emerald-950 text-xs sm:text-sm truncate">
                           {lastScannedResult.student.nama}
                         </h4>
-                        <span className="text-[10.5px] text-slate-400 font-mono">
+                        <span className="text-[10.5px] text-slate-500 font-mono">
                           {lastScannedResult.record.scanTime}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-400 truncate">
+                      <p className="text-[11px] text-slate-600 truncate">
                         Kelas: {lastScannedResult.student.kelas} | NIK: {lastScannedResult.student.nik}
                       </p>
-                      <div className="mt-0.5 text-[11px] font-semibold text-emerald-300">
+                      <div className="mt-0.5 text-[11px] font-bold text-emerald-800">
                         {lastScannedResult.message}
                       </div>
                     </div>
@@ -879,14 +940,14 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
             </div>
 
             {/* Right Column: Quick Student Search & 1-Click Action Table (7 Cols) */}
-            <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-lg flex flex-col">
+            <div className="lg:col-span-7 bg-white border border-emerald-100/90 rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-2.5">
                 <div>
-                  <h3 className="font-bold text-white text-sm flex items-center gap-1.5">
-                    <Search className="w-3.5 h-3.5 text-emerald-400" />
+                  <h3 className="font-bold text-emerald-950 text-sm flex items-center gap-1.5">
+                    <Search className="w-3.5 h-3.5 text-emerald-600" />
                     Pencarian & Absensi Manual
                   </h3>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-slate-500">
                     Klik tombol untuk tandai hadir atau terlambat
                   </p>
                 </div>
@@ -896,7 +957,7 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                   <select
                     value={selectedClass}
                     onChange={(e) => setSelectedClass(e.target.value)}
-                    className="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-300 focus:outline-none"
+                    className="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:bg-white focus:outline-none focus:border-emerald-500"
                   >
                     <option value="ALL">Semua Kelas</option>
                     {classList.map((cls) => (
@@ -909,7 +970,7 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                   <select
                     value={selectedGender}
                     onChange={(e) => setSelectedGender(e.target.value as any)}
-                    className="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-300 focus:outline-none"
+                    className="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:bg-white focus:outline-none focus:border-emerald-500"
                   >
                     <option value="ALL">Semua Santri</option>
                     <option value="Laki-laki">Santriwan (L)</option>
@@ -920,13 +981,13 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
 
               {/* Search input field */}
               <div className="relative mb-2.5">
-                <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Ketik nama santri atau NIK..."
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
 
@@ -947,15 +1008,15 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                         className={`flex items-center justify-between p-2 sm:p-2.5 rounded-xl border transition-all ${
                           rec
                             ? rec.status === 'tepat_waktu'
-                              ? 'bg-emerald-950/20 border-emerald-800/40 text-slate-200'
+                              ? 'bg-emerald-50/80 border-emerald-200 text-slate-800'
                               : rec.status === 'terlambat'
-                              ? 'bg-amber-950/20 border-amber-800/40 text-slate-200'
+                              ? 'bg-amber-50/80 border-amber-200 text-slate-800'
                               : rec.status === 'haid'
-                              ? 'bg-pink-950/20 border-pink-800/40 text-slate-200'
-                              : 'bg-slate-950/60 border-slate-800 text-slate-200'
+                              ? 'bg-pink-50/80 border-pink-200 text-slate-800'
+                              : 'bg-slate-50 border-slate-200 text-slate-800'
                             : isHaid
-                            ? 'bg-pink-950/10 border-pink-900/30 text-slate-300'
-                            : 'bg-slate-950/40 border-slate-800/60 hover:border-slate-700 text-slate-300'
+                            ? 'bg-pink-50/50 border-pink-200/80 text-slate-700'
+                            : 'bg-white border-slate-200 hover:border-emerald-200 hover:bg-emerald-50/30 text-slate-700'
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
@@ -963,25 +1024,25 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                             <img
                               src={student.foto}
                               alt={student.nama}
-                              className="w-8 h-8 rounded-lg object-cover border border-slate-700 cursor-pointer shrink-0"
+                              className="w-8 h-8 rounded-lg object-cover border border-slate-200 cursor-pointer shrink-0"
                               onClick={() => onOpenPhotoModal?.(student)}
                             />
                           ) : (
-                            <div className="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 font-bold text-xs flex items-center justify-center shrink-0">
+                            <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0">
                               {student.nama.substring(0, 2).toUpperCase()}
                             </div>
                           )}
 
                           <div className="min-w-0">
-                            <div className="font-semibold text-xs sm:text-sm text-white truncate flex items-center gap-1.5">
+                            <div className="font-bold text-xs sm:text-sm text-slate-900 truncate flex items-center gap-1.5">
                               {student.nama}
                               {isHaid && (
-                                <span className="px-1 py-0.2 rounded text-[9.5px] bg-pink-500/20 text-pink-300 border border-pink-500/30 font-medium">
+                                <span className="px-1.5 py-0.2 rounded text-[9.5px] bg-pink-100 text-pink-800 border border-pink-200 font-medium">
                                   Haid
                                 </span>
                               )}
                             </div>
-                            <div className="text-[11px] text-slate-400 truncate">
+                            <div className="text-[11px] text-slate-500 truncate">
                               {student.kelas} | NIK: {student.nik}
                             </div>
                           </div>
@@ -992,14 +1053,14 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                           {rec ? (
                             <div className="flex items-center gap-1.5">
                               <span
-                                className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold border ${
+                                className={`px-2 py-0.5 rounded-lg text-[11px] font-bold border ${
                                   rec.status === 'tepat_waktu'
-                                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
                                     : rec.status === 'terlambat'
-                                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                                    ? 'bg-amber-100 text-amber-800 border-amber-300'
                                     : rec.status === 'haid'
-                                    ? 'bg-pink-500/20 text-pink-300 border-pink-500/40'
-                                    : 'bg-slate-800 text-slate-300 border-slate-700'
+                                    ? 'bg-pink-100 text-pink-800 border-pink-300'
+                                    : 'bg-slate-100 text-slate-700 border-slate-200'
                                 }`}
                               >
                                 {rec.status === 'tepat_waktu' && '🟢 Tepat'}
@@ -1015,9 +1076,9 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                                   updateRecords(filtered);
                                 }}
                                 title="Hapus / Reset Absen"
-                                className="p-1 rounded-md text-slate-500 hover:text-rose-400 hover:bg-slate-800 cursor-pointer"
+                                className="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer transition-colors"
                               >
-                                <XCircle className="w-3.5 h-3.5" />
+                                <XCircle className="w-4 h-4" />
                               </button>
                             </div>
                           ) : (
@@ -1025,14 +1086,14 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                               <button
                                 onClick={() => handleRecordAttendance(student, 'tepat_waktu')}
                                 title="Tandai Tepat Waktu"
-                                className="px-2 py-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+                                className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors shadow-xs cursor-pointer"
                               >
                                 + Tepat
                               </button>
                               <button
                                 onClick={() => handleRecordAttendance(student, 'terlambat')}
                                 title="Tandai Terlambat / Masbuq"
-                                className="px-2 py-1 bg-amber-700 hover:bg-amber-600 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+                                className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-colors shadow-xs cursor-pointer"
                               >
                                 + Telat
                               </button>
@@ -1052,43 +1113,43 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
         {/* TAB 2: DAFTAR TERLAMBAT (MASBUQ / KETERLAMBATAN) */}
         {/* ========================================================================= */}
         {activeTab === 'terlambat' && (
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-lg">
+          <div className="bg-white border border-emerald-100/90 rounded-2xl p-3.5 sm:p-4 shadow-sm">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 mb-3">
               <div>
-                <h3 className="font-bold text-white text-base flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-amber-400" />
+                <h3 className="font-bold text-emerald-950 text-base flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-amber-600" />
                   Daftar Santri Terlambat / Masbuq ({currentSlotInfo.label})
                 </h3>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] text-slate-500">
                   Santri yang hadir setelah batas waktu tepat ({currentSlotInfo.onTimeEnd} WIB)
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg text-xs font-bold">
+                <span className="px-2.5 py-1 bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-bold">
                   Total: {lateStudents.length} Santri
                 </span>
                 <button
                   onClick={handleCopyReport}
-                  className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="px-2.5 py-1 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
-                  <Copy className="w-3 h-3" /> Salin Data
+                  <Copy className="w-3 h-3 text-slate-600" /> Salin Data
                 </button>
               </div>
             </div>
 
             {lateStudents.length === 0 ? (
-              <div className="p-8 text-center bg-slate-950/40 rounded-xl border border-slate-800/80">
-                <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-                <h4 className="font-bold text-white text-sm">Alhamdulillah, Tidak Ada Santri Terlambat</h4>
-                <p className="text-xs text-slate-400 mt-0.5">
+              <div className="p-8 text-center bg-emerald-50/40 rounded-xl border border-emerald-100">
+                <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
+                <h4 className="font-bold text-emerald-950 text-sm">Alhamdulillah, Tidak Ada Santri Terlambat</h4>
+                <p className="text-xs text-slate-600 mt-0.5">
                   Seluruh santri hadir tepat waktu sebelum pukul {currentSlotInfo.onTimeEnd} WIB.
                 </p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs text-slate-300">
-                  <thead className="bg-slate-950 text-[11px] uppercase font-semibold text-slate-400 border-b border-slate-800">
+                <table className="w-full text-left text-xs text-slate-700">
+                  <thead className="bg-emerald-50 text-[11px] uppercase font-bold text-emerald-900 border-b border-emerald-100">
                     <tr>
                       <th className="px-3 py-2">No</th>
                       <th className="px-3 py-2">Santri</th>
@@ -1099,35 +1160,35 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                       <th className="px-3 py-2 text-right">Aksi</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60 font-medium">
+                  <tbody className="divide-y divide-slate-100 font-medium">
                     {lateStudents.map((item, idx) => (
-                      <tr key={item.record.id} className="hover:bg-slate-850/50 transition-colors">
-                        <td className="px-3 py-2 text-slate-500 font-mono text-xs">{idx + 1}</td>
+                      <tr key={item.record.id} className="hover:bg-amber-50/30 transition-colors">
+                        <td className="px-3 py-2 text-slate-400 font-mono text-xs">{idx + 1}</td>
                         <td className="px-3 py-2">
                           <div className="flex items-center gap-2">
                             {item.student?.foto ? (
                               <img
                                 src={item.student.foto}
                                 alt={item.student.nama}
-                                className="w-7 h-7 rounded-lg object-cover border border-slate-700 shrink-0"
+                                className="w-7 h-7 rounded-lg object-cover border border-slate-200 shrink-0"
                               />
                             ) : (
-                              <div className="w-7 h-7 rounded-lg bg-slate-800 text-slate-300 font-bold text-xs flex items-center justify-center shrink-0">
+                              <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0">
                                 {item.student?.nama.substring(0, 2).toUpperCase()}
                               </div>
                             )}
                             <div>
-                              <div className="font-bold text-white text-xs">{item.student?.nama}</div>
+                              <div className="font-bold text-slate-900 text-xs">{item.student?.nama}</div>
                               <div className="text-[10.5px] text-slate-500 font-mono">NIK: {item.student?.nik}</div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-3 py-2 text-slate-300">{item.student?.kelas}</td>
-                        <td className="px-3 py-2 font-mono text-amber-300 font-bold">
+                        <td className="px-3 py-2 text-slate-700">{item.student?.kelas}</td>
+                        <td className="px-3 py-2 font-mono text-amber-700 font-bold">
                           {item.record.scanTime} WIB
                         </td>
                         <td className="px-3 py-2">
-                          <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 text-[11px] font-semibold">
+                          <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[11px] font-bold">
                             +{item.record.lateMinutes || 0} Menit
                           </span>
                         </td>
@@ -1142,7 +1203,7 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                               updateRecords(updated);
                             }}
                             placeholder="Alasan (cth: wudhu)..."
-                            className="bg-slate-950 border border-slate-700/80 rounded-md px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-amber-500 w-36 sm:w-44"
+                            className="bg-slate-50 border border-slate-200 rounded-md px-2 py-1 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-amber-500 w-36 sm:w-44"
                           />
                         </td>
                         <td className="px-3 py-2 text-right">
@@ -1153,7 +1214,7 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                               );
                               updateRecords(updated);
                             }}
-                            className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-[11px] text-emerald-400 rounded-md border border-slate-700 font-semibold cursor-pointer"
+                            className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-[11px] text-emerald-800 rounded-md border border-emerald-200 font-bold cursor-pointer transition-colors"
                           >
                             Ubah ke Tepat
                           </button>
@@ -1171,14 +1232,14 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
         {/* TAB 3: DAFTAR BELUM HADIR / ALPA & UDZUR */}
         {/* ========================================================================= */}
         {activeTab === 'tidak_hadir' && (
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-lg">
+          <div className="bg-white border border-emerald-100/90 rounded-2xl p-3.5 sm:p-4 shadow-sm">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 mb-3">
               <div>
-                <h3 className="font-bold text-white text-base flex items-center gap-1.5">
-                  <UserX className="w-4 h-4 text-rose-400" />
+                <h3 className="font-bold text-emerald-950 text-base flex items-center gap-1.5">
+                  <UserX className="w-4 h-4 text-rose-600" />
                   Daftar Belum Hadir & Udzur ({currentSlotInfo.label})
                 </h3>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] text-slate-500">
                   Santri yang belum presensi atau berhalangan syar'i / sakit
                 </p>
               </div>
@@ -1186,7 +1247,7 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={handleBulkMarkAbsent}
-                  className="px-3 py-1.5 bg-rose-700 hover:bg-rose-600 text-white rounded-lg text-xs font-bold transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer"
                 >
                   <UserX className="w-3.5 h-3.5" />
                   Tandai Sisa Belum Absen Sebagai Alpa
@@ -1195,14 +1256,14 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
             </div>
 
             {/* Quick Filters (Compact) */}
-            <div className="flex items-center gap-2 mb-3 bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs">
-              <span className="text-slate-400 font-semibold flex items-center gap-1 text-[11px]">
-                <Filter className="w-3 h-3" /> Filter Kelas:
+            <div className="flex items-center gap-2 mb-3 bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs">
+              <span className="text-slate-600 font-bold flex items-center gap-1 text-[11px]">
+                <Filter className="w-3 h-3 text-emerald-700" /> Filter Kelas:
               </span>
               <select
                 value={selectedClass}
                 onChange={(e) => setSelectedClass(e.target.value)}
-                className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-0.5 text-xs text-slate-200"
+                className="bg-white border border-slate-200 rounded-lg px-2 py-0.5 text-xs text-slate-700 focus:outline-none focus:border-emerald-500"
               >
                 <option value="ALL">Semua Kelas</option>
                 {classList.map((c) => (
@@ -1214,17 +1275,17 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
             </div>
 
             {absentStudents.length === 0 ? (
-              <div className="p-8 text-center bg-slate-950/40 rounded-xl border border-slate-800/80">
-                <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-                <h4 className="font-bold text-white text-sm">Masya Allah, Seluruh Santri Hadir Lengkap</h4>
-                <p className="text-xs text-slate-400 mt-0.5">
+              <div className="p-8 text-center bg-emerald-50/40 rounded-xl border border-emerald-100">
+                <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
+                <h4 className="font-bold text-emerald-950 text-sm">Masya Allah, Seluruh Santri Hadir Lengkap</h4>
+                <p className="text-xs text-slate-600 mt-0.5">
                   Tidak ada santri yang alpa atau belum terdata pada sesi {currentSlotInfo.label}.
                 </p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs text-slate-300">
-                  <thead className="bg-slate-950 text-[11px] uppercase font-semibold text-slate-400 border-b border-slate-800">
+                <table className="w-full text-left text-xs text-slate-700">
+                  <thead className="bg-emerald-50 text-[11px] uppercase font-bold text-emerald-900 border-b border-emerald-100">
                     <tr>
                       <th className="px-3 py-2">No</th>
                       <th className="px-3 py-2">Santri</th>
@@ -1233,45 +1294,45 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                       <th className="px-3 py-2 text-right">Tindakan Cepat</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60 font-medium">
+                  <tbody className="divide-y divide-slate-100 font-medium">
                     {absentStudents.map((item, idx) => (
-                      <tr key={item.student.id} className="hover:bg-slate-850/50 transition-colors">
-                        <td className="px-3 py-2 text-slate-500 font-mono text-xs">{idx + 1}</td>
+                      <tr key={item.student.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-3 py-2 text-slate-400 font-mono text-xs">{idx + 1}</td>
                         <td className="px-3 py-2">
                           <div className="flex items-center gap-2">
                             {item.student.foto ? (
                               <img
                                 src={item.student.foto}
                                 alt={item.student.nama}
-                                className="w-7 h-7 rounded-lg object-cover border border-slate-700 shrink-0"
+                                className="w-7 h-7 rounded-lg object-cover border border-slate-200 shrink-0"
                               />
                             ) : (
-                              <div className="w-7 h-7 rounded-lg bg-slate-800 text-slate-300 font-bold text-xs flex items-center justify-center shrink-0">
+                              <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0">
                                 {item.student.nama.substring(0, 2).toUpperCase()}
                               </div>
                             )}
                             <div>
-                              <div className="font-bold text-white text-xs">{item.student.nama}</div>
+                              <div className="font-bold text-slate-900 text-xs">{item.student.nama}</div>
                               <div className="text-[10.5px] text-slate-500 font-mono">NIK: {item.student.nik}</div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-3 py-2 text-slate-300">{item.student.kelas}</td>
+                        <td className="px-3 py-2 text-slate-700">{item.student.kelas}</td>
                         <td className="px-3 py-2">
                           {item.effectiveStatus === 'haid' ? (
-                            <span className="px-2 py-0.5 rounded-md bg-pink-500/20 text-pink-300 border border-pink-500/30 text-[11px] font-semibold flex items-center gap-1 w-max">
+                            <span className="px-2 py-0.5 rounded-md bg-pink-100 text-pink-800 border border-pink-200 text-[11px] font-bold flex items-center gap-1 w-max">
                               <Droplets className="w-2.5 h-2.5" /> Udzur Haid
                             </span>
                           ) : item.effectiveStatus === 'sakit' ? (
-                            <span className="px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-semibold flex items-center gap-1 w-max">
+                            <span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 border border-blue-200 text-[11px] font-bold flex items-center gap-1 w-max">
                               <HeartPulse className="w-2.5 h-2.5" /> Sakit
                             </span>
                           ) : item.effectiveStatus === 'izin' ? (
-                            <span className="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-semibold flex items-center gap-1 w-max">
+                            <span className="px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-800 border border-indigo-200 text-[11px] font-bold flex items-center gap-1 w-max">
                               📝 Izin
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[11px] font-semibold flex items-center gap-1 w-max">
+                            <span className="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 border border-rose-200 text-[11px] font-bold flex items-center gap-1 w-max">
                               ❓ Belum Absen
                             </span>
                           )}
@@ -1280,26 +1341,26 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => handleRecordAttendance(item.student, 'tepat_waktu')}
-                              className="px-2 py-0.5 bg-emerald-700 hover:bg-emerald-600 text-white text-[11px] rounded-md font-semibold cursor-pointer"
+                              className="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] rounded-md font-bold cursor-pointer transition-colors shadow-2xs"
                             >
                               Hadir
                             </button>
                             <button
                               onClick={() => handleRecordAttendance(item.student, 'sakit')}
-                              className="px-2 py-0.5 bg-blue-700 hover:bg-blue-600 text-white text-[11px] rounded-md font-semibold cursor-pointer"
+                              className="px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white text-[11px] rounded-md font-bold cursor-pointer transition-colors shadow-2xs"
                             >
                               Sakit
                             </button>
                             <button
                               onClick={() => handleRecordAttendance(item.student, 'izin')}
-                              className="px-2 py-0.5 bg-indigo-700 hover:bg-indigo-600 text-white text-[11px] rounded-md font-semibold cursor-pointer"
+                              className="px-2 py-0.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] rounded-md font-bold cursor-pointer transition-colors shadow-2xs"
                             >
                               Izin
                             </button>
                             {item.student.jenisKelamin === 'Perempuan' && (
                               <button
                                 onClick={() => handleRecordAttendance(item.student, 'haid')}
-                                className="px-2 py-0.5 bg-pink-700 hover:bg-pink-600 text-white text-[11px] rounded-md font-semibold cursor-pointer"
+                                className="px-2 py-0.5 bg-pink-600 hover:bg-pink-700 text-white text-[11px] rounded-md font-bold cursor-pointer transition-colors shadow-2xs"
                               >
                                 Haid
                               </button>
@@ -1321,9 +1382,9 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
         {activeTab === 'rekap' && (
           <div className="space-y-3">
             {/* Rekap 5 Waktu Sholat Hari Ini */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-lg">
-              <h3 className="font-bold text-white text-base mb-3 flex items-center gap-1.5">
-                <BookOpen className="w-4 h-4 text-emerald-400" />
+            <div className="bg-white border border-emerald-100/90 rounded-2xl p-3.5 sm:p-4 shadow-sm">
+              <h3 className="font-bold text-emerald-950 text-base mb-3 flex items-center gap-1.5">
+                <BookOpen className="w-4 h-4 text-emerald-700" />
                 Matriks Kehadiran 5 Waktu Sholat ({formatIndoDate(selectedDate)})
               </h3>
 
@@ -1340,11 +1401,11 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                   return (
                     <div
                       key={pKey}
-                      className="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex flex-col justify-between"
+                      className="bg-emerald-50/50 border border-emerald-200/80 rounded-xl p-3 flex flex-col justify-between"
                     >
                       <div>
-                        <div className="text-[10px] text-slate-400 font-serif">{slot.arabicLabel}</div>
-                        <div className="font-bold text-white text-sm capitalize mt-0.5">
+                        <div className="text-[11px] text-emerald-800 font-serif font-bold">{slot.arabicLabel}</div>
+                        <div className="font-bold text-slate-900 text-sm capitalize mt-0.5">
                           {slot.label}
                         </div>
                         <div className="text-[10.5px] text-slate-500 font-mono mt-0.5">
@@ -1352,18 +1413,18 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
                         </div>
                       </div>
 
-                      <div className="mt-3 pt-2 border-t border-slate-800/80 space-y-1 text-xs">
-                        <div className="flex justify-between text-slate-300">
+                      <div className="mt-3 pt-2 border-t border-emerald-200/60 space-y-1 text-xs">
+                        <div className="flex justify-between text-slate-600">
                           <span>🟢 Tepat:</span>
-                          <span className="font-bold text-emerald-400">{tepat}</span>
+                          <span className="font-bold text-emerald-700">{tepat}</span>
                         </div>
-                        <div className="flex justify-between text-slate-300">
+                        <div className="flex justify-between text-slate-600">
                           <span>🟡 Telat:</span>
-                          <span className="font-bold text-amber-400">{telat}</span>
+                          <span className="font-bold text-amber-700">{telat}</span>
                         </div>
-                        <div className="flex justify-between font-bold text-white pt-1 border-t border-slate-800">
+                        <div className="flex justify-between font-bold text-slate-900 pt-1 border-t border-emerald-200/60">
                           <span>Hadir:</span>
-                          <span className="text-emerald-300">{total} Santri</span>
+                          <span className="text-emerald-800">{total} Santri</span>
                         </div>
                       </div>
                     </div>
@@ -1373,18 +1434,18 @@ _Sistem Presensi Sholat Berjamaah - SMP-SMA Tahfidz Al-Qur\'an_`;
             </div>
 
             {/* Quick Share to WhatsApp CTA */}
-            <div className="bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 border border-emerald-500/30 rounded-2xl p-3.5 sm:p-4 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 border border-emerald-700 rounded-2xl p-3.5 sm:p-4 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3 text-white">
               <div>
                 <h4 className="font-bold text-white text-sm">Bagikan Laporan Sholat ke Grup Ustadz & Musyrif</h4>
-                <p className="text-[11px] text-emerald-200/70 mt-0.5">
+                <p className="text-[11px] text-emerald-100/90 mt-0.5">
                   Salin teks laporan rapi untuk koordinasi pengasuhan santri.
                 </p>
               </div>
               <button
                 onClick={handleCopyReport}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
+                className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-emerald-950 font-bold text-xs rounded-xl shadow-md transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
               >
-                {copiedState ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                {copiedState ? <Check className="w-3.5 h-3.5 text-emerald-950" /> : <Copy className="w-3.5 h-3.5" />}
                 {copiedState ? 'Laporan Disalin!' : 'Salin Format Laporan WA'}
               </button>
             </div>

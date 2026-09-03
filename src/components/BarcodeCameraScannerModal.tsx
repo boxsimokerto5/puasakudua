@@ -19,53 +19,86 @@ export const BarcodeCameraScannerModal: React.FC<BarcodeCameraScannerModalProps>
   const [lastScanned, setLastScanned] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState<number>(0);
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const lastScannedTimeRef = useRef<number>(0);
+  const onScanSuccessRef = useRef(onScanSuccess);
   const qrRegionId = 'barcode-camera-reader-region';
 
   useEffect(() => {
-    if (!isOpen) return;
+    onScanSuccessRef.current = onScanSuccess;
+  });
+
+  useEffect(() => {
+    const safeStop = async (scanner: Html5Qrcode | null) => {
+      if (!scanner) return;
+      try {
+        if (scanner.isScanning) {
+          await scanner.stop();
+        }
+      } catch {
+        // Safe ignore
+      }
+      try {
+        scanner.clear();
+      } catch {
+        // Safe ignore
+      }
+    };
+
+    if (!isOpen) {
+      if (scannerRef.current) {
+        const inst = scannerRef.current;
+        scannerRef.current = null;
+        safeStop(inst);
+      }
+      return;
+    }
 
     let isMounted = true;
-    let isStartingScanner = true;
     setIsStarting(true);
     setScannerError(null);
-
-    const html5QrCode = new Html5Qrcode(qrRegionId);
-    scannerRef.current = html5QrCode;
+    let localScanner: Html5Qrcode | null = null;
 
     const startScanner = async () => {
+      await new Promise((r) => setTimeout(r, 120));
+      if (!isMounted) return;
+
+      const el = document.getElementById(qrRegionId);
+      if (!el) return;
+
       try {
+        localScanner = new Html5Qrcode(qrRegionId);
+        scannerRef.current = localScanner;
+
         const config = {
           fps: 15,
           qrbox: { width: 280, height: 180 },
           aspectRatio: 1.333333,
         };
 
-        await html5QrCode.start(
+        await localScanner.start(
           { facingMode: 'environment' },
           config,
           (decodedText) => {
+            const now = Date.now();
+            if (now - lastScannedTimeRef.current < 1200) return;
+            lastScannedTimeRef.current = now;
+
             if (isMounted) {
+              playScanSuccessSound();
               setLastScanned(decodedText);
-              onScanSuccess(decodedText);
+              onScanSuccessRef.current(decodedText);
             }
           },
-          () => {
-            // ignore scan frame errors
-          }
+          () => {}
         );
 
-        isStartingScanner = false;
         if (isMounted) {
           setIsStarting(false);
-        } else {
-          // If unmounted while starting was resolving, stop safely
-          if (html5QrCode.isScanning) {
-            html5QrCode.stop().then(() => html5QrCode.clear()).catch(() => {});
-          }
+        } else if (localScanner) {
+          await safeStop(localScanner);
         }
       } catch (err: unknown) {
         console.error('Camera Scanner error:', err);
-        isStartingScanner = false;
         if (isMounted) {
           setIsStarting(false);
           const errMsg = String(err || '');
@@ -73,6 +106,8 @@ export const BarcodeCameraScannerModal: React.FC<BarcodeCameraScannerModalProps>
             setScannerError(
               'Akses kamera diblokir oleh browser. Silakan klik ikon gembok / kamera di bar alamat browser Anda, pilih "Izinkan (Allow)" kamera, lalu klik tombol Coba Lagi di bawah.'
             );
+          } else if (errMsg.includes('Cannot transition')) {
+            // Safe ignore
           } else {
             setScannerError(
               'Gagal mengakses kamera perangkat. Pastikan perangkat memiliki kamera yang terhubung atau gunakan Barcode Scanner USB / Input manual.'
@@ -82,46 +117,18 @@ export const BarcodeCameraScannerModal: React.FC<BarcodeCameraScannerModalProps>
       }
     };
 
-    // Give DOM time to mount qrRegionId
-    const timer = setTimeout(() => {
-      if (isMounted) {
-        startScanner();
-      }
-    }, 150);
+    startScanner();
 
     return () => {
       isMounted = false;
-      clearTimeout(timer);
-
-      const scanner = scannerRef.current;
-      if (scanner) {
-        try {
-          if (scanner.isScanning) {
-            scanner
-              .stop()
-              .then(() => {
-                try {
-                  scanner.clear();
-                } catch {
-                  // ignore clear error
-                }
-              })
-              .catch((e) => {
-                console.log('Safe cleanup ignore:', e);
-              });
-          } else if (!isStartingScanner) {
-            try {
-              scanner.clear();
-            } catch {
-              // ignore
-            }
-          }
-        } catch (e) {
-          console.log('Scanner cleanup catch:', e);
-        }
+      if (localScanner) {
+        const inst = localScanner;
+        localScanner = null;
+        scannerRef.current = null;
+        safeStop(inst);
       }
     };
-  }, [isOpen, onScanSuccess, retryCount]);
+  }, [isOpen, retryCount]);
 
   if (!isOpen) return null;
 

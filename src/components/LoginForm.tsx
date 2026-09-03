@@ -73,9 +73,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   const [haidUsername, setHaidUsername] = useState('');
   const [haidPassword, setHaidPassword] = useState('');
 
-  // Sholat login credentials
-  const [sholatUsername, setSholatUsername] = useState('sholat');
-  const [sholatPassword, setSholatPassword] = useState('istiqomah');
+  // Sholat login credentials (dikosongkan agar terproteksi dan tidak sembarang orang masuk)
+  const [sholatUsername, setSholatUsername] = useState('');
+  const [sholatPassword, setSholatPassword] = useState('');
 
   const [error, setError] = useState<string | null>(propError || null);
 
@@ -384,6 +384,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               type="button"
               onClick={() => {
                 setError(null);
+                setSholatUsername('');
+                setSholatPassword('');
                 setLoginMode('sholat');
               }}
               className="w-full py-2 px-3 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-all flex items-center justify-center gap-2"
@@ -445,6 +447,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             type="button"
             onClick={() => {
               setError(null);
+              setSholatUsername('');
+              setSholatPassword('');
               setLoginMode('main');
             }}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-800/80 hover:bg-slate-750 text-emerald-300 border border-emerald-600/40 transition-all cursor-pointer shadow-xs active:scale-95"
@@ -1000,6 +1004,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               type="button"
               onClick={() => {
                 setError(null);
+                setSholatUsername('');
+                setSholatPassword('');
                 setLoginMode('sholat');
               }}
               className="w-full py-2 px-2.5 rounded-xl text-[11.5px] font-black bg-gradient-to-r from-[#064e3b] via-[#047857] to-[#0f766e] hover:from-[#065f46] hover:via-[#059669] hover:to-[#115e59] text-emerald-100 border border-emerald-400/60 shadow-[0_0_16px_rgba(16,185,129,0.25)] transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"

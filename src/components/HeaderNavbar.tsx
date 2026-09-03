@@ -332,7 +332,11 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
                   </span>
                 </div>
                 <p className="hidden sm:block text-[10.5px] text-amber-200/90 font-medium -mt-0.5 truncate" title={displaySchoolName}>
-                  {isHaidRole ? 'Portal Pencatatan Haid & Suci Santriwati' : displaySchoolName}
+                  {isHaidRole
+                    ? 'Portal Pencatatan Haid & Suci Santriwati'
+                    : isSholatRole || activeAdminTab === 'sholat'
+                    ? 'Presensi Sholat Berjamaah 5 Waktu'
+                    : displaySchoolName}
                 </p>
               </div>
             </div>

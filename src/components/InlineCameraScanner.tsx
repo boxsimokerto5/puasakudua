@@ -23,32 +23,65 @@ export const InlineCameraScanner: React.FC<InlineCameraScannerProps> = ({
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const lastScannedTimeRef = useRef<number>(0);
+  const onScanSuccessRef = useRef(onScanSuccess);
 
   useEffect(() => {
-    if (!isActive) return;
+    onScanSuccessRef.current = onScanSuccess;
+  });
+
+  useEffect(() => {
+    const safeStop = async (scanner: Html5Qrcode | null) => {
+      if (!scanner) return;
+      try {
+        if (scanner.isScanning) {
+          await scanner.stop();
+        }
+      } catch {
+        // Safe ignore
+      }
+      try {
+        scanner.clear();
+      } catch {
+        // Safe ignore
+      }
+    };
+
+    if (!isActive) {
+      if (scannerRef.current) {
+        const inst = scannerRef.current;
+        scannerRef.current = null;
+        safeStop(inst);
+      }
+      return;
+    }
 
     let isMounted = true;
-    let isStartingScanner = true;
     setIsStarting(true);
     setScannerError(null);
-
-    const html5QrCode = new Html5Qrcode(scannerId);
-    scannerRef.current = html5QrCode;
+    let localScanner: Html5Qrcode | null = null;
 
     const startScanner = async () => {
+      await new Promise((r) => setTimeout(r, 120));
+      if (!isMounted) return;
+
+      const el = document.getElementById(scannerId);
+      if (!el) return;
+
       try {
+        localScanner = new Html5Qrcode(scannerId);
+        scannerRef.current = localScanner;
+
         const config = {
-          fps: 12, // Smooth, low CPU/GPU usage
+          fps: 12,
           qrbox: { width: 220, height: 160 },
           aspectRatio: 1.333333,
         };
 
-        await html5QrCode.start(
+        await localScanner.start(
           { facingMode: facingMode },
           config,
           (decodedText) => {
             const now = Date.now();
-            // Prevent duplicate triggers within 1.2s
             if (now - lastScannedTimeRef.current < 1200) {
               return;
             }
@@ -63,30 +96,26 @@ export const InlineCameraScanner: React.FC<InlineCameraScannerProps> = ({
                   // ignore
                 }
               }
-              onScanSuccess(decodedText);
+              onScanSuccessRef.current(decodedText);
             }
           },
-          () => {
-            // frame scan ignore
-          }
+          () => {}
         );
 
-        isStartingScanner = false;
         if (isMounted) {
           setIsStarting(false);
-        } else {
-          if (html5QrCode.isScanning) {
-            html5QrCode.stop().then(() => html5QrCode.clear()).catch(() => {});
-          }
+        } else if (localScanner) {
+          await safeStop(localScanner);
         }
       } catch (err: unknown) {
         console.error('Inline Camera error:', err);
-        isStartingScanner = false;
         if (isMounted) {
           setIsStarting(false);
           const errMsg = String(err || '');
           if (errMsg.includes('NotAllowedError') || errMsg.includes('Permission denied')) {
             setScannerError('Akses kamera diblokir. Izinkan izin kamera di browser Anda.');
+          } else if (errMsg.includes('Cannot transition')) {
+            // Safe ignore
           } else {
             setScannerError('Kamera tidak dapat diakses atau sedang digunakan aplikasi lain.');
           }
@@ -94,43 +123,18 @@ export const InlineCameraScanner: React.FC<InlineCameraScannerProps> = ({
       }
     };
 
-    const timer = setTimeout(() => {
-      if (isMounted) {
-        startScanner();
-      }
-    }, 100);
+    startScanner();
 
     return () => {
       isMounted = false;
-      clearTimeout(timer);
-
-      const scanner = scannerRef.current;
-      if (scanner) {
-        try {
-          if (scanner.isScanning) {
-            scanner
-              .stop()
-              .then(() => {
-                try {
-                  scanner.clear();
-                } catch {
-                  // ignore
-                }
-              })
-              .catch(() => {});
-          } else if (!isStartingScanner) {
-            try {
-              scanner.clear();
-            } catch {
-              // ignore
-            }
-          }
-        } catch {
-          // ignore
-        }
+      if (localScanner) {
+        const inst = localScanner;
+        localScanner = null;
+        scannerRef.current = null;
+        safeStop(inst);
       }
     };
-  }, [isActive, onScanSuccess, facingMode, scannerId]);
+  }, [isActive, facingMode, scannerId]);
 
   if (!isActive) return null;
 

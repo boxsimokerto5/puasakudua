@@ -735,7 +735,8 @@ export default function App() {
             {adminSettings.showTopBanner !== false &&
               activeAdminTab !== 'catat_haid' &&
               activeAdminTab !== 'daftar_haid' &&
-              activeAdminTab !== 'daftar_suci' && (
+              activeAdminTab !== 'daftar_suci' &&
+              activeAdminTab !== 'sholat' && (
                 <SlimBannerCarousel
                   onOpenCalendar={() => setActiveAdminTab('calendar')}
                   onOpenWisdom={() => setShowWisdomModal(true)}
@@ -745,7 +746,7 @@ export default function App() {
                 />
               )}
 
-            {/* Live Ramadan Prayer Times & Imsakiyah Banner Card (Hidden on Admin, Ceklist, Form Input, Raport, Calendar, Catat Haid, Daftar Haid, and Daftar Suci for a clean focused view) */}
+            {/* Live Ramadan Prayer Times & Imsakiyah Banner Card (Hidden on Admin, Ceklist, Form Input, Raport, Calendar, Catat Haid, Daftar Haid, Daftar Suci, and Sholat for a clean focused view) */}
             {activeAdminTab !== 'admin' &&
               activeAdminTab !== 'calendar' &&
               activeAdminTab !== 'input' &&
@@ -753,7 +754,8 @@ export default function App() {
               activeAdminTab !== 'checker' &&
               activeAdminTab !== 'catat_haid' &&
               activeAdminTab !== 'daftar_haid' &&
-              activeAdminTab !== 'daftar_suci' && (
+              activeAdminTab !== 'daftar_suci' &&
+              activeAdminTab !== 'sholat' && (
                 <PrayerTimeBannerCard
                   onOpenModal={() => setShowPrayerModal(true)}
                   onOpenSurahsModal={() => handleOpenSurahsModal('juz_amma')}
