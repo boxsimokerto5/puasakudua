@@ -6,6 +6,8 @@ import { DormCardModal } from './DormCardModal';
 import { BarcodeCameraScannerModal } from './BarcodeCameraScannerModal';
 import { BlacklistCardModal } from './BlacklistCardModal';
 import { validateScannedCard } from '../utils/cardSecurity';
+import { isStudentHaidOnDate } from '../utils/fiqhHaid';
+import { HaidFastingWarningModal } from './HaidFastingWarningModal';
 import {
   CheckCircle2,
   Search,
@@ -92,6 +94,11 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
     scannedVersion: number;
     activeVersion: number;
   } | null>(null);
+  const [haidAlert, setHaidAlert] = useState<{
+    student: Student;
+    record?: HaidRecord;
+    dayCount: number;
+  } | null>(null);
   
   const isLocked = Boolean(activeSession.isLocked);
   const isReadOnly = isLocked && !isAdmin;
@@ -140,6 +147,31 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
         alert('Sesi ini terkunci. Tidak dapat menginput data.');
         return;
       }
+
+      // Check if student is in Haid on active session date
+      const haidCheck = isStudentHaidOnDate(foundStudent.id, haidRecords, activeSession.date);
+      if (haidCheck.isHaid) {
+        playScanErrorSound();
+        setHaidAlert({
+          student: foundStudent,
+          record: haidCheck.record,
+          dayCount: haidCheck.dayCount,
+        });
+        setScanToast({
+          studentName: foundStudent.nama,
+          studentClass: foundStudent.kelas,
+          studentNik: foundStudent.nik,
+          studentPhoto: foundStudent.foto,
+          gender: foundStudent.jenisKelamin,
+          errorMessage: `⛔ Tidak dapat input puasa: Santriwati terindikasi sedang Haid (Hari ke-${haidCheck.dayCount}).`,
+          time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+          isError: true,
+        });
+        setTimeout(() => setScanToast(null), 5000);
+        setSearchQuery('');
+        return;
+      }
+
       onUpdateRecord(foundStudent.id, 'berpuasa');
       playScanSuccessSound();
       const verSuffix = valResult.activeVersion > 1 ? ` (V${valResult.activeVersion})` : '';
@@ -166,7 +198,7 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
       });
       setTimeout(() => setScanToast(null), 4000);
     }
-  }, [students, isReadOnly, onUpdateRecord]);
+  }, [students, isReadOnly, onUpdateRecord, haidRecords, activeSession.date]);
 
   // Handle enter key in search field (USB Barcode Scanner automatically sends Enter after scanning)
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -280,20 +312,44 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
   const handleMarkPuasaFromSuggest = (studentId: number) => {
     if (isReadOnly) return;
     const foundStudent = students.find((s) => s.id === studentId);
-    onUpdateRecord(studentId, 'berpuasa');
-    playQuickChirpSound();
-    if (foundStudent) {
+    if (!foundStudent) return;
+
+    // Check if student is in Haid on active session date
+    const haidCheck = isStudentHaidOnDate(studentId, haidRecords, activeSession.date);
+    if (haidCheck.isHaid) {
+      playScanErrorSound();
+      setHaidAlert({
+        student: foundStudent,
+        record: haidCheck.record,
+        dayCount: haidCheck.dayCount,
+      });
       setScanToast({
         studentName: foundStudent.nama,
         studentClass: foundStudent.kelas,
         studentNik: foundStudent.nik,
         studentPhoto: foundStudent.foto,
         gender: foundStudent.jenisKelamin,
+        errorMessage: `⛔ Tidak dapat input puasa: Santriwati terindikasi sedang Haid (Hari ke-${haidCheck.dayCount}).`,
         time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-        isError: false,
+        isError: true,
       });
-      setTimeout(() => setScanToast(null), 4000);
+      setTimeout(() => setScanToast(null), 5000);
+      setSearchQuery('');
+      return;
     }
+
+    onUpdateRecord(studentId, 'berpuasa');
+    playQuickChirpSound();
+    setScanToast({
+      studentName: foundStudent.nama,
+      studentClass: foundStudent.kelas,
+      studentNik: foundStudent.nik,
+      studentPhoto: foundStudent.foto,
+      gender: foundStudent.jenisKelamin,
+      time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      isError: false,
+    });
+    setTimeout(() => setScanToast(null), 4000);
     setSearchQuery('');
     if (searchInputRef.current) {
       searchInputRef.current.focus();
@@ -303,6 +359,19 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
   // Toggle fasting status from search suggestion
   const handleToggleStatusFromSuggest = (studentId: number, currentStatus: FastingStatus) => {
     if (isReadOnly) return;
+    if (currentStatus !== 'berpuasa') {
+      const foundStudent = students.find((s) => s.id === studentId);
+      const haidCheck = isStudentHaidOnDate(studentId, haidRecords, activeSession.date);
+      if (haidCheck.isHaid && foundStudent) {
+        playScanErrorSound();
+        setHaidAlert({
+          student: foundStudent,
+          record: haidCheck.record,
+          dayCount: haidCheck.dayCount,
+        });
+        return;
+      }
+    }
     const newStatus: FastingStatus = currentStatus === 'berpuasa' ? 'belum_diisi' : 'berpuasa';
     onUpdateRecord(studentId, newStatus);
     playQuickChirpSound();
@@ -744,12 +813,17 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
                       const record = activeSession.records[s.id];
                       const status = record?.status || 'belum_diisi';
                       const isFasting = status === 'berpuasa';
+                      const haidCheck = isStudentHaidOnDate(s.id, haidRecords, activeSession.date);
 
                       return (
                         <div
                           key={s.id}
                           className={`p-2.5 sm:p-3 transition-colors flex items-center justify-between gap-2 ${
-                            isFasting ? 'bg-emerald-50/70 hover:bg-emerald-50' : 'hover:bg-gray-50'
+                            isFasting
+                              ? 'bg-emerald-50/70 hover:bg-emerald-50'
+                              : haidCheck.isHaid
+                              ? 'bg-rose-50/60 hover:bg-rose-50'
+                              : 'hover:bg-gray-50'
                           }`}
                         >
                           <div
@@ -766,17 +840,24 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
                               className={`w-6 h-6 rounded-md font-bold text-[11px] flex items-center justify-center shrink-0 ${
                                 isFasting
                                   ? 'bg-emerald-600 text-white'
+                                  : haidCheck.isHaid
+                                  ? 'bg-rose-500 text-white'
                                   : 'bg-gray-100 text-gray-700'
                               }`}
                             >
                               {s.no}
                             </div>
                             <div className="min-w-0">
-                              <div className="flex items-center gap-1.5">
+                              <div className="flex items-center gap-1.5 flex-wrap">
                                 <p className="font-bold text-gray-900 text-xs truncate">{s.nama}</p>
                                 {isFasting && (
                                   <span className="px-1.5 py-0.2 rounded text-[9.5px] font-extrabold bg-emerald-600 text-white shrink-0">
                                     ✓ Puasa
+                                  </span>
+                                )}
+                                {haidCheck.isHaid && (
+                                  <span className="px-1.5 py-0.2 rounded text-[9.5px] font-extrabold bg-rose-100 text-rose-800 border border-rose-200 shrink-0">
+                                    🩸 Haid (H-{haidCheck.dayCount})
                                   </span>
                                 )}
                               </div>
@@ -810,10 +891,24 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
                                 onClick={() => handleMarkPuasaFromSuggest(s.id)}
                                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
                                   isReadOnly ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
-                                } bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs`}
+                                } ${
+                                  haidCheck.isHaid
+                                    ? 'bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300'
+                                    : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                                } shadow-xs`}
+                                title={haidCheck.isHaid ? 'Periksa Peringatan Haid' : 'Tandai Puasa'}
                               >
-                                <Plus className="w-3 h-3" />
-                                <span>Tandai</span>
+                                {haidCheck.isHaid ? (
+                                  <>
+                                    <ShieldAlert className="w-3 h-3 text-rose-700" />
+                                    <span>Haid</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Plus className="w-3 h-3" />
+                                    <span>Tandai</span>
+                                  </>
+                                )}
                               </button>
                             )}
                           </div>
@@ -1163,6 +1258,33 @@ export const FastingInputterView: React.FC<FastingInputterViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* Haid Fasting Warning Modal */}
+      <HaidFastingWarningModal
+        isOpen={Boolean(haidAlert)}
+        onClose={() => setHaidAlert(null)}
+        student={haidAlert?.student || null}
+        haidRecord={haidAlert?.record}
+        dayCount={haidAlert?.dayCount || 1}
+        sessionDate={activeSession.date}
+        onMarkAsHalangan={(studentId) => {
+          onUpdateRecord(studentId, 'halangan', 'Udzur Syar\'i: Sedang masa haid');
+          playQuickChirpSound();
+          if (haidAlert?.student) {
+            setScanToast({
+              studentName: haidAlert.student.nama,
+              studentClass: haidAlert.student.kelas,
+              studentNik: haidAlert.student.nik,
+              studentPhoto: haidAlert.student.foto,
+              gender: haidAlert.student.jenisKelamin,
+              errorMessage: `✓ Berhasil ditandai: "Udzur / Halangan" (Sedang Haid Hari ke-${haidAlert.dayCount})`,
+              time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+              isError: false,
+            });
+            setTimeout(() => setScanToast(null), 4500);
+          }
+        }}
+      />
 
       {/* Camera Barcode Scanner Modal */}
       <BarcodeCameraScannerModal

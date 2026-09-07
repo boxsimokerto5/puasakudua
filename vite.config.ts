@@ -60,7 +60,19 @@ export default defineConfig(() => {
       dedupe: ['react', 'react-dom'],
     },
     optimizeDeps: {
-      include: ['react', 'react-dom', 'lucide-react', '@supabase/supabase-js'],
+      include: [
+        'react',
+        'react-dom',
+        'react-dom/client',
+        'react/jsx-runtime',
+        'react/jsx-dev-runtime',
+        'lucide-react',
+        '@supabase/supabase-js',
+        'qrcode',
+        'jspdf',
+        'jspdf-autotable',
+        'html5-qrcode',
+      ],
     },
     build: {
       target: 'es2020',

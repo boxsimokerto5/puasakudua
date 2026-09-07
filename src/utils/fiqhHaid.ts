@@ -217,6 +217,44 @@ export function getActiveHaidRecordForStudent(studentId: number, records: HaidRe
 }
 
 /**
+ * Check if a student is currently in Haid on a specific date (or actively in haid)
+ */
+export function isStudentHaidOnDate(
+  studentId: number,
+  records: HaidRecord[],
+  targetDateStr?: string
+): { isHaid: boolean; record?: HaidRecord; dayCount: number } {
+  const targetDate = targetDateStr || getTodayDateStr();
+
+  for (const r of records) {
+    if (r.studentId !== studentId) continue;
+
+    // Case 1: Currently active haid
+    if (r.status === 'haid_aktif') {
+      const days = calculateDaysBetween(r.startDate, targetDate);
+      // Valid haid within 1-15 days or starting on or before target date
+      if (r.startDate <= targetDate && days <= FIQH_CONSTANTS.MAX_HAID_DAYS + 1) {
+        return { isHaid: true, record: r, dayCount: days };
+      }
+      // If target date is before today but after/equal start date
+      if (r.startDate <= targetDate) {
+        return { isHaid: true, record: r, dayCount: days };
+      }
+    }
+
+    // Case 2: Completed haid where target date falls between start and end date
+    if (r.status === 'selesai_mandi' && r.endDate) {
+      if (targetDate >= r.startDate && targetDate <= r.endDate) {
+        const days = calculateDaysBetween(r.startDate, targetDate);
+        return { isHaid: true, record: r, dayCount: days };
+      }
+    }
+  }
+
+  return { isHaid: false, dayCount: 0 };
+}
+
+/**
  * Helper to get latest completed haid record for a student
  */
 export function getLatestCompletedHaidRecord(studentId: number, records: HaidRecord[]): HaidRecord | undefined {

@@ -32,7 +32,7 @@ import { FastingSession, Student, UserSession } from '../types';
 interface CalendarViewProps {
   sessions: FastingSession[];
   students: Student[];
-  user: UserSession;
+  user?: UserSession | null;
   activeSessionId: string;
   onSelectSession: (id: string) => void;
   onCreateSessionForDate: (dateStr: string, title: string) => void;
@@ -550,7 +550,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   </button>
                 </div>
               ) : (
-                user.role === 'admin' && (
+                user?.role === 'admin' && (
                   <button
                     type="button"
                     onClick={handleCreateSession}
@@ -639,7 +639,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       <span className="font-bold text-amber-950">{ev.title}</span>
                       {ev.time && <span className="text-slate-500 ml-2 text-[11px]">({ev.time})</span>}
                     </div>
-                    {(user.role === 'admin' || user.role === 'penginput') && (
+                    {(user?.role === 'admin' || user?.role === 'penginput') && (
                       <button
                         type="button"
                         onClick={() => handleDeleteEvent(ev.id)}

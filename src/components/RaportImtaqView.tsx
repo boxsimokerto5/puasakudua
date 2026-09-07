@@ -35,7 +35,7 @@ import {
 interface RaportImtaqViewProps {
   students: Student[];
   sessions: Record<string, FastingSession>;
-  user: UserSession;
+  user?: UserSession | null;
   onLogout?: () => void;
 }
 
@@ -53,7 +53,7 @@ export const RaportImtaqView: React.FC<RaportImtaqViewProps> = ({
   const [selectedStudentStats, setSelectedStudentStats] = useState<StudentImtaqStats | null>(null);
 
   // Custom Signature Names for PDF
-  const [pembinaName, setPembinaName] = useState<string>(user.name || 'Wali Asuh / Pembina Ibadah');
+  const [pembinaName, setPembinaName] = useState<string>(user?.name || 'Wali Asuh / Pembina Ibadah');
   const [kepalaName, setKepalaName] = useState<string>('Kepala Asrama SRT 1 Kediri');
 
   // Calculate all Imtaq statistics
