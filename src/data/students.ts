@@ -36,8 +36,15 @@ export function getStoredStudents(): Student[] {
     }
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      memoryStudentsCache = parsed;
-      return parsed;
+      // Pastikan santri yang telah keluar (Muhamad Javier Risqullah) otomatis terfilter dari storage lama
+      const cleaned = parsed.filter(
+        (s: Student) => s.nik !== '3506142709120004' && !s.nama?.toLowerCase().includes('javier')
+      );
+      if (cleaned.length !== parsed.length) {
+        localStorage.setItem(STUDENTS_STORAGE_KEY, JSON.stringify(cleaned));
+      }
+      memoryStudentsCache = cleaned;
+      return cleaned;
     }
   } catch (e) {
     console.error('Error reading stored students:', e);
