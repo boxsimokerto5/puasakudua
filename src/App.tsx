@@ -731,7 +731,7 @@ export default function App() {
           />
 
           {/* Main Container */}
-          <main className="max-w-7xl w-full mx-auto px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3.5 flex-1 space-y-3 sm:space-y-4">
+          <main className="max-w-7xl w-full mx-auto px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3.5 flex-1 space-y-3 sm:space-y-4 pb-[max(1.5rem,calc(env(safe-area-inset-bottom,0px)+1.5rem))]">
             {/* Slim Sliding Banner Carousel (Ramadan, Hadith, Activity Highlights) */}
             {adminSettings.showTopBanner !== false &&
               activeAdminTab !== 'catat_haid' &&
@@ -989,7 +989,7 @@ export default function App() {
           )}
 
           {/* Clean Footer */}
-          <footer className={`${activeTheme.colors.footerBgClass} text-white/80 text-xs py-5 border-t border-white/10 mt-12 transition-colors duration-300`}>
+          <footer className={`${activeTheme.colors.footerBgClass} text-white/80 text-xs py-5 pb-[max(1.25rem,calc(env(safe-area-inset-bottom,0px)+1.25rem))] border-t border-white/10 mt-12 transition-colors duration-300`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
               <div className="flex items-center gap-2">
                 <img src="/assets/logo.svg" alt="Logo" className="w-5 h-5 object-contain" />

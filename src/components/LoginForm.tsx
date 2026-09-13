@@ -222,7 +222,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   // =========================================================================
   if (loginMode === 'haid') {
     return (
-      <div className="relative min-h-screen flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#fff0f5] via-[#ffe4e9] to-[#fce7f3] text-slate-800 overflow-hidden select-none">
+      <div className="relative min-h-screen flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8 pt-[max(2.5rem,calc(env(safe-area-inset-top,0px)+1.5rem))] pb-[max(2.5rem,calc(env(safe-area-inset-bottom,0px)+1.5rem))] bg-gradient-to-b from-[#fff0f5] via-[#ffe4e9] to-[#fce7f3] text-slate-800 overflow-hidden select-none">
         {/* Soft Pink Glow & Floating Animation */}
         <style>{`
           @keyframes pinkFloatSoft {
@@ -415,7 +415,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   // =========================================================================
   if (loginMode === 'sholat') {
     return (
-      <div className="relative min-h-screen flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#021814] via-[#042d25] to-[#01140e] text-slate-100 overflow-hidden select-none">
+      <div className="relative min-h-screen flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8 pt-[max(2.5rem,calc(env(safe-area-inset-top,0px)+1.5rem))] pb-[max(2.5rem,calc(env(safe-area-inset-bottom,0px)+1.5rem))] bg-gradient-to-b from-[#021814] via-[#042d25] to-[#01140e] text-slate-100 overflow-hidden select-none">
         {/* Starry Ambiance */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
           <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
@@ -557,7 +557,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   // VIEW 1: HALAMAN LOGIN UTAMA (TEMA RAMADHAN EMERALD & GOLD)
   // =========================================================================
   return (
-    <div className="relative min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#021c15] via-[#033123] to-[#01140e] text-white overflow-hidden select-none">
+    <div className="relative min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-[max(3rem,calc(env(safe-area-inset-top,0px)+2rem))] pb-[max(3rem,calc(env(safe-area-inset-bottom,0px)+2rem))] bg-gradient-to-b from-[#021c15] via-[#033123] to-[#01140e] text-white overflow-hidden select-none">
       {/* Dynamic Keyframes for Login Ramadan Sky & Animated Walking Camel */}
       <style>{`
         @keyframes loginTwinkle {
