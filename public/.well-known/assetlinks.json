@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.puasaku.srt1kediri",
+      "sha256_cert_fingerprints": [
+        "DE:50:EB:D9:5B:9B:31:60:07:D6:4B:32:C5:E2:31:06:B4:9C:62:F5:40:F1:0E:40:A3:00:D1:41:E2:C5:42:26"
+      ]
+    }
+  }
+]
