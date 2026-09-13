@@ -35,9 +35,19 @@ jobs:
       - name: 🤖 Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: 📦 Install Bubblewrap CLI (Resmi Google Chrome)
+      - name: 📦 Install Bubblewrap CLI
         run: |
           npm install -g @bubblewrap/cli
+
+      - name: ⚙️ Konfigurasi Path Bubblewrap (Non-Interaktif)
+        run: |
+          mkdir -p ~/.bubblewrap
+          cat << EOF > ~/.bubblewrap/config.json
+          {
+            "jdkPath": "$JAVA_HOME",
+            "androidSdkPath": "$ANDROID_HOME"
+          }
+          EOF
 
       - name: 🔑 Persiapkan Keystore Release
         id: setup_keystore
@@ -83,12 +93,11 @@ jobs:
           ]
           EOF
 
-      - name: 🚀 Inisialisasi & Build TWA (Google Bubblewrap)
+      - name: 🚀 Inisialisasi & Build TWA
         run: |
           mkdir -p twa-app
           cd twa-app
 
-          # Buat konfigurasi twa-manifest.json resmi
           cat << EOF > twa-manifest.json
           {
             "packageId": "com.puasaku.srt1kediri",
@@ -128,11 +137,11 @@ jobs:
           }
           EOF
 
-          # Generate proyek Android
-          bubblewrap build --manifest=twa-manifest.json --signingKeyPath="$KEYSTORE_FILE" --signingKeyAlias="$KEY_ALIAS" --keyPassword="$KEY_PASS" --storePassword="$STORE_PASS"
+          # Build TWA non-interaktif
+          bubblewrap build --manifest=twa-manifest.json --skipPwaValidation --signingKeyPath="$KEYSTORE_FILE" --signingKeyAlias="$KEY_ALIAS" --keyPassword="$KEY_PASS" --storePassword="$STORE_PASS"
 
           cd ..
-          
+
           # Pindahkan hasil AAB & APK ke folder output
           find twa-app -name "*.aab" -exec cp {} output-twa/PUASAKU-SRT1Kediri-PlayStore-Release.aab \;
           find twa-app -name "*.apk" -exec cp {} output-twa/PUASAKU-SRT1Kediri-Release-Signed.apk \;
