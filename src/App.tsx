@@ -730,8 +730,8 @@ export default function App() {
             onApplyUpdate={autoUpdate.applyUpdate}
           />
 
-          {/* Main Container */}
-          <main className="max-w-7xl w-full mx-auto px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3.5 flex-1 space-y-3 sm:space-y-4 pb-[max(1.5rem,calc(env(safe-area-inset-bottom,0px)+1.5rem))]">
+          {/* Main Container with dynamic responsive padding and margin to prevent edge-to-edge crowding */}
+          <main className="max-w-7xl w-full mx-auto px-4 xs:px-5 sm:px-6 lg:px-8 py-3.5 sm:py-5 flex-1 space-y-4 sm:space-y-5 pb-[max(2rem,calc(env(safe-area-inset-bottom,0px)+2rem))] transition-all duration-200">
             {/* Slim Sliding Banner Carousel (Ramadan, Hadith, Activity Highlights) */}
             {adminSettings.showTopBanner !== false &&
               activeAdminTab !== 'catat_haid' &&
