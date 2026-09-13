@@ -10,17 +10,17 @@ on:
   workflow_dispatch:
     inputs:
       host_domain:
-        description: 'Domain Host TWA (misal: puasaku.sekolahrakyat.sch.id atau domain preview)'
+        description: 'Domain Host TWA (misal: puasaku.pages.dev)'
         required: false
         default: 'ais-pre-i5tusnjnohh6qfhmyvnunv-95670230943.asia-east1.run.app'
         type: string
       version_code:
-        description: 'Android Version Code (integer, misal: 1, 2, 3...)'
+        description: 'Android Version Code (integer)'
         required: false
         default: '1'
         type: string
       version_name:
-        description: 'Android Version Name (misal: 1.0.0)'
+        description: 'Android Version Name'
         required: false
         default: '1.0.0'
         type: string
@@ -63,7 +63,6 @@ jobs:
           mkdir -p output-twa
           KEYSTORE_FILE="$RUNNER_TEMP/release.keystore"
           
-          # Cek apakah pengguna menyimpan ANDROID_KEYSTORE_BASE64 di GitHub Secrets
           if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
             echo "Menggunakan Keystore resmi dari GitHub Secrets..."
             echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > "$KEYSTORE_FILE"
@@ -87,260 +86,133 @@ jobs:
               -dname "CN=PUASAKU SRT 1 KEDIRI, OU=IT Department, O=Sekolah Rakyat 1 Kediri, L=Kediri, ST=Jawa Timur, C=ID"
           fi
 
-          # Ekstrak SHA-256 Fingerprint untuk Digital Asset Links
           echo "=========================================================="
-          echo "📋 SHA-256 CERTIFICATE FINGERPRINT UNTUK assetlinks.json:"
+          echo "📋 MENGAMBIL SHA-256 FINGERPRINT..."
           SHA256_FINGERPRINT=$(keytool -list -v -keystore "$KEYSTORE_FILE" -alias "$KEY_ALIAS" -storepass "$STORE_PASS" | grep "SHA256:" | head -n 1 | awk '{print $2}')
-          echo "$SHA256_FINGERPRINT"
+          echo "SHA256: $SHA256_FINGERPRINT"
           echo "=========================================================="
 
-          # Simpan ke environment workflow
           echo "KEYSTORE_FILE=$KEYSTORE_FILE" >> $GITHUB_ENV
           echo "KEY_ALIAS=$KEY_ALIAS" >> $GITHUB_ENV
           echo "KEY_PASS=$KEY_PASS" >> $GITHUB_ENV
           echo "STORE_PASS=$STORE_PASS" >> $GITHUB_ENV
           echo "SHA256_FINGERPRINT=$SHA256_FINGERPRINT" >> $GITHUB_ENV
 
-          # Buat file assetlinks.json siap pakai dengan fingerprint ini
-          cat <<EOF > output-twa/assetlinks.json
-[
-  {
-    "relation": ["delegate_permission/common.handle_all_urls"],
-    "target": {
-      "namespace": "android_app",
-      "package_name": "com.puasaku.srt1kediri",
-      "sha256_cert_fingerprints": [
-        "$SHA256_FINGERPRINT"
-      ]
-    }
-  }
-]
-EOF
-
-      - name: 🌐 Siapkan Template Proyek Android TWA
+      - name: 🔨 Eksekusi Build Android TWA (AAB & APK Signed)
+        env:
+          TARGET_HOST: ${{ github.event.inputs.host_domain || 'ais-pre-i5tusnjnohh6qfhmyvnunv-95670230943.asia-east1.run.app' }}
+          VERSION_CODE: ${{ github.event.inputs.version_code || '1' }}
+          VERSION_NAME: ${{ github.event.inputs.version_name || '1.0.0' }}
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
         run: |
-          TARGET_HOST="${{ github.event.inputs.host_domain || 'ais-pre-i5tusnjnohh6qfhmyvnunv-95670230943.asia-east1.run.app' }}"
-          VERSION_CODE="${{ github.event.inputs.version_code || '1' }}"
-          VERSION_NAME="${{ github.event.inputs.version_name || '1.0.0' }}"
-          
-          echo "Target Host Domain: $TARGET_HOST"
-          echo "Version Code: $VERSION_CODE | Version Name: $VERSION_NAME"
-
-          # Buat proyek Android Native TWA (menggunakan AndroidX Browser / CustomTabs & Trusted Web Activity)
+          mkdir -p output-twa
           mkdir -p twa-project/app/src/main/res/values
-          mkdir -p twa-project/app/src/main/res/mipmap-anydpi-v26
           mkdir -p twa-project/app/src/main/res/mipmap-hdpi
           mkdir -p twa-project/app/src/main/res/mipmap-mdpi
           mkdir -p twa-project/app/src/main/res/mipmap-xhdpi
           mkdir -p twa-project/app/src/main/res/mipmap-xxhdpi
           mkdir -p twa-project/app/src/main/res/mipmap-xxxhdpi
 
-          # Salin ikon dari public/android-chrome
-          cp public/android-chrome-192x192.png twa-project/app/src/main/res/mipmap-xxhdpi/ic_launcher.png || true
-          cp public/android-chrome-512x512.png twa-project/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png || true
-          cp public/android-chrome-192x192.png twa-project/app/src/main/res/mipmap-hdpi/ic_launcher.png || true
-          cp public/android-chrome-192x192.png twa-project/app/src/main/res/mipmap-mdpi/ic_launcher.png || true
-          cp public/android-chrome-192x192.png twa-project/app/src/main/res/mipmap-xhdpi/ic_launcher.png || true
+          cp public/android-chrome-192x192.png twa-project/app/src/main/res/mipmap-xxhdpi/ic_launcher.png 2>/dev/null || true
+          cp public/android-chrome-512x512.png twa-project/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png 2>/dev/null || true
 
           # 1. settings.gradle
-          cat << 'EOF' > twa-project/settings.gradle
-pluginManagement {
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-rootProject.name = "PuasakuTWA"
-include ':app'
-EOF
+          printf 'pluginManagement {\n    repositories {\n        google()\n        mavenCentral()\n        gradlePluginPortal()\n    }\n}\ndependencyResolutionManagement {\n    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)\n    repositories {\n        google()\n        mavenCentral()\n    }\n}\nrootProject.name = "PuasakuTWA"\ninclude ":app"\n' > twa-project/settings.gradle
 
-          # 2. build.gradle (Root)
-          cat << 'EOF' > twa-project/build.gradle
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.2'
-    }
-}
-EOF
+          # 2. build.gradle
+          printf 'buildscript {\n    repositories {\n        google()\n        mavenCentral()\n    }\n    dependencies {\n        classpath "com.android.tools.build:gradle:8.2.2"\n    }\n}\n' > twa-project/build.gradle
 
           # 3. app/build.gradle
-          cat << EOF > twa-project/app/build.gradle
-plugins {
-    id 'com.android.application'
-}
+          cat << 'GRADLE_EOF' > twa-project/app/build.gradle
+          plugins {
+              id 'com.android.application'
+          }
+          android {
+              namespace 'com.puasaku.srt1kediri'
+              compileSdk 34
+              defaultConfig {
+                  applicationId "com.puasaku.srt1kediri"
+                  minSdk 21
+                  targetSdk 34
+                  versionCode 1
+                  versionName "1.0.0"
+                  resValue "string", "app_name", "PUASAKU - SRT 1 KEDIRI"
+                  resValue "string", "package_name", "com.puasaku.srt1kediri"
+                  resValue "string", "host_name", "ais-pre-i5tusnjnohh6qfhmyvnunv-95670230943.asia-east1.run.app"
+                  resValue "string", "default_url", "https://ais-pre-i5tusnjnohh6qfhmyvnunv-95670230943.asia-east1.run.app/"
+                  resValue "color", "colorPrimary", "#064e3b"
+                  resValue "color", "navigationColor", "#064e3b"
+                  resValue "color", "backgroundColor", "#064e3b"
+              }
+              signingConfigs {
+                  release {
+                      storeFile file(System.getenv('KEYSTORE_FILE'))
+                      storePassword System.getenv('STORE_PASS')
+                      keyAlias System.getenv('KEY_ALIAS')
+                      keyPassword System.getenv('KEY_PASS')
+                  }
+              }
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.release
+                      minifyEnabled false
+                  }
+              }
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+          }
+          dependencies {
+              implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+              implementation 'androidx.browser:browser:1.8.0'
+          }
+          GRADLE_EOF
 
-android {
-    namespace 'com.puasaku.srt1kediri'
-    compileSdk 34
+          # 4. AndroidManifest.xml
+          cat << 'MANIFEST_EOF' > twa-project/app/src/main/AndroidManifest.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.puasaku.srt1kediri">
+              <uses-permission android:name="android.permission.INTERNET" />
+              <application
+                  android:allowBackup="true"
+                  android:icon="@mipmap/ic_launcher"
+                  android:label="@string/app_name"
+                  android:theme="@android:style/Theme.Translucent.NoTitleBar">
+                  <meta-data android:name="asset_statements" android:resource="@string/asset_statements" />
+                  <activity
+                      android:name="com.google.androidbrowserhelper.trusted.LauncherActivity"
+                      android:exported="true">
+                      <meta-data android:name="android.support.customtabs.trusted.DEFAULT_URL" android:value="@string/default_url" />
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                      <intent-filter android:autoVerify="true">
+                          <action android:name="android.intent.action.VIEW" />
+                          <category android:name="android.intent.category.DEFAULT" />
+                          <category android:name="android.intent.category.BROWSABLE" />
+                          <data android:scheme="https" android:host="@string/host_name" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          MANIFEST_EOF
 
-    defaultConfig {
-        applicationId "com.puasaku.srt1kediri"
-        minSdk 21
-        targetSdk 34
-        versionCode ${VERSION_CODE}
-        versionName "${VERSION_NAME}"
+          # 5. Asset Statements & assetlinks.json
+          echo '<resources><string name="asset_statements" translatable="false">[{\"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": {\"namespace\": \"android_app\", \"package_name\": \"com.puasaku.srt1kediri\", \"sha256_cert_fingerprints\": [\"'$SHA256_FINGERPRINT'\"]}}]</string></resources>' > twa-project/app/src/main/res/values/strings.xml
+          echo '[{"relation": ["delegate_permission/common.handle_all_urls"],"target": {"namespace": "android_app","package_name": "com.puasaku.srt1kediri","sha256_cert_fingerprints": ["'$SHA256_FINGERPRINT'"]}}]' > output-twa/assetlinks.json
 
-        resValue "string", "app_name", "PUASAKU - SRT 1 KEDIRI"
-        resValue "string", "package_name", "com.puasaku.srt1kediri"
-        resValue "string", "host_name", "${TARGET_HOST}"
-        resValue "string", "default_url", "https://${TARGET_HOST}/"
-        resValue "color", "colorPrimary", "#064e3b"
-        resValue "color", "navigationColor", "#064e3b"
-        resValue "color", "navigationDividerColor", "#00000000"
-        resValue "color", "backgroundColor", "#064e3b"
-    }
-
-    signingConfigs {
-        release {
-            storeFile file('${KEYSTORE_FILE}')
-            storePassword '${STORE_PASS}'
-            keyAlias '${KEY_ALIAS}'
-            keyPassword '${KEY_PASS}'
-        }
-    }
-
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-        debug {
-            signingConfig signingConfigs.release
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-}
-
-dependencies {
-    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
-    implementation 'androidx.browser:browser:1.8.0'
-}
-EOF
-
-          # 4. app/src/main/AndroidManifest.xml
-          cat << 'EOF' > twa-project/app/src/main/AndroidManifest.xml
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.puasaku.srt1kediri">
-
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher"
-        android:supportsRtl="true"
-        android:theme="@android:style/Theme.Translucent.NoTitleBar">
-
-        <meta-data
-            android:name="asset_statements"
-            android:resource="@string/asset_statements" />
-
-        <!-- TWA Launcher Activity Resmi Google Android Browser Helper -->
-        <activity
-            android:name="com.google.androidbrowserhelper.trusted.LauncherActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar">
-
-            <meta-data
-                android:name="android.support.customtabs.trusted.DEFAULT_URL"
-                android:value="@string/default_url" />
-
-            <meta-data
-                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR"
-                android:resource="@color/colorPrimary" />
-
-            <meta-data
-                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR"
-                android:resource="@color/navigationColor" />
-
-            <meta-data
-                android:name="android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR"
-                android:resource="@color/backgroundColor" />
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="https"
-                    android:host="@string/host_name" />
-            </intent-filter>
-        </activity>
-    </application>
-</manifest>
-EOF
-
-          # 5. app/src/main/res/values/strings.xml (Asset statements untuk Digital Asset Links)
-          cat << EOF > twa-project/app/src/main/res/values/strings.xml
-<resources>
-    <string name="asset_statements" translatable="false">
-        [{\\"relation\\": [\\"delegate_permission/common.handle_all_urls\\"], \\"target\\": {\\"namespace\\": \\"android_app\\", \\"package_name\\": \\"com.puasaku.srt1kediri\\", \\"sha256_cert_fingerprints\\": [\\"${SHA256_FINGERPRINT}\\"]}}]
-    </string>
-</resources>
-EOF
-
-          # 6. Pasang Gradle Wrapper 8.5
+          # 6. Build Gradle
           cd twa-project
-          gradle wrapper --gradle-version 8.5 || (
-            echo "Fallback menyiapkan gradle wrapper..."
-            curl -sSL "https://services.gradle.org/distributions/gradle-8.5-bin.zip" -o gradle.zip
-            unzip -q gradle.zip
-            ./gradle-8.5/bin/gradle wrapper
-            rm -rf gradle-8.5 gradle.zip
-          )
-
-      - name: 🔨 Build Android App Bundle (.aab) & APK Release (Signed)
-        run: |
-          cd twa-project
-          chmod +x gradlew
-          
-          echo "Menjalankan kompilasi Gradle untuk AAB (Play Store) & APK..."
-          export ANDROID_HOME=$ANDROID_SDK_ROOT
-          ./gradlew bundleRelease assembleRelease --no-daemon --stacktrace
-
+          curl -sSL "https://services.gradle.org/distributions/gradle-8.5-bin.zip" -o gradle.zip
+          unzip -q gradle.zip
+          ./gradle-8.5/bin/gradle bundleRelease assembleRelease --no-daemon
           cd ..
-          
-          AAB_FILE=$(find twa-project/app/build/outputs/bundle/release -name "*.aab" | head -n 1)
-          APK_FILE=$(find twa-project/app/build/outputs/apk/release -name "*.apk" | head -n 1)
-          
-          if [ -n "$AAB_FILE" ] && [ -f "$AAB_FILE" ]; then
-            cp "$AAB_FILE" output-twa/PUASAKU-SRT1Kediri-PlayStore-Release.aab
-            echo "✓ Signed AAB siap untuk Google Play Store: output-twa/PUASAKU-SRT1Kediri-PlayStore-Release.aab"
-          fi
 
-          if [ -n "$APK_FILE" ] && [ -f "$APK_FILE" ]; then
-            cp "$APK_FILE" output-twa/PUASAKU-SRT1Kediri-Release-Signed.apk
-            echo "✓ Signed APK siap untuk instalasi manual di HP: output-twa/PUASAKU-SRT1Kediri-Release-Signed.apk"
-          fi
+          find twa-project/app/build/outputs/bundle/release -name "*.aab" -exec cp {} output-twa/PUASAKU-SRT1Kediri-PlayStore-Release.aab \;
+          find twa-project/app/build/outputs/apk/release -name "*.apk" -exec cp {} output-twa/PUASAKU-SRT1Kediri-Release-Signed.apk \;
 
-          # Simpan Keystore ke zip agar aman dan bisa diunduh
           zip -j output-twa/release-keystore.zip "$KEYSTORE_FILE"
           echo "Key Alias: $KEY_ALIAS | Password: $STORE_PASS" > output-twa/keystore-info.txt
 
@@ -355,24 +227,3 @@ EOF
             output-twa/keystore-info.txt
             output-twa/release-keystore.zip
           retention-days: 30
-
-      - name: 🏷️ Buat Release GitHub (Jika Push Tag v*)
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            output-twa/PUASAKU-SRT1Kediri-PlayStore-Release.aab
-            output-twa/PUASAKU-SRT1Kediri-Release-Signed.apk
-            output-twa/assetlinks.json
-          name: Rilis TWA ${{ github.ref_name }}
-          body: |
-            ## 🚀 PUASAKU SRT 1 KEDIRI - Rilis TWA Android (Signed)
-            
-            Paket aplikasi Android resmi berbasis **Trusted Web Activity (TWA)** untuk Google Play Store.
-            
-            ### 📦 File yang Disediakan:
-            1. **`PUASAKU-SRT1Kediri-PlayStore-Release.aab`**: Unggah file ini ke **Google Play Console** (Production / Testing).
-            2. **`PUASAKU-SRT1Kediri-Release-Signed.apk`**: APK yang sudah ditandatangani untuk dites langsung di HP Android.
-            3. **`assetlinks.json`**: Letakkan di hosting web Anda pada `/.well-known/assetlinks.json`.
-          draft: false
-          prerelease: false
