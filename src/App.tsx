@@ -52,6 +52,7 @@ import { useAutoUpdate } from './hooks/useAutoUpdate';
 import { INDONESIA_CITIES, CityLocation } from './utils/prayerTimes';
 import { applyThemeToDocument, getTheme } from './utils/themeConfig';
 import { Sparkles, Cloud, CloudCheck, RefreshCw, Download } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 
 const USER_SESSION_KEY = 'sr_kediri_user_session_v1';
 const PRAYER_CITY_KEY = 'sr_kediri_prayer_city_v1';
@@ -805,6 +806,7 @@ export default function App() {
                     onSaveHaidRecord={handleSaveHaidRecord}
                     onNavigateToDaftarHaid={() => setActiveAdminTab('daftar_haid')}
                     onNavigateToDaftarSuci={() => setActiveAdminTab('daftar_suci')}
+                    onFinishHaid={handleFinishHaid}
                   />
                 ) : activeAdminTab === 'daftar_haid' ? (
                   <DaftarHaidView
@@ -874,28 +876,50 @@ export default function App() {
                   isSupabaseConnected={isCloudConnected}
                   onOpenSupabaseConfig={() => setIsSupabaseModalOpen(true)}
                 />
-              ) : activeAdminTab === 'input' ? (
-                <FastingInputterView
-                  students={students}
-                  activeSession={activeSession}
-                  haidRecords={haidRecords}
-                  onUpdateRecord={handleUpdateRecord}
-                  onBulkUpdateRecords={handleBulkUpdateRecords}
-                  onOpenStudentModal={() => setIsStudentModalOpen(true)}
-                  onOpenPhotoModal={() => handleOpenPhotoModal()}
-                  isAdmin={true}
-                  onToggleLockSession={handleToggleLockSession}
-                  onLogout={handleLogout}
-                  onUpdateStudents={handleUpdateStudents}
-                />
               ) : (
-                <FastingCheckerView
-                  students={students}
-                  activeSession={activeSession}
-                  user={user}
-                  onVerifySession={handleVerifySession}
-                  onLogout={handleLogout}
-                />
+                <AnimatePresence mode="wait" initial={false}>
+                  {activeAdminTab === 'input' ? (
+                    <motion.div
+                      key="tab-input"
+                      initial={{ opacity: 0, x: -24 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 24 }}
+                      transition={{ duration: 0.28, ease: [0.25, 0.1, 0.25, 1] }}
+                      className="w-full"
+                    >
+                      <FastingInputterView
+                        students={students}
+                        activeSession={activeSession}
+                        haidRecords={haidRecords}
+                        onUpdateRecord={handleUpdateRecord}
+                        onBulkUpdateRecords={handleBulkUpdateRecords}
+                        onOpenStudentModal={() => setIsStudentModalOpen(true)}
+                        onOpenPhotoModal={() => handleOpenPhotoModal()}
+                        isAdmin={true}
+                        onToggleLockSession={handleToggleLockSession}
+                        onLogout={handleLogout}
+                        onUpdateStudents={handleUpdateStudents}
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="tab-checker"
+                      initial={{ opacity: 0, x: 24 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -24 }}
+                      transition={{ duration: 0.28, ease: [0.25, 0.1, 0.25, 1] }}
+                      className="w-full"
+                    >
+                      <FastingCheckerView
+                        students={students}
+                        activeSession={activeSession}
+                        user={user}
+                        onVerifySession={handleVerifySession}
+                        onLogout={handleLogout}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               )
             ) : isPenginput ? (
               activeAdminTab === 'input' ? (

@@ -72,6 +72,7 @@ export default defineConfig(() => {
         'jspdf',
         'jspdf-autotable',
         'html5-qrcode',
+        'motion/react',
       ],
     },
     build: {

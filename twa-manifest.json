@@ -1,0 +1,43 @@
+{
+  "packageId": "com.puasaku.srt1kediri",
+  "host": "ais-pre-i5tusnjnohh6qfhmyvnunv-95670230943.asia-east1.run.app",
+  "name": "PUASAKU - SRT 1 KEDIRI",
+  "launcherName": "Puasaku",
+  "themeColor": "#064e3b",
+  "themeColorDark": "#022c22",
+  "navigationColor": "#064e3b",
+  "navigationColorDark": "#022c22",
+  "navigationDividerColor": "#00000000",
+  "navigationDividerColorDark": "#00000000",
+  "backgroundColor": "#064e3b",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://ais-pre-i5tusnjnohh6qfhmyvnunv-95670230943.asia-east1.run.app/android-chrome-512x512.png",
+  "maskableIconUrl": "https://ais-pre-i5tusnjnohh6qfhmyvnunv-95670230943.asia-east1.run.app/android-chrome-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./release.keystore",
+    "alias": "puasaku_key"
+  },
+  "appVersionCode": 1,
+  "appVersionName": "1.0.0",
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://ais-pre-i5tusnjnohh6qfhmyvnunv-95670230943.asia-east1.run.app/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": false
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://ais-pre-i5tusnjnohh6qfhmyvnunv-95670230943.asia-east1.run.app/"
+}

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.puasaku.srt1kediri",
+      "sha256_cert_fingerprints": [
+        "PASTE_SHA256_FINGERPRINT_HERE_MISAL_14:6D:E9:..."
+      ]
+    }
+  }
+]
